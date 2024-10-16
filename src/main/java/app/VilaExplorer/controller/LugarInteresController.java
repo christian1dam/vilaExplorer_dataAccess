@@ -7,59 +7,63 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/lugares-interes")
+@RequestMapping("/api/lugares")
 public class LugarInteresController {
 
-        @Autowired
-        private LugarInteresService lugarInteresService;
+    @Autowired
+    private LugarInteresService lugarInteresService;
 
-        @GetMapping
-        public List<LugarInteres> listarTodos() {
-            return lugarInteresService.obtenerTodos();
+    // GET all lugares
+    @GetMapping
+    public List<LugarInteres> getAllLugares() {
+        return lugarInteresService.findAll();
+    }
+
+    // GET lugar by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<LugarInteres> getLugarById(@PathVariable Long id) {
+        Optional<LugarInteres> lugar = lugarInteresService.findById(id);
+        return lugar.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // POST create new lugar
+    @PostMapping
+    public LugarInteres createLugar(@RequestBody LugarInteres lugarInteres) {
+        return lugarInteresService.save(lugarInteres);
+    }
+
+    // PUT update existing lugar
+    @PutMapping("/{id}")
+    public ResponseEntity<LugarInteres> updateLugar(@PathVariable Long id, @RequestBody LugarInteres lugarDetails) {
+        Optional<LugarInteres> lugarOptional = lugarInteresService.findById(id);
+
+        if (!lugarOptional.isPresent()) {
+            return ResponseEntity.notFound().build();
         }
 
-        @GetMapping("/{id}")
-        public ResponseEntity<LugarInteres> obtenerPorId(@PathVariable Long id) {
-            LugarInteres lugarInteres = lugarInteresService.obtenerPorId(id);
-            if (lugarInteres != null) {
-                return ResponseEntity.ok(lugarInteres);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+        LugarInteres lugar = lugarOptional.get();
+        lugar.setNombreLugar(lugarDetails.getNombreLugar());
+        lugar.setDescripcion(lugarDetails.getDescripcion());
+        lugar.setImagen(lugarDetails.getImagen());
+        lugar.setCategoria(lugarDetails.getCategoria());
+        // Actualiza otros campos según sea necesario
+
+        LugarInteres updatedLugar = lugarInteresService.save(lugar);
+        return ResponseEntity.ok(updatedLugar);
+    }
+
+    // DELETE lugar by ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteLugar(@PathVariable Long id) {
+        if (!lugarInteresService.findById(id).isPresent()) {
+            return ResponseEntity.notFound().build();
         }
 
-        @PostMapping
-        public LugarInteres crear(@RequestBody LugarInteres lugarInteres) {
-            return lugarInteresService.guardar(lugarInteres);
-        }
-
-        @PutMapping("/{id}")
-        public ResponseEntity<LugarInteres> actualizar(@PathVariable Long id, @RequestBody LugarInteres detallesLugarInteres) {
-            LugarInteres lugarExistente = lugarInteresService.obtenerPorId(id);
-            if (lugarExistente != null) {
-                lugarExistente.setFechaAlta(detallesLugarInteres.getFechaAlta());
-                lugarExistente.setNombreLugar(detallesLugarInteres.getNombreLugar());
-                lugarExistente.setDescripcion(detallesLugarInteres.getDescripcion());
-                lugarExistente.setImagen(detallesLugarInteres.getImagen());
-                lugarExistente.setCategoria(detallesLugarInteres.getCategoria());
-
-                LugarInteres actualizado = lugarInteresService.guardar(lugarExistente);
-                return ResponseEntity.ok(actualizado);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        }
-
-        @DeleteMapping("/{id}")
-        public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-            LugarInteres lugarInteres = lugarInteresService.obtenerPorId(id);
-            if (lugarInteres != null) {
-                lugarInteresService.eliminar(id);
-                return ResponseEntity.noContent().build();
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        }
+        lugarInteresService.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
 }

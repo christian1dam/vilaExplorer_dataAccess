@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Spliterator;
 
 @Service
 public class PlatoServiceImpl implements PlatoService {
@@ -37,4 +36,13 @@ public class PlatoServiceImpl implements PlatoService {
         platoRepository.deleteById(id);
     }
 
+    @Override
+    public Plato actualizarPlato(Long id, Plato platoUpdated) throws PlatoNotFoundException {
+        Optional<Plato> plato = platoRepository.findById(id);
+        if(plato.isEmpty()){
+            throw new PlatoNotFoundException("El plato con el ID " + id + " no se ha encontrado en la base de datos.");
+        }
+        platoUpdated.setPlato_id(plato.get().getPlato_id());
+        return platoRepository.save(platoUpdated);
+    }
 }

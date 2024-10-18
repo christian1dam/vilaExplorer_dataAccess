@@ -7,10 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +41,17 @@ public class PlatoController {
         try{
             platoServiceImpl.eliminarPlato(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (PlatoNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/put/{id}")
+    public ResponseEntity<Plato> actualizarPlato(@PathVariable Long id, @RequestBody Plato platoUpdated){
+        Plato plato;
+        try {
+            plato = platoServiceImpl.actualizarPlato(id, platoUpdated);
+            return new ResponseEntity<>(plato, HttpStatus.OK);
         } catch (PlatoNotFoundException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

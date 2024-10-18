@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class Plato {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long receta_id;
+    private long plato_id;
     @Column(nullable = false)
     private String nombre;
     @Column(nullable = false)

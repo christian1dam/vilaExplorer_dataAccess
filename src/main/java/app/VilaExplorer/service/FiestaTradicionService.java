@@ -1,7 +1,5 @@
 package app.VilaExplorer.service;
 
-import app.VilaExplorer.domain.FiestaTradicion;
-
 import java.util.List;
 import java.util.Optional;
 

@@ -1,7 +1,5 @@
 package app.VilaExplorer.service;
 
-import app.VilaExplorer.domain.FiestaTradicion;
-import app.VilaExplorer.repository.FiestaTradicionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

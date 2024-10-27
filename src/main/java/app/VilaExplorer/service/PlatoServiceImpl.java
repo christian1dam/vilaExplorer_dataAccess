@@ -42,7 +42,7 @@ public class PlatoServiceImpl implements PlatoService {
         if(plato.isEmpty()){
             throw new PlatoNotFoundException("El plato con el ID " + id + " no se ha encontrado en la base de datos.");
         }
-        platoUpdated.setPlato_id(plato.get().getPlato_id());
+        platoUpdated.setId_plato(plato.get().getId_plato());
         return platoRepository.save(platoUpdated);
     }
 }

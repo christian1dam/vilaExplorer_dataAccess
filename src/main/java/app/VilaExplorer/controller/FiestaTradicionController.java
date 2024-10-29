@@ -16,54 +16,37 @@ public class FiestaTradicionController {
     @Autowired
     private FiestaTradicionService fiestaTradicionService;
 
-    // GET all fiestas
-    @GetMapping
-    public List<FiestaTradicion> getAllFiestas() {
+    @GetMapping("/detalle/{id}")
+    public ResponseEntity<FiestaTradicion> getFiestaTradicionById(@PathVariable Long id) {
+        Optional<FiestaTradicion> fiestaTradicion = fiestaTradicionService.findById(id);
+        return fiestaTradicion.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/todos")
+    public List<FiestaTradicion> getAllFiestasTradicion() {
         return fiestaTradicionService.findAll();
     }
 
-    // GET fiesta by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<FiestaTradicion> getFiestaById(@PathVariable Integer id) {
-        Optional<FiestaTradicion> fiesta = fiestaTradicionService.findById(id);
-        return fiesta.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    // POST create new fiesta
-    @PostMapping
-    public FiestaTradicion createFiesta(@RequestBody FiestaTradicion fiestaTradicion) {
+    @PostMapping("/crear")
+    public FiestaTradicion createFiestaTradicion(@RequestBody FiestaTradicion fiestaTradicion) {
         return fiestaTradicionService.save(fiestaTradicion);
     }
 
-    // PUT update existing fiesta
-    @PutMapping("/{id}")
-    public ResponseEntity<FiestaTradicion> updateFiesta(@PathVariable Integer id, @RequestBody FiestaTradicion fiestaDetails) {
-        Optional<FiestaTradicion> fiestaOptional = fiestaTradicionService.findById(id);
-
-        if (!fiestaOptional.isPresent()) {
+    @PutMapping("/modificar/{id}")
+    public ResponseEntity<FiestaTradicion> updateFiestaTradicion(@PathVariable Long id, @RequestBody FiestaTradicion fiestaTradicion) {
+        Optional<FiestaTradicion> existingFiestaTradicion = fiestaTradicionService.findById(id);
+        if (existingFiestaTradicion.isPresent()) {
+            fiestaTradicion.setIdFiestaTradicion(id);
+            return ResponseEntity.ok(fiestaTradicionService.save(fiestaTradicion));
+        } else {
             return ResponseEntity.notFound().build();
         }
-
-        FiestaTradicion fiesta = fiestaOptional.get();
-        fiesta.setNombre(fiestaDetails.getNombre());
-        fiesta.setDescripcion(fiestaDetails.getDescripcion());
-        fiesta.setImagen(fiestaDetails.getImagen());
-        fiesta.setAutor(fiestaDetails.getAutor());
-        // Actualiza otros campos según sea necesario
-
-        FiestaTradicion updatedFiesta = fiestaTradicionService.save(fiesta);
-        return ResponseEntity.ok(updatedFiesta);
     }
 
-    // DELETE fiesta by ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFiesta(@PathVariable Integer id) {
-        if (!fiestaTradicionService.findById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
 
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<Void> deleteFiestaTradicion(@PathVariable Long id) {
         fiestaTradicionService.deleteById(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

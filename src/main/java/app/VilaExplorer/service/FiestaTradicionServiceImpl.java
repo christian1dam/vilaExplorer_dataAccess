@@ -10,18 +10,17 @@ import java.util.Optional;
 
 @Service
 public class FiestaTradicionServiceImpl implements FiestaTradicionService {
-
     @Autowired
     private FiestaTradicionRepository fiestaTradicionRepository;
 
     @Override
-    public List<FiestaTradicion> findAll() {
-        return fiestaTradicionRepository.findAll();
+    public Optional<FiestaTradicion> findById(Long id) {
+        return fiestaTradicionRepository.findById(id);
     }
 
     @Override
-    public Optional<FiestaTradicion> findById(Integer id) {
-        return fiestaTradicionRepository.findById(id);
+    public List<FiestaTradicion> findAll() {
+        return fiestaTradicionRepository.findAll();
     }
 
     @Override
@@ -30,9 +29,7 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
     }
 
     @Override
-    public void deleteById(Integer id) {
+    public void deleteById(Long id) {
         fiestaTradicionRepository.deleteById(id);
     }
-
-    // metodos adicionales ...
 }

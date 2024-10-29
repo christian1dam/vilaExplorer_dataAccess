@@ -10,18 +10,17 @@ import java.util.Optional;
 
 @Service
 public class PuntuacionLugarServiceImpl implements PuntuacionLugarService {
-
     @Autowired
     private PuntuacionLugarRepository puntuacionLugarRepository;
 
     @Override
-    public List<PuntuacionLugar> findAll() {
-        return puntuacionLugarRepository.findAll();
+    public Optional<PuntuacionLugar> findById(Long id) {
+        return puntuacionLugarRepository.findById(id);
     }
 
     @Override
-    public Optional<PuntuacionLugar> findById(Long id) {
-        return puntuacionLugarRepository.findById(id);
+    public List<PuntuacionLugar> findAll() {
+        return puntuacionLugarRepository.findAll();
     }
 
     @Override
@@ -33,6 +32,4 @@ public class PuntuacionLugarServiceImpl implements PuntuacionLugarService {
     public void deleteById(Long id) {
         puntuacionLugarRepository.deleteById(id);
     }
-
-    // Métodos adicionales si los necesitas
 }

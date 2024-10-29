@@ -8,10 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "redactor")
 @PrimaryKeyJoinColumn(name = "id_usuario")
-public class Redactor {
+public class Redactor extends Usuario {
 }

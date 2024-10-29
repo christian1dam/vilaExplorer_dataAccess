@@ -10,57 +10,36 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/rutas-lugares")
+@RequestMapping("/api/ruta-lugar")
 public class RutaLugarController {
 
     @Autowired
     private RutaLugarService rutaLugarService;
 
-    // GET all rutas-lugares
-    @GetMapping
-    public List<RutaLugar> getAllRutasLugares() {
+    @GetMapping("/detalle/{id}")
+    public ResponseEntity<RutaLugar> getRutaLugarById(@PathVariable Long id) {
+        Optional<RutaLugar> rutaLugar = rutaLugarService.findById(id);
+        return rutaLugar.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/todos")
+    public List<RutaLugar> getAllRutasLugar() {
         return rutaLugarService.findAll();
     }
 
-    // GET ruta-lugar by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<RutaLugar> getRutaLugarById(@PathVariable Long id) {
-        Optional<RutaLugar> rutaLugar = rutaLugarService.findById(id);
-        return rutaLugar.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    // POST create new ruta-lugar
-    @PostMapping
+    @PostMapping("/crear")
     public RutaLugar createRutaLugar(@RequestBody RutaLugar rutaLugar) {
         return rutaLugarService.save(rutaLugar);
     }
 
-    // PUT update existing ruta-lugar
-    @PutMapping("/{id}")
-    public ResponseEntity<RutaLugar> updateRutaLugar(@PathVariable Long id, @RequestBody RutaLugar rutaLugarDetails) {
-        Optional<RutaLugar> rutaLugarOptional = rutaLugarService.findById(id);
-
-        if (!rutaLugarOptional.isPresent()) {
+    @PutMapping("/modificar/{id}")
+    public ResponseEntity<RutaLugar> updateRutaLugar(@PathVariable Long id, @RequestBody RutaLugar rutaLugar) {
+        Optional<RutaLugar> existingRutaLugar = rutaLugarService.findById(id);
+        if (existingRutaLugar.isPresent()) {
+            rutaLugar.setIdRutaLugar(id);
+            return ResponseEntity.ok(rutaLugarService.save(rutaLugar));
+        } else {
             return ResponseEntity.notFound().build();
         }
-
-        RutaLugar rutaLugar = rutaLugarOptional.get();
-        rutaLugar.setId_ruta(rutaLugarDetails.getId_ruta());
-        rutaLugar.setId_lugar(rutaLugarDetails.getId_lugar());
-
-        RutaLugar updatedRutaLugar = rutaLugarService.save(rutaLugar);
-        return ResponseEntity.ok(updatedRutaLugar);
-    }
-
-    // DELETE ruta-lugar by ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRutaLugar(@PathVariable Long id) {
-        if (!rutaLugarService.findById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        rutaLugarService.deleteById(id);
-        return ResponseEntity.ok().build();
     }
 }

@@ -14,34 +14,15 @@ import java.time.LocalDate;
 public class Coordenada {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id_coordenada;
+    @Column(name = "id_coordenada")
+    private Long idCoordenada;
 
-    @Column(name = "latitud")
+    @Column(nullable = false)
     private double latitud;
-    @Column(name = "longitud")
+
+    @Column(nullable = false)
     private double longitud;
 
-    public long getId_coordenada() {
-        return id_coordenada;
-    }
-
-    public void setId_coordenada(long id_coordenada) {
-        this.id_coordenada = id_coordenada;
-    }
-
-    public double getLatitud() {
-        return latitud;
-    }
-
-    public void setLatitud(double latitud) {
-        this.latitud = latitud;
-    }
-
-    public double getLongitud() {
-        return longitud;
-    }
-
-    public void setLongitud(double longitud) {
-        this.longitud = longitud;
-    }
+    @OneToOne(mappedBy = "coordenada", cascade = CascadeType.ALL, orphanRemoval = true)
+    private LugarInteres lugarInteres;
 }

@@ -10,18 +10,17 @@ import java.util.Optional;
 
 @Service
 public class RutaLugarServiceImpl implements RutaLugarService {
-
     @Autowired
     private RutaLugarRepository rutaLugarRepository;
 
     @Override
-    public List<RutaLugar> findAll() {
-        return rutaLugarRepository.findAll();
+    public Optional<RutaLugar> findById(Long id) {
+        return rutaLugarRepository.findById(id);
     }
 
     @Override
-    public Optional<RutaLugar> findById(Long id) {
-        return rutaLugarRepository.findById(id);
+    public List<RutaLugar> findAll() {
+        return rutaLugarRepository.findAll();
     }
 
     @Override
@@ -33,6 +32,5 @@ public class RutaLugarServiceImpl implements RutaLugarService {
     public void deleteById(Long id) {
         rutaLugarRepository.deleteById(id);
     }
-
-    // Métodos adicionales si los necesitas
 }
+

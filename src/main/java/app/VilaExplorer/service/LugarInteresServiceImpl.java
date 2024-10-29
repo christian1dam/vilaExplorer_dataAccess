@@ -10,18 +10,17 @@ import java.util.Optional;
 
 @Service
 public class LugarInteresServiceImpl implements LugarInteresService {
-
     @Autowired
     private LugarInteresRepository lugarInteresRepository;
 
     @Override
-    public List<LugarInteres> findAll() {
-        return lugarInteresRepository.findAll();
+    public Optional<LugarInteres> findById(Long id) {
+        return lugarInteresRepository.findById(id);
     }
 
     @Override
-    public Optional<LugarInteres> findById(Long id) {
-        return lugarInteresRepository.findById(id);
+    public List<LugarInteres> findAll() {
+        return lugarInteresRepository.findAll();
     }
 
     @Override
@@ -33,6 +32,4 @@ public class LugarInteresServiceImpl implements LugarInteresService {
     public void deleteById(Long id) {
         lugarInteresRepository.deleteById(id);
     }
-
-    //metodos adicionales ...
 }

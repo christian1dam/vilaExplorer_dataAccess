@@ -10,58 +10,36 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/puntuaciones-lugares")
+@RequestMapping("/api/puntuacion-lugar")
 public class PuntuacionLugarController {
 
     @Autowired
     private PuntuacionLugarService puntuacionLugarService;
 
-    // GET all puntuaciones
-    @GetMapping
-    public List<PuntuacionLugar> getAllPuntuaciones() {
+    @GetMapping("/detalle/{id}")
+    public ResponseEntity<PuntuacionLugar> getPuntuacionLugarById(@PathVariable Long id) {
+        Optional<PuntuacionLugar> puntuacionLugar = puntuacionLugarService.findById(id);
+        return puntuacionLugar.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/todos")
+    public List<PuntuacionLugar> getAllPuntuacionesLugar() {
         return puntuacionLugarService.findAll();
     }
 
-    // GET puntuacion by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<PuntuacionLugar> getPuntuacionById(@PathVariable Long id) {
-        Optional<PuntuacionLugar> puntuacion = puntuacionLugarService.findById(id);
-        return puntuacion.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    // POST create new puntuacion
-    @PostMapping
-    public PuntuacionLugar createPuntuacion(@RequestBody PuntuacionLugar puntuacionLugar) {
+    @PostMapping("/crear")
+    public PuntuacionLugar createPuntuacionLugar(@RequestBody PuntuacionLugar puntuacionLugar) {
         return puntuacionLugarService.save(puntuacionLugar);
     }
 
-    // PUT update existing puntuacion
-    @PutMapping("/{id}")
-    public ResponseEntity<PuntuacionLugar> updatePuntuacion(@PathVariable Long id, @RequestBody PuntuacionLugar puntuacionDetails) {
-        Optional<PuntuacionLugar> puntuacionOptional = puntuacionLugarService.findById(id);
-
-        if (!puntuacionOptional.isPresent()) {
+    @PutMapping("/modificar/{id}")
+    public ResponseEntity<PuntuacionLugar> updatePuntuacionLugar(@PathVariable Long id, @RequestBody PuntuacionLugar puntuacionLugar) {
+        Optional<PuntuacionLugar> existingPuntuacionLugar = puntuacionLugarService.findById(id);
+        if (existingPuntuacionLugar.isPresent()) {
+            puntuacionLugar.setIdPuntuacion(id);
+            return ResponseEntity.ok(puntuacionLugarService.save(puntuacionLugar));
+        } else {
             return ResponseEntity.notFound().build();
         }
-
-        PuntuacionLugar puntuacion = puntuacionOptional.get();
-        puntuacion.setId_usuario(puntuacionDetails.getId_usuario());
-        puntuacion.setId_lugar(puntuacionDetails.getId_lugar());
-        puntuacion.setPuntuacion(puntuacionDetails.getPuntuacion());
-
-        PuntuacionLugar updatedPuntuacion = puntuacionLugarService.save(puntuacion);
-        return ResponseEntity.ok(updatedPuntuacion);
-    }
-
-    // DELETE puntuacion by ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePuntuacion(@PathVariable Long id) {
-        if (!puntuacionLugarService.findById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        puntuacionLugarService.deleteById(id);
-        return ResponseEntity.ok().build();
     }
 }

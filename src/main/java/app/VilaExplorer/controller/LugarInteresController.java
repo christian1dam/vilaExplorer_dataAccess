@@ -16,54 +16,25 @@ public class LugarInteresController {
     @Autowired
     private LugarInteresService lugarInteresService;
 
-    // GET all lugares
-    @GetMapping
-    public List<LugarInteres> getAllLugares() {
+    @GetMapping("/detalle/{id}")
+    public ResponseEntity<LugarInteres> getLugarInteresById(@PathVariable Long id) {
+        Optional<LugarInteres> lugarInteres = lugarInteresService.findById(id);
+        return lugarInteres.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/todos")
+    public List<LugarInteres> getAllLugaresInteres() {
         return lugarInteresService.findAll();
     }
 
-    // GET lugar by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<LugarInteres> getLugarById(@PathVariable Long id) {
-        Optional<LugarInteres> lugar = lugarInteresService.findById(id);
-        return lugar.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    // POST create new lugar
-    @PostMapping
-    public LugarInteres createLugar(@RequestBody LugarInteres lugarInteres) {
+    @PostMapping("/crear")
+    public LugarInteres createLugarInteres(@RequestBody LugarInteres lugarInteres) {
         return lugarInteresService.save(lugarInteres);
     }
 
-    // PUT update existing lugar
-    @PutMapping("/{id}")
-    public ResponseEntity<LugarInteres> updateLugar(@PathVariable Long id, @RequestBody LugarInteres lugarDetails) {
-        Optional<LugarInteres> lugarOptional = lugarInteresService.findById(id);
-
-        if (!lugarOptional.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        LugarInteres lugar = lugarOptional.get();
-        lugar.setNombreLugar(lugarDetails.getNombreLugar());
-        lugar.setDescripcion(lugarDetails.getDescripcion());
-        lugar.setImagen(lugarDetails.getImagen());
-        lugar.setCategoria(lugarDetails.getCategoria());
-        // Actualiza otros campos según sea necesario
-
-        LugarInteres updatedLugar = lugarInteresService.save(lugar);
-        return ResponseEntity.ok(updatedLugar);
-    }
-
-    // DELETE lugar by ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLugar(@PathVariable Long id) {
-        if (!lugarInteresService.findById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<Void> deleteLugarInteres(@PathVariable Long id) {
         lugarInteresService.deleteById(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

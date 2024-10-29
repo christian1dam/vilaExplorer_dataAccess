@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -15,19 +16,26 @@ import java.time.LocalDate;
 public class LugarInteres {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id_lugarinteres;
+    @Column(name = "id_lugar_interes")
+    private Long idLugarInteres;
 
-    @Column(name = "fechaAlta")
+    @Column(name = "fecha_alta", nullable = false)
     private LocalDate fechaAlta;
-    @Column(name = "nombreLugar")
+
+    @Column(name = "nombre_lugar", nullable = false)
     private String nombreLugar;
-    @Column(name = "descripcion")
+
+    @Column(nullable = false)
     private String descripcion;
-    @Column(name = "imagen")
+
+    @Column(nullable = false)
     private String imagen;
-    @Column(name = "categoria")
-    private String categoria;
 
+    @ManyToOne
+    @JoinColumn(name = "id_tipo_lugar", nullable = false)
+    private TipoLugarInteres tipoLugar;
 
-
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "id_coordenada", referencedColumnName = "id_coordenada", nullable = false)
+    private Coordenada coordenada;
 }

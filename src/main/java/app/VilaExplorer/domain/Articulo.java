@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Data
@@ -14,22 +13,21 @@ import java.util.Date;
 @NoArgsConstructor
 @Table(name = "articulo")
 public class Articulo {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_articulo;
+    private Long idArticulo;
 
-    @Column
+    @Column(nullable = false)
+    private String contenido; // Changed from 'TEXT' to 'String'
+
+    @Column(nullable = false)
+    private LocalDate fechaPublicacion;
+
+    @Column(nullable = false, length = 255)
     private String titulo;
 
-    @Column
-    private String contenido;
-
-    @Column(name = "fecha_publicacion", nullable = false)
-    @Temporal(TemporalType.DATE)
-    private Date fechaPublicacion;
-
     @ManyToOne
-    @JoinColumn(name = "id_autor", nullable = false)
+    @JoinColumn(name = "id_autor", nullable = false, foreignKey = @ForeignKey(name = "FK_articulo_usuario"))
     private Usuario autor;
-
 }

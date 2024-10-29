@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FiestaTradicionService {
+    Optional<FiestaTradicion> findById(Long id);
     List<FiestaTradicion> findAll();
-    Optional<FiestaTradicion> findById(Integer id);
     FiestaTradicion save(FiestaTradicion fiestaTradicion);
-    void deleteById(Integer id);
-    // Métodos adicionales.....
+    void deleteById(Long id);
 }

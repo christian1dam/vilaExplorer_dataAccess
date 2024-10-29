@@ -13,57 +13,21 @@ import lombok.NoArgsConstructor;
 public class Ruta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id_ruta;
+    @Column(name = "id_ruta")
+    private Long idRuta;
 
-    @Column(name = "nombre")
+    @Column(name = "nombre_ruta", nullable = false)
     private String nombre;
-    @Column(name = "id_origen")
-    private int id_origen;
-    @Column(name = "id_destino")
-    private int id_destino;
-    @Column(name = "id_autor")
-    private long id_autor;
 
-    //Todo
+    @ManyToOne
+    @JoinColumn(name = "id_origen", nullable = false)
+    private LugarInteres origen;
 
+    @ManyToOne
+    @JoinColumn(name = "id_destino", nullable = false)
+    private LugarInteres destino;
 
-    public long getId_ruta() {
-        return id_ruta;
-    }
-
-    public void setId_ruta(long id_ruta) {
-        this.id_ruta = id_ruta;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public int getId_origen() {
-        return id_origen;
-    }
-
-    public void setId_origen(int id_origen) {
-        this.id_origen = id_origen;
-    }
-
-    public int getId_destino() {
-        return id_destino;
-    }
-
-    public void setId_destino(int id_destino) {
-        this.id_destino = id_destino;
-    }
-
-    public long getId_autor() {
-        return id_autor;
-    }
-
-    public void setId_autor(long id_autor) {
-        this.id_autor = id_autor;
-    }
+    @ManyToOne
+    @JoinColumn(name = "id_autor", nullable = false)
+    private Usuario autor;
 }

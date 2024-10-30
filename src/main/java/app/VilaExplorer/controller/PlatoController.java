@@ -32,8 +32,8 @@ public class PlatoController {
     }
 
     @PostMapping("/crear")
-    public Plato createPlato(@RequestBody Plato plato) {
-        return platoService.save(plato);
+    public ResponseEntity<Plato> createPlato(@RequestBody Plato plato) {
+        return new ResponseEntity<>(platoService.save(plato), HttpStatus.OK);
     }
 
     @DeleteMapping("/eliminar/{id}")

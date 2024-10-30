@@ -3,10 +3,12 @@ package app.VilaExplorer.controller;
 import app.VilaExplorer.domain.Plato;
 import app.VilaExplorer.service.PlatoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.event.ItemListener;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,8 +26,9 @@ public class PlatoController {
     }
 
     @GetMapping("/todos")
-    public List<Plato> getAllPlatos() {
-        return platoService.findAll();
+    public ResponseEntity<Iterable<Plato>> getAllPlatos() {
+       Iterable<Plato> platos = platoService.findAll();
+        return new ResponseEntity<>(platos, HttpStatus.OK);
     }
 
     @PostMapping("/crear")

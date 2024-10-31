@@ -9,10 +9,12 @@ import lombok.*;
 @AllArgsConstructor
 @IdClass(PuntuacionTradicionID.class)
 public class PuntuacionTradicion {
-  @ManyToOne
+    @Id
+    @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "id_fiesta", nullable = false)
     private FiestaTradicion fiesta;

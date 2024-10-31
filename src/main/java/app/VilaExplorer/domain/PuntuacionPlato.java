@@ -11,10 +11,13 @@ import lombok.NoArgsConstructor;
 @IdClass(PuntuacionPlatoID.class)
 @Table(name = "puntuacion_plato")
 public class PuntuacionPlato {
+
+    @Id
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "id_plato", nullable = false)
     private Plato plato;

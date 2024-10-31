@@ -33,14 +33,14 @@ public class PuntuacionPlatoController {
         return puntuacionPlatoService.save(puntuacionPlato);
     }
 
-    @PutMapping("/modificar/{id}")
-    public ResponseEntity<PuntuacionPlato> updatePuntuacionPlato(@PathVariable Long id, @RequestBody PuntuacionPlato puntuacionPlato) {
-        Optional<PuntuacionPlato> existingPuntuacionPlato = puntuacionPlatoService.findById(id);
-        if (existingPuntuacionPlato.isPresent()) {
-            puntuacionPlato.setIdPuntuacionPlato(id);
-            return ResponseEntity.ok(puntuacionPlatoService.save(puntuacionPlato));
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+//    @PutMapping("/modificar/{id}")
+//    public ResponseEntity<PuntuacionPlato> updatePuntuacionPlato(@PathVariable Long id, @RequestBody PuntuacionPlato puntuacionPlato) {
+//        Optional<PuntuacionPlato> existingPuntuacionPlato = puntuacionPlatoService.findById(id);
+//        if (existingPuntuacionPlato.isPresent()) {
+//            puntuacionPlato.setIdPuntuacionPlato(id);
+//            return ResponseEntity.ok(puntuacionPlatoService.save(puntuacionPlato));
+//        } else {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
 }

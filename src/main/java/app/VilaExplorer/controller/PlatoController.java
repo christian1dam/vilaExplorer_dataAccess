@@ -1,44 +1,59 @@
 package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.Plato;
-import app.VilaExplorer.service.PlatoService;
+import app.VilaExplorer.exception.PlatoNotFoundException;
+import app.VilaExplorer.service.PlatoServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.event.ItemListener;
 import java.util.List;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/api/platos")
+@RequestMapping("/plato")
 public class PlatoController {
-
     @Autowired
-    private PlatoService platoService;
+    private PlatoServiceImpl platoServiceImpl;
 
-    @GetMapping("/detalle/{id}")
-    public ResponseEntity<Plato> getPlatoById(@PathVariable Long id) {
-        Optional<Plato> plato = platoService.findById(id);
-        return plato.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/todos")
-    public ResponseEntity<Iterable<Plato>> getAllPlatos() {
-       Iterable<Plato> platos = platoService.findAll();
+    @GetMapping("/nombre")
+    public ResponseEntity<List<Plato>> getAllPlatos() {
+        List<Plato> platos = platoServiceImpl.findAll();
         return new ResponseEntity<>(platos, HttpStatus.OK);
     }
 
-    @PostMapping("/crear")
-    public ResponseEntity<Plato> createPlato(@RequestBody Plato plato) {
-        return new ResponseEntity<>(platoService.save(plato), HttpStatus.OK);
+    @GetMapping("/{id}")
+    public ResponseEntity<Optional<Plato>> getPlatoByID(@PathVariable long id) {
+        Optional<Plato> plato = platoServiceImpl.findById(id);
+        return new ResponseEntity<>(plato, HttpStatus.OK);
     }
 
-    @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<Void> deletePlato(@PathVariable Long id) {
-        platoService.deleteById(id);
-        return ResponseEntity.noContent().build();
+    @PostMapping("/add")
+    public ResponseEntity<Plato> addPlato(@RequestBody Plato plato) {
+        Plato platoNuevo = platoServiceImpl.addPlato(plato);
+        return new ResponseEntity<>(platoNuevo, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Response> eliminarPlato(@PathVariable Long id) {
+        try {
+            platoServiceImpl.eliminarPlato(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (PlatoNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/put/{id}")
+    public ResponseEntity<Plato> actualizarPlato(@PathVariable Long id, @RequestBody Plato platoUpdated) {
+        Plato plato;
+        try {
+            plato = platoServiceImpl.actualizarPlato(id, platoUpdated);
+            return new ResponseEntity<>(plato, HttpStatus.OK);
+        } catch (PlatoNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

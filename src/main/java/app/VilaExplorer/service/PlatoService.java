@@ -1,13 +1,17 @@
 package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.Plato;
+import app.VilaExplorer.exception.PlatoNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface PlatoService {
-    Optional<Plato> findById(Long id);
     List<Plato> findAll();
-    Plato save(Plato plato);
-    void deleteById(Long id);
+
+    Optional<Plato> findById(Long id);
+
+    Plato addPlato(Plato plato);
+
+    Plato actualizarPlato(Long id, Plato platoUpdated) throws PlatoNotFoundException;
 }

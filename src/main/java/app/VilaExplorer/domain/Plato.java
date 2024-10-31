@@ -32,14 +32,14 @@ public class Plato {
     private boolean estado;
 
     @ManyToOne
-    @JoinColumn(name = "id_categoria", nullable = false)
-    private CategoriaPlato categoria;
-
-    @ManyToOne
-    @JoinColumn(name = "id_autor", nullable = false, foreignKey = @ForeignKey(name = "FK_plato_usuario_autor"))
+    @JoinColumn(name = "id_autor", nullable = false)
     private Usuario autor;
 
     @ManyToOne
-    @JoinColumn(name = "id_aprobador", nullable = false, foreignKey = @ForeignKey(name = "FK_plato_usuario_aprobador"))
+    @JoinColumn(name = "id_aprobador", nullable = false)
     private Usuario aprobador;
+
+    @ManyToOne
+    @JoinColumn(name = "id_categoria", nullable = false)
+    private CategoriaPlato categoria;
 }

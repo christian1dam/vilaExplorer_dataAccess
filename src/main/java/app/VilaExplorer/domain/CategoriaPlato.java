@@ -13,8 +13,9 @@ import lombok.NoArgsConstructor;
 public class CategoriaPlato {
 
     @Id
+    @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id_categoria;
+     private Long id_categoria;
 
     @Column(nullable = false)
     private String nombreCategoria;

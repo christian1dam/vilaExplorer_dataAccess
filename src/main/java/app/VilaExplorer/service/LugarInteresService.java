@@ -9,6 +9,7 @@ public interface LugarInteresService {
     Optional<LugarInteres> findById(Long id);
     List<LugarInteres> findAll();
     LugarInteres save(LugarInteres lugarInteres);
-    void deleteById(Long id);
+    void deleteByIdLogico(Long id); //metodo para desactivar un lugar de interes
+    List<LugarInteres> findAllActivos();  // metodo para obtener todos los lugares de interes activos
 }
 

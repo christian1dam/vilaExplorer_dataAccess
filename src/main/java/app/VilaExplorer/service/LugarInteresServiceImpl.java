@@ -23,13 +23,28 @@ public class LugarInteresServiceImpl implements LugarInteresService {
         return lugarInteresRepository.findAll();
     }
 
+    //metodo para obtener todos los lugares de interes activos
+    @Override
+    public List<LugarInteres> findAllActivos() {
+        return lugarInteresRepository.findAll().stream()
+                .filter(LugarInteres::getActivo)
+                .toList();
+    }
+
     @Override
     public LugarInteres save(LugarInteres lugarInteres) {
         return lugarInteresRepository.save(lugarInteres);
     }
 
+    //metodo para desactivar un lugar de interes
     @Override
-    public void deleteById(Long id) {
-        lugarInteresRepository.deleteById(id);
+    public void deleteByIdLogico(Long id) {
+        Optional<LugarInteres> lugarInteres = lugarInteresRepository.findById(id);
+        if (lugarInteres.isPresent()) {
+            LugarInteres lugar = lugarInteres.get();
+            lugar.setActivo(false);
+            lugarInteresRepository.save(lugar);
+        }
     }
+
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 @Entity
@@ -31,11 +32,13 @@ public class LugarInteres {
     @Column(nullable = false)
     private String imagen;
 
+    @Column(name = "activo", nullable = false)
+    private Boolean activo = true;
+
     @ManyToOne
     @JoinColumn(name = "id_tipo_lugar", nullable = false)
     private TipoLugarInteres tipoLugar;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "id_coordenada", referencedColumnName = "id_coordenada", nullable = false)
-    private Coordenada coordenada;
+    @OneToMany(mappedBy = "lugarInteres", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Coordenada> coordenadas;
 }

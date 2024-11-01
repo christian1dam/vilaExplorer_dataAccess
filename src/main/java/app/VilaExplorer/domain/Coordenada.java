@@ -1,5 +1,6 @@
 package app.VilaExplorer.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,6 +24,8 @@ public class Coordenada {
     @Column(nullable = false)
     private double longitud;
 
-    @OneToOne(mappedBy = "coordenada", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // Evita la recursividad al ignorar la relación inversa
+    @ManyToOne
+    @JoinColumn(name = "id_lugar_interes", nullable = false)
     private LugarInteres lugarInteres;
 }

@@ -2,14 +2,15 @@ package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.FiestaTradicion;
 import app.VilaExplorer.repository.FiestaTradicionRepository;
+import app.VilaExplorer.service.FiestaTradicionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
 @Service
 public class FiestaTradicionServiceImpl implements FiestaTradicionService {
+
     @Autowired
     private FiestaTradicionRepository fiestaTradicionRepository;
 
@@ -31,5 +32,10 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
     @Override
     public void deleteById(Long id) {
         fiestaTradicionRepository.deleteById(id);
+    }
+
+    @Override
+    public List<FiestaTradicion> findByAutorId(Long idAutor) {
+        return fiestaTradicionRepository.findByAutorId(idAutor);
     }
 }

@@ -20,16 +20,16 @@ public class LugarInteres {
     @Column(name = "id_lugar_interes")
     private Long idLugarInteres;
 
-    @Column(name = "fecha_alta", nullable = false)
-    private LocalDate fechaAlta;
-
     @Column(name = "nombre_lugar", nullable = false)
     private String nombreLugar;
 
-    @Column(nullable = false)
+    @Column(name = "descripcion", nullable = false)
     private String descripcion;
 
-    @Column(nullable = false)
+    @Column(name = "fecha_alta", nullable = false)
+    private LocalDate fechaAlta;
+
+    @Column(name = "imagen", nullable = false)
     private String imagen;
 
     @Column(name = "activo", nullable = false)
@@ -38,7 +38,4 @@ public class LugarInteres {
     @ManyToOne
     @JoinColumn(name = "id_tipo_lugar", nullable = false)
     private TipoLugarInteres tipoLugar;
-
-    @OneToMany(mappedBy = "lugarInteres", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Coordenada> coordenadas;
 }

@@ -1,9 +1,9 @@
 package app.VilaExplorer.repository;
 
-import app.VilaExplorer.domain.Redactor;
+import app.VilaExplorer.domain.Coordenadas;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RedactorRepository extends JpaRepository<Redactor, Long> {
+public interface CoordenadasRepository extends JpaRepository<Coordenadas, Long> {
 }

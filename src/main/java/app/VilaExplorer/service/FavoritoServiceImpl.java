@@ -33,4 +33,10 @@ public class FavoritoServiceImpl implements FavoritoService {
     public void deleteById(Long id) {
         favoritoRepository.deleteById(id);
     }
+
+    @Override
+    public List<Favorito> findByUsuarioId(Long idUsuario) {
+        return List.of();
+    }
+
 }

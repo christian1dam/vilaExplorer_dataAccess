@@ -11,4 +11,5 @@ public interface FavoritoService {
     List<Favorito> findAll();
     Favorito save(Favorito favorito);
     void deleteById(Long id);
+    List<Favorito> findByUsuarioId(Long idUsuario);
 }

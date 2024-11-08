@@ -1,9 +1,10 @@
 package app.VilaExplorer.repository;
 
-import app.VilaExplorer.domain.RutaLugar;
+
+import app.VilaExplorer.domain.LugarInteresCoordenadas;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RutaLugarRepository extends JpaRepository<RutaLugar, Long> {
+public interface LugarInteresCoordenadasRepository extends JpaRepository<LugarInteresCoordenadas, Long> {
 }

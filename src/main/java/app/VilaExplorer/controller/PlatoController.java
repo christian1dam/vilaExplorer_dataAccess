@@ -41,4 +41,11 @@ public class PlatoController {
         platoService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/aprobar/{platoId}/{aprobadorId}")
+    public ResponseEntity<Plato> aprobarPlato(@PathVariable Long platoId, @PathVariable Long aprobadorId) {
+        Plato platoAprobado = platoService.aprobarPlato(platoId, aprobadorId);
+        return ResponseEntity.ok(platoAprobado);
+    }
+
 }

@@ -17,17 +17,19 @@ public class Ruta {
     private Long idRuta;
 
     @Column(name = "nombre_ruta", nullable = false)
-    private String nombre;
-
-    @ManyToOne
-    @JoinColumn(name = "id_origen", nullable = false)
-    private LugarInteres origen;
-
-    @ManyToOne
-    @JoinColumn(name = "id_destino", nullable = false)
-    private LugarInteres destino;
+    private String nombreRuta;
 
     @ManyToOne
     @JoinColumn(name = "id_autor", nullable = false)
     private Usuario autor;
+
+    @ManyToOne
+    @JoinColumn(name = "id_origen", nullable = false)
+    private Coordenadas origen;
+
+    @ManyToOne
+    @JoinColumn(name = "id_destino", nullable = false)
+    private Coordenadas destino;
+
+
 }

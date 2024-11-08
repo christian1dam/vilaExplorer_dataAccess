@@ -1,8 +1,6 @@
 package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.LugarInteres;
-import app.VilaExplorer.repository.LugarInteresRepository;
-import app.VilaExplorer.repository.PuntuacionLugarRepository;
 import app.VilaExplorer.service.LugarInteresService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

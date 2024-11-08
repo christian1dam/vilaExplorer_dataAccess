@@ -15,15 +15,16 @@ public class FiestaTradicion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_fiesta_tradicion")
     private Long idFiestaTradicion;
 
-    @Column(nullable = false, length = 255)
+    @Column(name = "nombre", nullable = false)
     private String nombre;
 
-    @Column(nullable = false)
+    @Column(name = "descripcion", nullable = false)
     private String descripcion;
 
-    @Column(nullable = false, length = 255)
+    @Column(name = "imagen", nullable = false)
     private String imagen;
 
     @ManyToOne

@@ -16,18 +16,19 @@ public class Articulo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_articulo")
     private Long idArticulo;
 
-    @Column(nullable = false)
-    private String contenido; // Changed from 'TEXT' to 'String'
+    @Column(name = "contenido")
+    private String contenido;
 
-    @Column(nullable = false)
+    @Column(name = "fecha_publicacion")
     private LocalDate fechaPublicacion;
 
-    @Column(nullable = false, length = 255)
+    @Column(name = "titulo")
     private String titulo;
 
     @ManyToOne
     @JoinColumn(name = "id_autor", nullable = false, foreignKey = @ForeignKey(name = "FK_articulo_usuario"))
-    private Usuario autor;
+    private Usuario autorId;
 }

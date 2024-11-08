@@ -10,4 +10,7 @@ public interface PlatoService {
     List<Plato> findAll();
     Plato save(Plato plato);
     void deleteById(Long id);
+
+    //metodo para aprobar un plato
+    Plato aprobarPlato(Long platoId, Long aprobadorId);
 }

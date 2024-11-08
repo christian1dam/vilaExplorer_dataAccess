@@ -11,4 +11,5 @@ public interface ArticuloService {
     List<Articulo> findAll();
     Articulo save(Articulo articulo);
     void deleteById(Long id);
+    List<Articulo> findByAutorId(Long autorId); // Buscar artículos por ID de autor
 }

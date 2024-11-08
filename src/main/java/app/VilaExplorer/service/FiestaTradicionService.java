@@ -10,4 +10,5 @@ public interface FiestaTradicionService {
     List<FiestaTradicion> findAll();
     FiestaTradicion save(FiestaTradicion fiestaTradicion);
     void deleteById(Long id);
+    List<FiestaTradicion> findByAutorId(Long idAutor);
 }

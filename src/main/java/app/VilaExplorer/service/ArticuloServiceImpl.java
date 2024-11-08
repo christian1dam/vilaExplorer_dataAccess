@@ -33,4 +33,9 @@ public class ArticuloServiceImpl implements ArticuloService {
     public void deleteById(Long id) {
         articuloRepository.deleteById(id);
     }
+
+    @Override
+    public List<Articulo> findByAutorId(Long idAutor) {
+        return articuloRepository.findByAutorId(idAutor);
+    }
 }

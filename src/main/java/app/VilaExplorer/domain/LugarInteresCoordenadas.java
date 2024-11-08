@@ -19,6 +19,6 @@ public class LugarInteresCoordenadas {
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "id_coordenada", referencedColumnName = "id_coordenada")
+    @JoinColumn(name = "id_coordenada", referencedColumnName = "id_coordenadas")
     private Coordenadas coordenada;
 }

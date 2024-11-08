@@ -2,6 +2,7 @@ package app.VilaExplorer.service;
 
 
 import app.VilaExplorer.domain.Articulo;
+import app.VilaExplorer.domain.Usuario;
 import app.VilaExplorer.repository.ArticuloRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class ArticuloServiceImpl implements ArticuloService {
     }
 
     @Override
-    public List<Articulo> findByAutorId(Long idAutor) {
+    public List<Articulo> findByAutorId(Usuario idAutor) {
         return articuloRepository.findByAutorId(idAutor);
     }
 }

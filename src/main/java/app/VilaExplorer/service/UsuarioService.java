@@ -1,12 +1,26 @@
 package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.Usuario;
+import app.VilaExplorer.exception.RolNotFoundException;
+import app.VilaExplorer.exception.UsuarioNotFoundException;
+
 import java.util.List;
 import java.util.Optional;
 
 public interface UsuarioService {
-    Optional<Usuario> findById(Long id);
     List<Usuario> findAll();
+
+    Optional<Usuario> findById(Long id);
+
     Usuario save(Usuario usuario);
-    void deleteById(Long id);
+
+    void deleteById(Long id) throws RolNotFoundException;
+
+    boolean existsById(Long id) throws RolNotFoundException;
+
+    Usuario asignarRolAUsuario(Long usuarioId, String rol) throws UsuarioNotFoundException, RolNotFoundException;
+
+    List<Usuario> findUsuariosByRol(String rol) throws RolNotFoundException;
+
+    Usuario crearUsuarioConRol(Usuario usuario, String rol) throws RolNotFoundException, UsuarioNotFoundException;
 }

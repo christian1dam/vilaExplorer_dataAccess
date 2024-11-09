@@ -1,18 +1,20 @@
 package app.VilaExplorer.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
-@Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
 @Table(name = "usuario")
 public class Usuario {
 
@@ -33,11 +35,16 @@ public class Usuario {
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDate fechaCreacion;
 
-    @Column(name = "activo", nullable = false)
-    private Boolean activo = true;
+    @Column(name = "estado", nullable = false)
+    private Boolean estado = true;
 
-    @OneToMany(mappedBy = "usuario")
-    @JsonIgnore
-    private List<UsuarioRol> roles;
+    // Relación muchos a muchos a través de UsuarioRol
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private List<UsuarioRol> roles = new ArrayList<>();
+
+    // Rol actual del usuario
+    @ManyToOne
+    @JoinColumn(name = "id_rol_actual")
+    private Rol rolActual;
 }
-

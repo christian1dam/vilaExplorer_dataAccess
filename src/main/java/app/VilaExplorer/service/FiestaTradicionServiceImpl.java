@@ -1,6 +1,7 @@
 package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.FiestaTradicion;
+import app.VilaExplorer.domain.Usuario;
 import app.VilaExplorer.repository.FiestaTradicionRepository;
 import app.VilaExplorer.service.FiestaTradicionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
     }
 
     @Override
-    public List<FiestaTradicion> findByAutorId(Long idAutor) {
-        return fiestaTradicionRepository.findByAutorId(idAutor);
+    public List<FiestaTradicion> findByAutor(Usuario idAutor) {
+        return fiestaTradicionRepository.findByAutor(idAutor);
     }
 }

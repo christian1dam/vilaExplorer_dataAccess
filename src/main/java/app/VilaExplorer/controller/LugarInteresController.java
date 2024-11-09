@@ -50,39 +50,39 @@ public class LugarInteresController {
         return lugarInteresService.findAllActivos();
     }
 
-
-    // POST /api/lugares/crear
-    @PostMapping("/crear")
-    public LugarInteres createLugarInteres(@RequestBody LugarInteres lugarInteres) {
-        lugarInteres.getCoordenadas().forEach(coordenada -> coordenada.setLugarInteres(lugarInteres));//asignar el lugar de interes a las coordenadas
-        return lugarInteresService.save(lugarInteres);
-    }
+//
+//    // POST /api/lugares/crear
+//    @PostMapping("/crear")
+//    public LugarInteres createLugarInteres(@RequestBody LugarInteres lugarInteres) {
+//        lugarInteres.getCoordenadas().forEach(coordenada -> coordenada.setLugarInteres(lugarInteres));//asignar el lugar de interes a las coordenadas
+//        return lugarInteresService.save(lugarInteres);
+//    }
 
 
     // PUT /api/lugares/modificar/{id}
-    @PutMapping("/modificar/{id}")
-    public ResponseEntity<LugarInteres> updateLugarInteres(@PathVariable Long id, @RequestBody LugarInteres lugarInteresDetalle) {
-        LugarInteres lugarInteres = lugarInteresService.findById(id)
-                .orElseThrow(() -> new RuntimeException("No se encontró el lugar de interés con el id: " + id));
-
-        if (!lugarInteres.getActivo()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        // Actualizando los atributos de LugarInteres
-        lugarInteres.setNombreLugar(lugarInteresDetalle.getNombreLugar());
-        lugarInteres.setDescripcion(lugarInteresDetalle.getDescripcion());
-        lugarInteres.setImagen(lugarInteresDetalle.getImagen());
-        lugarInteres.setTipoLugar(lugarInteresDetalle.getTipoLugar());
-        lugarInteres.setFechaAlta(lugarInteresDetalle.getFechaAlta());
-
-        // Gestionar las coordenadas: eliminar las existentes y añadir las nuevas
-        lugarInteres.getCoordenadas().clear();
-        lugarInteres.getCoordenadas().addAll(lugarInteresDetalle.getCoordenadas());
-        lugarInteresDetalle.getCoordenadas().forEach(coordenada -> coordenada.setLugarInteres(lugarInteres));
-
-        return ResponseEntity.ok(lugarInteresService.save(lugarInteres));
-    }
+//    @PutMapping("/modificar/{id}")
+//    public ResponseEntity<LugarInteres> updateLugarInteres(@PathVariable Long id, @RequestBody LugarInteres lugarInteresDetalle) {
+//        LugarInteres lugarInteres = lugarInteresService.findById(id)
+//                .orElseThrow(() -> new RuntimeException("No se encontró el lugar de interés con el id: " + id));
+//
+//        if (!lugarInteres.getActivo()) {
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        // Actualizando los atributos de LugarInteres
+//        lugarInteres.setNombreLugar(lugarInteresDetalle.getNombreLugar());
+//        lugarInteres.setDescripcion(lugarInteresDetalle.getDescripcion());
+//        lugarInteres.setImagen(lugarInteresDetalle.getImagen());
+//        lugarInteres.setTipoLugar(lugarInteresDetalle.getTipoLugar());
+//        lugarInteres.setFechaAlta(lugarInteresDetalle.getFechaAlta());
+//
+//        // Gestionar las coordenadas: eliminar las existentes y añadir las nuevas
+//        lugarInteres.getCoordenadas().clear();
+//        lugarInteres.getCoordenadas().addAll(lugarInteresDetalle.getCoordenadas());
+//        lugarInteresDetalle.getCoordenadas().forEach(coordenada -> coordenada.setLugarInteres(lugarInteres));
+//
+//        return ResponseEntity.ok(lugarInteresService.save(lugarInteres));
+//    }
 
     //Para Administradores el metodo desactiva un lugar de interes
     // PUT /api/lugares/desactivar/{id}

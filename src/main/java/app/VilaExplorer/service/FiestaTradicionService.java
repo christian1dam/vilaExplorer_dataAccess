@@ -1,6 +1,7 @@
 package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.FiestaTradicion;
+import app.VilaExplorer.domain.Usuario;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,5 +11,5 @@ public interface FiestaTradicionService {
     List<FiestaTradicion> findAll();
     FiestaTradicion save(FiestaTradicion fiestaTradicion);
     void deleteById(Long id);
-    List<FiestaTradicion> findByAutorId(Long idAutor);
+    List<FiestaTradicion> findByAutor(Usuario idAutor);
 }

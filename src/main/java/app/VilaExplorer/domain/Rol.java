@@ -8,22 +8,18 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
 @Table(name = "rol")
 public class Rol {
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = "id_rol")
-        private Long idRol;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_rol")
+    private Long id_rol;
 
-        @Column (name = "nombre_rol", nullable = false)
-        private String nombreRol;
-
-        @OneToMany(mappedBy = "rol")
-        @JsonIgnore
-        private List<UsuarioRol> usuarios;
+    @Column(nullable = false, unique = true)
+    private String nombre;
 }

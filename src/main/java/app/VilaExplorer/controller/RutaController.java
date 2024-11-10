@@ -38,4 +38,10 @@ public class RutaController {
         rutaService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    // Obtener rutas por autor
+    @GetMapping("/autor/{autorId}")
+    public List<Ruta> getRutasByAutor(@PathVariable Long autorId) {
+        return rutaService.findByAutorId(autorId);
+    }
 }

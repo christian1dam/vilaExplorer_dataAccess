@@ -36,6 +36,23 @@ public class PlatoController {
         return new ResponseEntity<>(platoService.save(plato), HttpStatus.OK);
     }
 
+    // actualizar un plato existente
+    @PutMapping("/modificar/{id}")
+    public ResponseEntity<Plato> updatePlato(@PathVariable Long id, @RequestBody Plato platoDetalles) {
+        Plato plato = platoService.findById(id)
+                .orElseThrow(() -> new RuntimeException("No se encontró el plato con el id: " + id));
+
+        plato.setNombre(platoDetalles.getNombre());
+        plato.setDescripcion(platoDetalles.getDescripcion());
+        plato.setIngredientes(platoDetalles.getIngredientes());
+        plato.setReceta(platoDetalles.getReceta());
+        plato.setTipoPlato(platoDetalles.getTipoPlato());
+        plato.setAutor(platoDetalles.getAutor());
+
+        return ResponseEntity.ok(platoService.save(plato));
+    }
+
+
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<Void> deletePlato(@PathVariable Long id) {
         platoService.deleteById(id);

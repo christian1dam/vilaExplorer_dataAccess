@@ -20,6 +20,11 @@ public class TipoPlato {
     @Column(name = "nombre_tipo", nullable = false)
     private String nombreTipo;
 
+    // este campo permite hacer un borrado lógico
+    //para cuiddar la integridad de los datos
+    @Column(name = "activo", nullable = false)
+    private Boolean activo = true;
+
     @ManyToOne
     @JoinColumn(name = "id_categoria", nullable = false)
     private CategoriaPlato categoriaPlato;

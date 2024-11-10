@@ -11,24 +11,29 @@ import java.util.Optional;
 
 @Service
 public class TipoLugarInteresServiceImpl implements TipoLugarInteresService {
+
     @Autowired
     private TipoLugarInteresRepository tipoLugarInteresRepository;
 
+    //Metodo para obtener un tipo de lugar por id
     @Override
     public Optional<TipoLugarInteres> findById(Long id) {
         return tipoLugarInteresRepository.findById(id);
     }
 
+    //Metodo para obtener todos los tipos de lugar
     @Override
     public List<TipoLugarInteres> findAll() {
         return tipoLugarInteresRepository.findAll();
     }
 
+    //Metodo para guardar un tipo de lugar
     @Override
     public TipoLugarInteres save(TipoLugarInteres tipoLugarInteres) {
         return tipoLugarInteresRepository.save(tipoLugarInteres);
     }
 
+    //Metodo para eliminar un tipo de lugar por id
     @Override
     public void deleteById(Long id) {
         tipoLugarInteresRepository.deleteById(id);

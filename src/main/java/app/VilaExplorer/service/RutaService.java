@@ -11,4 +11,7 @@ public interface RutaService {
     List<Ruta> findAll();
     Ruta save(Ruta ruta);
     void deleteById(Long id);
+
+    //Buscar rutas creadas por un usuario específico
+    List<Ruta> findByAutorId(Long autorId);
 }

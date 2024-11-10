@@ -31,6 +31,7 @@ public class LugarInteresServiceImpl implements LugarInteresService {
                 .toList();
     }
 
+    //metodo para guardar un lugar de interes
     @Override
     public LugarInteres save(LugarInteres lugarInteres) {
         return lugarInteresRepository.save(lugarInteres);

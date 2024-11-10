@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class RutaServiceImpl implements RutaService {
+public class
+RutaServiceImpl implements RutaService {
     @Autowired
     private RutaRepository rutaRepository;
 
@@ -32,5 +33,10 @@ public class RutaServiceImpl implements RutaService {
     @Override
     public void deleteById(Long id) {
         rutaRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Ruta> findByAutorId(Long autorId) {
+        return rutaRepository.findByAutorId(autorId);
     }
 }

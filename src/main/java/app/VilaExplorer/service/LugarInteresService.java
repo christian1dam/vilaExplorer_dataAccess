@@ -10,7 +10,7 @@ public interface LugarInteresService {
     List<LugarInteres> findAll();
     List<LugarInteres> findAllActivos();
     LugarInteres save(LugarInteres lugarInteres);
-    void deleteByIdLogico(Long id);
+    void deleteByIdLogico(Long id);//borrado logico para cambiar el estado de activo a false
 
 }
 

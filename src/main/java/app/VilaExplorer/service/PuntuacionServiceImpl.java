@@ -1,0 +1,126 @@
+package app.VilaExplorer.service;
+
+import app.VilaExplorer.domain.Puntuacion;
+import app.VilaExplorer.enums.TipoEntidad;
+import app.VilaExplorer.repository.PuntuacionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+public class PuntuacionServiceImpl implements PuntuacionService {
+
+    @Autowired
+    private PuntuacionRepository puntuacionRepository;
+
+    /* Metodo que devuelve todas las puntuaciones de una entidad
+    Se necesita el ID de la entidad y el tipo de entidad
+        * @param idEntidad ID de la entidad
+        * @param tipoEntidad Tipo de entidad
+        * @return Lista de puntuaciones de la entidad
+    */
+
+    @Override
+    public List<Puntuacion> findAllByEntidad(Long idEntidad, TipoEntidad tipoEntidad) {
+        return puntuacionRepository.findByIdEntidadAndTipoEntidad(idEntidad, tipoEntidad);
+    }
+
+    /*
+    Metodo que devuelve el promedio de calificación de una entidad
+    Se necesita el ID de la entidad y el tipo de entidad
+        * @param idEntidad ID de la entidad
+        * @param tipoEntidad Tipo de entidad
+        * @return Promedio de calificación de la entidad
+       */
+    @Override
+    public Optional<Double> getPromedioCalificacion(Long idEntidad, TipoEntidad tipoEntidad) {
+        List<Puntuacion> puntuaciones = findAllByEntidad(idEntidad, tipoEntidad);
+        return puntuaciones.isEmpty() ? Optional.empty() :
+                Optional.of(puntuaciones.stream()
+                        .mapToInt(Puntuacion::getPuntuacion)
+                        .average()
+                        .orElse(0.0));
+    }
+
+    /*
+    * Este metodo devuelve el conteo de cada valor de calificación para una entidad
+    * Se necesita el ID de la entidad y el tipo de entidad
+    * @param idEntidad ID de la entidad
+    * @param tipoEntidad Tipo de entidad
+    * @return Mapa con el conteo de cada valor de calificación
+    * Sirve para mostrar la cantidad de calificaciones de cada estrella e un lugar o plato
+     */
+    @Override
+    public Map<Integer, Long> getConteoCalificacionesPorEstrella(Long idEntidad, TipoEntidad tipoEntidad) {
+        List<Puntuacion> puntuaciones = findAllByEntidad(idEntidad, tipoEntidad);
+        return puntuaciones.stream()
+                .collect(Collectors.groupingBy(
+                        Puntuacion::getPuntuacion,
+                        Collectors.counting()
+                ));
+    }
+
+    /*
+    * Este metodo devuelve las puntuaciones de un usuario para una entidad específica
+    * se necesita el ID del usuario, el ID de la entidad y el tipo de entidad
+    * @param idUsuario ID del usuario
+    * @param idEntidad ID de la entidad
+    * @param tipoEntidad Tipo de entidad
+    * @return Lista de puntuaciones del usuario para la entidad
+    * Sirve para mostrar las calificaciones que un usuario ha dado a un lugar o plato
+    */
+    @Override
+    public List<Puntuacion> findByUsuarioAndEntidad(Long idUsuario, Long idEntidad, TipoEntidad tipoEntidad) {
+        return puntuacionRepository.findByUsuarioIdAndIdEntidadAndTipoEntidad(idUsuario, idEntidad, tipoEntidad);
+    }
+
+    @Override
+    public List<Puntuacion> findAllByUsuario(Long idUsuario) {
+        return puntuacionRepository.findByUsuarioId(idUsuario);
+    }
+
+    /*
+        * Este metodo filtra las entidades que tengan un promedio de calificación igual o superior a un valor específico.
+        * @param tipoEntidad Tipo de entidad a filtrar
+        * @param calificacionMinima Calificación mínima requerida
+        * @return Lista de IDs de entidades que cumplen con el criterio de filtrado
+        *
+     */
+    @Override
+    public List<Long> findEntidadesConCalificacionMinima(TipoEntidad tipoEntidad, double calificacionMinima) {
+        List<Long> entidadesFiltradas = new ArrayList<>();
+        List<Puntuacion> puntuaciones = puntuacionRepository.findByTipoEntidad(tipoEntidad);
+        Map<Long, List<Puntuacion>> puntuacionesAgrupadas = puntuaciones.stream()
+                .collect(Collectors.groupingBy(Puntuacion::getIdEntidad));
+
+        for (Map.Entry<Long, List<Puntuacion>> entry : puntuacionesAgrupadas.entrySet()) {
+            double promedio = entry.getValue().stream()
+                    .mapToInt(Puntuacion::getPuntuacion)
+                    .average()
+                    .orElse(0.0);
+            if (promedio >= calificacionMinima) {
+                entidadesFiltradas.add(entry.getKey());
+            }
+        }
+        return entidadesFiltradas;
+    }
+
+    @Override
+    public Puntuacion updatePuntuacion(Long idUsuario, Long idEntidad, TipoEntidad tipoEntidad, Integer nuevaPuntuacion) {
+        Puntuacion puntuacion = puntuacionRepository
+                .findByUsuarioIdAndIdEntidadAndTipoEntidad(idUsuario, idEntidad, tipoEntidad)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Puntuación no encontrada para la entidad especificada"));
+
+        puntuacion.setPuntuacion(nuevaPuntuacion);
+        return puntuacionRepository.save(puntuacion);
+    }
+
+
+}

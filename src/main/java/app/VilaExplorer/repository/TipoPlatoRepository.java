@@ -4,6 +4,20 @@ import app.VilaExplorer.domain.TipoPlato;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface TipoPlatoRepository extends JpaRepository<TipoPlato, Long> {
+    // Obtener todos los tipos de plato activos
+    List<TipoPlato> findByActivoTrue();
+
+    // Obtener todos los tipos de plato, incluidos los inactivos
+    List<TipoPlato> findAll();
+
+    // Buscar un tipo de plato por su ID y que esté activo
+    TipoPlato findByIdAndActivoTrue(Long id);
+
+    // Buscar todos los tipos de plato activos por ID de categoría
+    List<TipoPlato> findByCategoriaPlatoIdAndActivoTrue(Long categoriaId);
+
 }

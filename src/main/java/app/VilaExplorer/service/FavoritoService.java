@@ -12,7 +12,7 @@ public interface FavoritoService {
     List<Favorito> findAll();
     Favorito save(Favorito favorito);
     void deleteById(Long id);
-    List<Favorito> findByUsuarioId(Long idUsuario);
+    List<Favorito> findByUsuario_IdUsuario(Long idUsuario);
 
     /**
      * Devuelve una lista de favoritos de un usuario para una entidad específica.
@@ -20,5 +20,5 @@ public interface FavoritoService {
      * @param tipoEntidad el tipo de entidad
      * @return una lista de favoritos
      */
-    List<Favorito> findByUsuarioIdAndTipoEntidad(Long idUsuario, TipoEntidad tipoEntidad);
+    List<Favorito> findByUsuario_IdUsuarioAndTipoEntidad(Long idUsuario, TipoEntidad tipoEntidad);
 }

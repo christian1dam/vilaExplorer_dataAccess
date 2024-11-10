@@ -15,7 +15,7 @@ public class CategoriaPlato {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_categoria")
-    private long idCategoria;
+    private long idCategoriaPlato;
 
     @Column(name = "nombre_categoria")
     private String nombreCategoria;

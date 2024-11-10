@@ -9,6 +9,7 @@ import java.util.List;
 
 @Repository
 public interface FavoritoRepository extends JpaRepository<Favorito, Long> {
-    List<Favorito> findByUsuarioId(Long idUsuario);
-    List<Favorito> findByUsuarioIdAndTipoEntidad(Long idUsuario, TipoEntidad tipoEntidad);
+    List<Favorito> findByUsuario_IdUsuario(Long idUsuario);
+    List<Favorito> findByUsuario_IdUsuarioAndTipoEntidad(Long idUsuario, TipoEntidad tipoEntidad);
+
 }

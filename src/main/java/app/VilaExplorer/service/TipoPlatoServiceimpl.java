@@ -46,6 +46,6 @@ public class TipoPlatoServiceimpl implements TipoPlatoService {
 
     @Override
     public List<TipoPlato> findByCategoriaId(Long categoriaId) {
-        return tipoPlatoRepository.findByCategoriaPlatoIdAndActivoTrue(categoriaId);
+        return tipoPlatoRepository.findByCategoriaPlato_IdCategoriaPlatoAndActivoTrue(categoriaId);
     }
 }

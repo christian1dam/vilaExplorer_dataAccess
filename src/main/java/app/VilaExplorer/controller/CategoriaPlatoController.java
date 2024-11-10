@@ -41,7 +41,7 @@ public class CategoriaPlatoController {
     public ResponseEntity<CategoriaPlato> updateCategoriaPlato(@PathVariable Long id, @RequestBody CategoriaPlato categoriaPlato) {
         Optional<CategoriaPlato> existingCategoriaPlato = categoriaPlatoService.findById(id);
         if (existingCategoriaPlato.isPresent()) {
-            categoriaPlato.setIdCategoria(id); // Actualiza el campo 'idCategoria'
+            categoriaPlato.setIdCategoriaPlato(id); // Actualiza el campo 'idCategoria'
             return ResponseEntity.ok(categoriaPlatoService.save(categoriaPlato));
         } else {
             return ResponseEntity.notFound().build();

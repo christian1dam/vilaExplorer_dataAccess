@@ -17,7 +17,7 @@ public interface FiestaTradicionRepository extends JpaRepository<FiestaTradicion
      * Encuentra todas las fiestas tradicionales de un autor
      * @param autor
      */
-    List<FiestaTradicion> findByAutorId(Usuario autor);
+    List<FiestaTradicion> findByAutor_IdUsuario(Usuario autor);
 
 
     /**

@@ -45,7 +45,7 @@ public class FavoritoController {
      */
     @GetMapping("/usuario/{idUsuario}")
     public List<Favorito> getFavoritosByUsuario(@PathVariable Long idUsuario) {
-        return favoritoService.findByUsuarioId(idUsuario);
+        return favoritoService.findByUsuario_IdUsuario(idUsuario);
     }
 
     /**
@@ -56,7 +56,7 @@ public class FavoritoController {
      */
     @GetMapping("/usuario/{idUsuario}/tipo/{tipoEntidad}")
     public List<Favorito> getFavoritosByUsuarioAndTipoEntidad(@PathVariable Long idUsuario, @PathVariable TipoEntidad tipoEntidad) {
-        return favoritoService.findByUsuarioIdAndTipoEntidad(idUsuario, tipoEntidad);
+        return favoritoService.findByUsuario_IdUsuarioAndTipoEntidad(idUsuario, tipoEntidad);
     }
 
     /**

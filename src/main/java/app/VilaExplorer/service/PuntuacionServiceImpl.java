@@ -76,12 +76,12 @@ public class PuntuacionServiceImpl implements PuntuacionService {
     */
     @Override
     public List<Puntuacion> findByUsuarioAndEntidad(Long idUsuario, Long idEntidad, TipoEntidad tipoEntidad) {
-        return puntuacionRepository.findByUsuarioIdAndIdEntidadAndTipoEntidad(idUsuario, idEntidad, tipoEntidad);
+        return puntuacionRepository.findByUsuario_IdUsuarioAndIdEntidadAndTipoEntidad(idUsuario, idEntidad, tipoEntidad);
     }
 
     @Override
     public List<Puntuacion> findAllByUsuario(Long idUsuario) {
-        return puntuacionRepository.findByUsuarioId(idUsuario);
+        return puntuacionRepository.findByUsuario_IdUsuario(idUsuario);
     }
 
     /*
@@ -113,7 +113,7 @@ public class PuntuacionServiceImpl implements PuntuacionService {
     @Override
     public Puntuacion updatePuntuacion(Long idUsuario, Long idEntidad, TipoEntidad tipoEntidad, Integer nuevaPuntuacion) {
         Puntuacion puntuacion = puntuacionRepository
-                .findByUsuarioIdAndIdEntidadAndTipoEntidad(idUsuario, idEntidad, tipoEntidad)
+                .findByUsuario_IdUsuarioAndIdEntidadAndTipoEntidad(idUsuario, idEntidad, tipoEntidad)
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Puntuación no encontrada para la entidad especificada"));

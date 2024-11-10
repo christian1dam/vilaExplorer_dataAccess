@@ -16,10 +16,10 @@ public interface PuntuacionRepository extends JpaRepository<Puntuacion, Long> {
     List<Puntuacion> findByIdEntidadAndTipoEntidad(Long idEntidad, TipoEntidad tipoEntidad);
 
     // Encuentra todas las puntuaciones realizadas por un usuario en una entidad específica
-    List<Puntuacion> findByUsuarioIdAndIdEntidadAndTipoEntidad(Long idUsuario, Long idEntidad, TipoEntidad tipoEntidad);
+    List<Puntuacion> findByUsuario_IdUsuarioAndIdEntidadAndTipoEntidad(Long idUsuario, Long idEntidad, TipoEntidad tipoEntidad);
 
     // Encuentra todas las puntuaciones realizadas por un usuario en todas las entidades
-    List<Puntuacion> findByUsuarioId(Long idUsuario);
+    List<Puntuacion> findByUsuario_IdUsuario(Long idUsuario);
 
     // Encuentra todas las puntuaciones de un tipo de entidad específico (por ejemplo, todos los platos, todos los lugares)
     List<Puntuacion> findByTipoEntidad(TipoEntidad tipoEntidad);

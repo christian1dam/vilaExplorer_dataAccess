@@ -10,6 +10,7 @@ import java.util.List;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+    // Buscar un usuario por su nombre de usuario
     @Query("SELECT u FROM Usuario u JOIN u.roles ur JOIN ur.rol r WHERE r.nombre = :rol")
     List<Usuario> findUsuariosByRol(@Param("rol") String rol);
 }

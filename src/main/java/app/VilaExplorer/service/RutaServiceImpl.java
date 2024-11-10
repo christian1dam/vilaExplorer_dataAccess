@@ -37,6 +37,6 @@ RutaServiceImpl implements RutaService {
 
     @Override
     public List<Ruta> findByAutorId(Long autorId) {
-        return rutaRepository.findByAutorId(autorId);
+        return rutaRepository.findByAutor_IdUsuario(autorId);
     }
 }

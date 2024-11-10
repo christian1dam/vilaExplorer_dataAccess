@@ -60,7 +60,7 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
      */
     @Override
     public List<FiestaTradicion> findByAutor(Usuario autor) {
-        return fiestaTradicionRepository.findByAutorId(autor);
+        return fiestaTradicionRepository.findByAutor_IdUsuario(autor);
     }
 
     /**

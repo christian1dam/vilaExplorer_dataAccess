@@ -15,9 +15,10 @@ public interface TipoPlatoRepository extends JpaRepository<TipoPlato, Long> {
     List<TipoPlato> findAll();
 
     // Buscar un tipo de plato por su ID y que esté activo
-    TipoPlato findByIdAndActivoTrue(Long id);
+    TipoPlato findByIdTipoPlatoAndActivoTrue(Long idTipoPlato);
 
     // Buscar todos los tipos de plato activos por ID de categoría
-    List<TipoPlato> findByCategoriaPlatoIdAndActivoTrue(Long categoriaId);
+    List<TipoPlato> findByCategoriaPlato_IdCategoriaPlatoAndActivoTrue(Long idCategoriaPlato);
+
 
 }

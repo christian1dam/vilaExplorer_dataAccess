@@ -58,8 +58,8 @@ public class FavoritoServiceImpl implements FavoritoService {
      * @return una lista de favoritos
      */
     @Override
-    public List<Favorito> findByUsuarioId(Long idUsuario) {
-        return favoritoRepository.findByUsuarioId(idUsuario);
+    public List<Favorito> findByUsuario_IdUsuario(Long idUsuario) {
+        return favoritoRepository.findByUsuario_IdUsuario(idUsuario);
     }
 
     /**
@@ -69,8 +69,8 @@ public class FavoritoServiceImpl implements FavoritoService {
      * @return una lista de favoritos
      */
     @Override
-    public List<Favorito> findByUsuarioIdAndTipoEntidad(Long idUsuario, TipoEntidad tipoEntidad) {
-        return favoritoRepository.findByUsuarioIdAndTipoEntidad(idUsuario, tipoEntidad);
+    public List<Favorito> findByUsuario_IdUsuarioAndTipoEntidad(Long idUsuario, TipoEntidad tipoEntidad) {
+        return favoritoRepository.findByUsuario_IdUsuarioAndTipoEntidad(idUsuario, tipoEntidad);
     }
 
 }

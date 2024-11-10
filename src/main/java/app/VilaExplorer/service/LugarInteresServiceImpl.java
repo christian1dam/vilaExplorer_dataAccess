@@ -26,10 +26,9 @@ public class LugarInteresServiceImpl implements LugarInteresService {
     //metodo para obtener todos los lugares de interes activos
     @Override
     public List<LugarInteres> findAllActivos() {
-        return lugarInteresRepository.findAll().stream()
-                .filter(LugarInteres::getActivo)
-                .toList();
+        return lugarInteresRepository.findAllByActivoTrue();
     }
+
 
     //metodo para guardar un lugar de interes
     @Override

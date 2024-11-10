@@ -23,4 +23,12 @@ public class Coordenadas {
 
     @Column (name = "longitud", nullable = false)
     private Double longitud;
+
+    @ManyToOne
+    @JoinColumn(name = "id_lugar_interes")
+    private LugarInteres lugarInteres;
+
+    @ManyToOne
+    @JoinColumn(name = "id_ruta")
+    private Ruta ruta;
 }

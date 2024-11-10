@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -23,13 +25,7 @@ public class Ruta {
     @JoinColumn(name = "id_autor", nullable = false)
     private Usuario autor;
 
-    @ManyToOne
-    @JoinColumn(name = "id_origen", nullable = false)
-    private Coordenadas origen;
-
-    @ManyToOne
-    @JoinColumn(name = "id_destino", nullable = false)
-    private Coordenadas destino;
-
+    @OneToMany(mappedBy = "ruta", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Coordenadas> coordenadas;
 
 }

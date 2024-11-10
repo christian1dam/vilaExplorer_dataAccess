@@ -25,12 +25,22 @@ public class CategoriaPlatoServiceImpl implements CategoriaPlatoService {
     }
 
     @Override
+    public List<CategoriaPlato> findAllActivos() {
+        return categoriaPlatoRepository.findByActivoTrue();
+    }
+
+    @Override
     public CategoriaPlato save(CategoriaPlato categoriaPlato) {
         return categoriaPlatoRepository.save(categoriaPlato);
     }
 
     @Override
-    public void deleteById(Long id) {
-        categoriaPlatoRepository.deleteById(id);
+    public void deleteByIdLogico(Long id) {
+        Optional<CategoriaPlato> categoriaPlato = categoriaPlatoRepository.findById(id);
+        if (categoriaPlato.isPresent()) {
+            CategoriaPlato categoria = categoriaPlato.get();
+            categoria.setActivo(false); // Cambiar el estado a inactivo (borrado lógico)
+            categoriaPlatoRepository.save(categoria);
+        }
     }
 }

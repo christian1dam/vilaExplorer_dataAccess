@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface CategoriaPlatoService {
     Optional<CategoriaPlato> findById(Long id);
     List<CategoriaPlato> findAll();
+    List<CategoriaPlato> findAllActivos(); // Metodo para obtener solo las categorías activas
     CategoriaPlato save(CategoriaPlato categoriaPlato);
-    void deleteById(Long id);
+    void deleteByIdLogico(Long id); // Cambiado para realizar un borrado lógico
 }

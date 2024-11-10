@@ -30,5 +30,5 @@ public class Articulo {
 
     @ManyToOne
     @JoinColumn(name = "id_autor", nullable = false, foreignKey = @ForeignKey(name = "FK_articulo_usuario"))
-    private Usuario autorId;
+    private Usuario autor;
 }

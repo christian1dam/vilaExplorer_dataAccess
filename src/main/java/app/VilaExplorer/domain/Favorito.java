@@ -1,4 +1,5 @@
 package app.VilaExplorer.domain;
+import app.VilaExplorer.enums.TipoEntidad;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,7 +20,10 @@ public class Favorito {
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne
-    @JoinColumn(name = "id_lugar", nullable = false)
-    private LugarInteres lugarInteres;
+    @Column(name = "id_entidad", nullable = false)
+    private Long idEntidad;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_entidad", nullable = false)
+    private TipoEntidad tipoEntidad;
 }

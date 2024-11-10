@@ -29,9 +29,20 @@ public class RutaController {
     }
 
     @PostMapping("/crear")
-    public Ruta createRuta(@RequestBody Ruta ruta) {
-        return rutaService.save(ruta);
+    public ResponseEntity<Ruta> createRuta(@RequestBody Ruta ruta) {
+        // Validar que se hayan enviado coordenadas
+        if (ruta.getCoordenadas() == null || ruta.getCoordenadas().isEmpty()) {
+            return ResponseEntity.badRequest().body(null); // Es obligatorio tener al menos un par de coordenadas
+        }
+
+        // Asociar cada coordenada a la ruta
+        ruta.getCoordenadas().forEach(coordenada -> coordenada.setRuta(ruta));
+
+        // Guardar la ruta junto con las coordenadas asociadas
+        Ruta savedRuta = rutaService.save(ruta);
+        return ResponseEntity.ok(savedRuta);
     }
+
 
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<Void> deleteRuta(@PathVariable Long id) {

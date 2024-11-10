@@ -39,4 +39,8 @@ public class LugarInteres {
     @ManyToOne
     @JoinColumn(name = "id_tipo_lugar", nullable = false)
     private TipoLugarInteres tipoLugar;
+
+    @OneToMany(mappedBy = "lugarInteres", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Coordenadas> coordenadas;
+
 }

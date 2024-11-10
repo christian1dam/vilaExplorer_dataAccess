@@ -27,6 +27,11 @@ public class CategoriaPlatoController {
         return categoriaPlatoService.findAll();
     }
 
+    @GetMapping("/activos")
+    public List<CategoriaPlato> getAllCategoriasPlatoActivos() {
+        return categoriaPlatoService.findAllActivos();
+    }
+
     @PostMapping("/crear")
     public CategoriaPlato createCategoriaPlato(@RequestBody CategoriaPlato categoriaPlato) {
         return categoriaPlatoService.save(categoriaPlato);
@@ -36,16 +41,18 @@ public class CategoriaPlatoController {
     public ResponseEntity<CategoriaPlato> updateCategoriaPlato(@PathVariable Long id, @RequestBody CategoriaPlato categoriaPlato) {
         Optional<CategoriaPlato> existingCategoriaPlato = categoriaPlatoService.findById(id);
         if (existingCategoriaPlato.isPresent()) {
-            categoriaPlato.setId_categoria(id);
+            categoriaPlato.setIdCategoria(id); // Actualiza el campo 'idCategoria'
             return ResponseEntity.ok(categoriaPlatoService.save(categoriaPlato));
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
+    // Borrado lógico de una categoría de plato por ID
+    //Para mantener la integridad de los datos, se realiza un borrado lógico
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<Void> deleteCategoriaPlato(@PathVariable Long id) {
-        categoriaPlatoService.deleteById(id);
+    public ResponseEntity<Void> deleteCategoriaPlatoLogico(@PathVariable Long id) {
+        categoriaPlatoService.deleteByIdLogico(id);
         return ResponseEntity.noContent().build();
     }
 }

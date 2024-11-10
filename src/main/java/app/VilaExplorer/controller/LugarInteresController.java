@@ -53,11 +53,19 @@ public class LugarInteresController {
 
     // POST /api/lugares/crear
     @PostMapping("/crear")
-    public LugarInteres createLugarInteres(@RequestBody LugarInteres lugarInteres) {
-        lugarInteres.getCoordenadas().forEach(coordenada -> coordenada.setLugarInteres(lugarInteres));//asignar el lugar de interes a las coordenadas
-        return lugarInteresService.save(lugarInteres);
-    }
+    public ResponseEntity<LugarInteres> createLugarInteres(@RequestBody LugarInteres lugarInteres) {
+        // Validar que se hayan enviado coordenadas
+        if (lugarInteres.getCoordenadas() == null || lugarInteres.getCoordenadas().isEmpty()) {
+            return ResponseEntity.badRequest().body(null); // Es obligatorio tener al menos un par de coordenadas
+        }
 
+        // Asociar cada coordenada al lugar de interés
+        lugarInteres.getCoordenadas().forEach(coordenada -> coordenada.setLugarInteres(lugarInteres));
+
+        // Guardar el lugar de interés junto con las coordenadas asociadas
+        LugarInteres savedLugarInteres = lugarInteresService.save(lugarInteres);
+        return ResponseEntity.ok(savedLugarInteres);
+    }
 
     // PUT /api/lugares/modificar/{id}
     @PutMapping("/modificar/{id}")

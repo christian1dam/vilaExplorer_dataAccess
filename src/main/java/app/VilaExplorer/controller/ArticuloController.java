@@ -17,6 +17,11 @@ public class ArticuloController {
     @Autowired
     private ArticuloService articuloService;
 
+    /**
+     * Metodo que permite obtener un artículo por su id
+     * @param id id del articulo
+     * @return
+     */
     @GetMapping("/detalle/{id}")
     public ResponseEntity<Articulo> getArticuloById(@PathVariable Long id) {
         Optional<Articulo> articulo = articuloService.findById(id);

@@ -6,19 +6,23 @@ import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.service.UsuarioService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuario")
 public class UsuarioController {
+    private static final String RESET = "\u001B[0m";
+    private static final String RED = "\u001B[31m";
+
     @Autowired
     private UsuarioService usuarioService;
 
@@ -60,39 +64,38 @@ public class UsuarioController {
             Usuario usuarioConRol = usuarioService.crearUsuarioConRol(usuario, rol);
             return new ResponseEntity<>(usuarioConRol, HttpStatus.CREATED);
         } catch (RolNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            System.out.println(RED + e.getMessage() + RESET);
+            return new ResponseEntity<>(usuario, HttpStatus.NOT_FOUND);
+        } catch (DataIntegrityViolationException e) {
+            System.out.println(RED + e.getMessage() + RESET);
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (Exception e) {
+            System.out.println(RED + e.getMessage() + RESET);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     // Actualizar un usuario existente
     @PutMapping("/{id}")
     @Transactional
     public ResponseEntity<Usuario> updateUsuario(@PathVariable Long id, @RequestBody Usuario usuarioDetails) {
-        Optional<Usuario> usuario = usuarioService.findById(id);
-        if (usuario.isPresent()) {
-            Usuario updatedUsuario = usuario.get();
-            updatedUsuario.setNombre(usuarioDetails.getNombre());
-            updatedUsuario.setEmail(usuarioDetails.getEmail());
-            updatedUsuario.setPassword(usuarioDetails.getPassword());
-            updatedUsuario.setEstado(usuarioDetails.getEstado());
-            updatedUsuario.setFechaCreacion(usuarioDetails.getFechaCreacion());
-            usuarioService.save(updatedUsuario);
-            return ResponseEntity.ok(updatedUsuario);
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            Usuario usuarioActualizado = usuarioService.updateUsuario(id, usuarioDetails);
+            return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);
+        } catch (UsuarioNotFoundException e) {
+            System.out.println(RED + e.getMessage() + RESET);
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
     }
 
     @PatchMapping("/updateRole")
     @Transactional
-    public ResponseEntity<Usuario> updateUsuarioRole(@RequestParam(value = "id_usuario") Long usuarioID, @RequestParam(value = "rol") String rol) {
+    public ResponseEntity<Usuario> updateRole(@RequestParam(value = "id_usuario") Long usuarioID, @RequestParam(value = "rol") String rol) {
         try {
-            Usuario usuarioActualizado = usuarioService.asignarRolAUsuario(usuarioID, rol);
+            Usuario usuarioActualizado = usuarioService.updateRolDelUsuario(usuarioID, rol);
             return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);
         } catch (UsuarioNotFoundException | RolNotFoundException e) {
+            System.out.println(Color.red + " " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

@@ -8,7 +8,9 @@ import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.repository.RolRepository;
 import app.VilaExplorer.repository.UsuarioRepository;
 import app.VilaExplorer.repository.UsuarioRolRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,48 +59,76 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public Usuario asignarRolAUsuario(Long usuarioId, String nombreRol) throws UsuarioNotFoundException, RolNotFoundException {
+    @Transactional
+    public Usuario updateRolDelUsuario(Long usuarioId, String nombreRol) throws UsuarioNotFoundException, RolNotFoundException {
         // Buscar el usuario por ID
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado"));
-
-        // Buscar el rol por nombre
-        Rol rol = rolRepository.findByNombre(nombreRol)
-                .orElseThrow(() -> new RolNotFoundException("Rol no encontrado"));
-
-        // Asignar el nuevo rol como rol actual del usuario
-        usuario.setRolActual(rol);
-
-        // Crear la relación UsuarioRol con la fecha de asignación
-        UsuarioRol usuarioRol = new UsuarioRol();
-        usuarioRol.setUsuario(usuario);
-        usuarioRol.setRol(rol);
-        usuarioRol.setFechaDeAsignacion(LocalDateTime.now());
-
-        // Guardar en el historial de roles
-        usuarioRolRepository.save(usuarioRol);
-
-        // Agregar el nuevo UsuarioRol a la lista roles del usuario en memoria
-        usuario.getRoles().add(usuarioRol);
-
-        // Guardar el usuario con el nuevo rol actual
-        return usuarioRepository.save(usuario);
+        if (usuarioRepository.findById(usuarioId).isEmpty()) {
+            throw new UsuarioNotFoundException("Usuario no encontrado en la base de datos");
+        }
+        if (rolRepository.findByNombre(nombreRol).isEmpty()) {
+            throw new RolNotFoundException("Rol no encontrado");
+        }
+        Usuario usuarioFromDB = usuarioRepository.findById(usuarioId).get();
+        return asignarRolAUsuario(usuarioFromDB, nombreRol);
     }
 
     @Override
     public List<Usuario> findUsuariosByRol(String rol) throws RolNotFoundException {
-        Rol rolFromDB = rolRepository.findByNombre(rol)
-                .orElseThrow(() -> new RolNotFoundException("Rol no encontrado"));
+        if (rolRepository.findByNombre(rol).isEmpty()) {
+            throw new RolNotFoundException("El rol no existe en la base de datos");
+        }
         return usuarioRepository.findUsuariosByRol(rol);
     }
 
     @Override
     @Transactional
-    public Usuario crearUsuarioConRol(Usuario usuario, String rol) throws RolNotFoundException, UsuarioNotFoundException {
-        // Guardar el usuario sin rol
-        Usuario newUsuario = usuarioRepository.save(usuario);
+    public Usuario crearUsuarioConRol(Usuario usuario, String rol) throws RolNotFoundException, DataIntegrityViolationException {
+        /*
+        Primero se hacen validaciones antes de crear el usuario,
+        verificando si ya existe un usuario con el mismo correo electronico y
+        si el rol que se le quiere asignar no existe en la base de datos.
+         */
 
-        // Usar asignarRolAUsuario para asignar el rol al usuario en una transacción
-        return asignarRolAUsuario(newUsuario.getIdUsuario(), rol);
+        if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
+            throw new DataIntegrityViolationException("Este email ya existe en la base de datos.");
+        } else if (rolRepository.findByNombre(rol).isEmpty()) {
+            throw new RolNotFoundException("No se ha encontrado el rol en la base de datos");
+        }
+        return asignarRolAUsuario(usuario, rol);
+    }
+
+    @Override
+    @Transactional
+    public Usuario updateUsuario(Long id, Usuario usuarioDetails) throws UsuarioNotFoundException {
+        if (usuarioRepository.findById(id).isEmpty()) {
+            throw new UsuarioNotFoundException("Error, no existe un usuario con este ID: " + id);
+        }
+        Usuario usuarioActualizado = usuarioRepository.findById(id).get();
+        usuarioActualizado.setNombre(usuarioDetails.getNombre());
+        usuarioActualizado.setEmail(usuarioDetails.getEmail());
+        usuarioActualizado.setPassword(usuarioDetails.getPassword());
+        usuarioActualizado.setEstado(usuarioDetails.getEstado());
+        usuarioActualizado.setFechaCreacion(usuarioDetails.getFechaCreacion());
+        return usuarioRepository.save(usuarioActualizado);
+    }
+
+    private Usuario asignarRolAUsuario(Usuario usuario, String rol) {
+        Usuario usuarioGuardado = usuarioRepository.save(usuario);
+        assert rolRepository.findByNombre(rol).isPresent();
+        Rol rolFromDB = rolRepository.findByNombre(rol).get();
+
+        // Asigna el rol después de guardar el usuario
+        usuarioGuardado.setRolActual(rolFromDB);
+
+        UsuarioRol usuarioRol = new UsuarioRol();
+        usuarioRol.setUsuario(usuarioGuardado);
+        usuarioRol.setRol(rolFromDB);
+        usuarioRol.setFechaDeAsignacion(LocalDateTime.now());
+
+        usuarioRolRepository.save(usuarioRol);
+
+        usuarioGuardado.getRoles().add(usuarioRol);
+
+        return usuarioRepository.save(usuarioGuardado);
     }
 }

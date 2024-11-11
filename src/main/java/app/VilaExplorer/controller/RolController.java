@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,8 @@ import static app.VilaExplorer.controller.Response.NOT_FOUND;
 @RestController
 @RequestMapping(value = "/api/roles")
 public class RolController {
+    private static final String RESET = "\u001B[0m";
+    private static final String RED = "\u001B[31m";
 
     @Autowired
     RolService rolService;
@@ -47,9 +50,14 @@ public class RolController {
     })
     @PostMapping("/add")
     @Transactional
-    public ResponseEntity<Rol> anyadirRol(@RequestBody Rol rol){
-        Rol nuevoRol = rolService.anyadirRol(rol);
-        return new ResponseEntity<>(nuevoRol, HttpStatus.CREATED);
+    public ResponseEntity<Rol> anyadirRol(@RequestBody Rol rol) {
+        try{
+            Rol nuevoRol = rolService.anyadirRol(rol);
+            return new ResponseEntity<>(nuevoRol, HttpStatus.CREATED);
+        }catch (DataIntegrityViolationException e){
+            System.out.println(RED + e.getMessage() + RESET);
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
     }
 
 
@@ -78,10 +86,11 @@ public class RolController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Response> eliminarRolPorID(@PathVariable Long id) {
-        try{
+        try {
             rolService.eliminarRolPorID(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }catch (RolNotFoundException rnfe){
+        } catch (RolNotFoundException rnfe) {
+            System.out.println(RED + rnfe.getMessage() + RESET);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

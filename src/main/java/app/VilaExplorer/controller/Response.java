@@ -26,7 +26,7 @@ public class Response {
         return new Response(new Error(NO_ERROR, NO_MESSAGE));
     }
 
-    public static Response errorResonse(int errorCode, String
+    public static Response errorResponse(int errorCode, String
             errorMessage) {
         return new Response(new Error(errorCode, errorMessage));
     }

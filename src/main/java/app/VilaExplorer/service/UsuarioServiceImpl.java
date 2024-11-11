@@ -8,7 +8,6 @@ import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.repository.RolRepository;
 import app.VilaExplorer.repository.UsuarioRepository;
 import app.VilaExplorer.repository.UsuarioRolRepository;
-import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
@@ -36,8 +34,10 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public Optional<Usuario> findById(Long id) {
-        return usuarioRepository.findById(id);
+    public Usuario findById(Long id) throws UsuarioNotFoundException {
+        if (usuarioRepository.findById(id).isEmpty())
+            throw new UsuarioNotFoundException("El usuario con el ID " + id + " no existe en la base de datos");
+        return usuarioRepository.findById(id).get();
     }
 
     @Override
@@ -46,16 +46,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public void deleteById(Long id) throws RolNotFoundException {
+    public void deleteById(Long id) throws UsuarioNotFoundException {
         if (!usuarioRepository.existsById(id)) {
-            throw new RolNotFoundException("El usuario con el ID " + id + " no existe en la base de datos");
+            throw new UsuarioNotFoundException("El usuario con el ID " + id + " no existe en la base de datos");
         }
         usuarioRepository.deleteById(id);
-    }
-
-    @Override
-    public boolean existsById(Long id) {
-        return usuarioRepository.existsById(id);
     }
 
     @Override
@@ -88,7 +83,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         verificando si ya existe un usuario con el mismo correo electronico y
         si el rol que se le quiere asignar no existe en la base de datos.
          */
-
         if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
             throw new DataIntegrityViolationException("Este email ya existe en la base de datos.");
         } else if (rolRepository.findByNombre(rol).isEmpty()) {
@@ -107,11 +101,21 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuarioActualizado.setNombre(usuarioDetails.getNombre());
         usuarioActualizado.setEmail(usuarioDetails.getEmail());
         usuarioActualizado.setPassword(usuarioDetails.getPassword());
-        usuarioActualizado.setEstado(usuarioDetails.getEstado());
+        usuarioActualizado.setActivo(usuarioDetails.getActivo());
         usuarioActualizado.setFechaCreacion(usuarioDetails.getFechaCreacion());
         return usuarioRepository.save(usuarioActualizado);
     }
 
+    @Override
+    public void deleteUsuarioLogico(Long id) throws UsuarioNotFoundException {
+        if (usuarioRepository.findById(id).isEmpty())
+            throw new UsuarioNotFoundException("El usuario no se encuentra en la base de datos.");
+        Usuario usuarioExistente = usuarioRepository.findById(id).get();
+        usuarioExistente.setActivo(false);
+        usuarioRepository.save(usuarioExistente);
+    }
+
+//    Solamente se llama a este metodo despues de haber hecho las validaciones de usuario y rol.
     private Usuario asignarRolAUsuario(Usuario usuario, String rol) {
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
         assert rolRepository.findByNombre(rol).isPresent();

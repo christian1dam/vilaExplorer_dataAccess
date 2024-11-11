@@ -18,7 +18,7 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .components(new Components())
                 .info(new Info().title("VilaExplorer API")
-                        .description("API REST para la gestión de los enPonit de VilaExplorer.\n" +
+                        .description("API REST para la gestión de los endPoints de VilaExplorer.\n" +
                                 "Contactos:\n" +
                                 " - VilaExplorerAdmin: aangelcruzmx@gmail.com\n" +
                                 " - VilaExplorerAdmin: ivan01092004@gmail.com\n" +

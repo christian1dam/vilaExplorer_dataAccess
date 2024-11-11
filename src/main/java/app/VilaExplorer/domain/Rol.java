@@ -23,7 +23,6 @@ import java.util.List;
 @Table(name = "rol")
 @Schema(description = "Representación de un rol del sistema, el cual define permisos y acceso")
 public class Rol {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_rol")

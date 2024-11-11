@@ -8,7 +8,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RolServiceImpl implements RolService {
@@ -38,11 +37,17 @@ public class RolServiceImpl implements RolService {
     }
 
     @Override
-    public Optional<Rol> getRolByNombre(String rol) throws DataIntegrityViolationException {
+    public Rol getRolByNombre(String rol) throws RolNotFoundException {
         if (rolRepository.findByNombre(rol).isEmpty()){
-            throw new DataIntegrityViolationException("Este rol no existe en la base de datos.");
+            throw new RolNotFoundException("Este rol no existe en la base de datos.");
         }
-        return rolRepository.findByNombre(rol);
+        return rolRepository.findByNombre(rol).get();
+    }
+
+    @Override
+    public void desactivaRolPorID(Long id) throws RolNotFoundException {
+        if(rolRepository.findById(id).isEmpty()) throw new RolNotFoundException("El id que has introducido no pertenece a ningún rol");
+        rolRepository.findById(id).get().setActivo(false);
     }
 
     // Metodo para obtener todos los roles activos

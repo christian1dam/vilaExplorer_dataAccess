@@ -4,31 +4,40 @@ import app.VilaExplorer.domain.Usuario;
 import app.VilaExplorer.exception.RolNotFoundException;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.service.UsuarioService;
+import com.fasterxml.jackson.core.sym.CharsToNameCanonicalizer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
+import jdk.swing.interop.SwingInterOpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Optional;
+
+import static app.VilaExplorer.controller.Response.NOT_FOUND;
 
 
 /**
  * Controlador para la API REST de Usuarios.
+ *
  * @author VilaExplorerAdmin
  * @version 1.0
  */
 @RestController
 @RequestMapping("/api/usuario")
 public class UsuarioController {
+    private static final String RESET = "\u001B[0m";
+    private static final String RED = "\u001B[31m";
+
     @Autowired
     private UsuarioService usuarioService;
 
@@ -51,11 +60,14 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Usuario>> getUsuarioById(@PathVariable Long id) {
-        Optional<Usuario> usuario;
-        usuario = usuarioService.findById(id);
-        if (usuario.isPresent()) return new ResponseEntity<>(usuario, HttpStatus.OK);
-        else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long id) {
+        try {
+            Usuario usuario = usuarioService.findById(id);
+            return new ResponseEntity<>(usuario, HttpStatus.OK);
+        } catch (UsuarioNotFoundException e) {
+            System.out.println(RED + e.getMessage() + RESET);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 
@@ -70,14 +82,11 @@ public class UsuarioController {
         List<Usuario> usuarios;
         try {
             usuarios = usuarioService.findUsuariosByRol(rol);
+            return new ResponseEntity<>(usuarios, HttpStatus.OK);
         } catch (RolNotFoundException e) {
-            throw new RuntimeException(e);
+            System.out.println(RED + e.getMessage() + RESET);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        if (usuarios.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(usuarios, HttpStatus.OK);
     }
 
     // Crear un nuevo usuario
@@ -85,6 +94,7 @@ public class UsuarioController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Usuario creado", content = @Content(schema = @Schema(implementation = Usuario.class))),
             @ApiResponse(responseCode = "404", description = "Rol no encontrado", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Error de consistencia de datos", content = @Content),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor", content = @Content)
     })
     @PostMapping("/add")
@@ -93,11 +103,15 @@ public class UsuarioController {
             Usuario usuarioConRol = usuarioService.crearUsuarioConRol(usuario, rol);
             return new ResponseEntity<>(usuarioConRol, HttpStatus.CREATED);
         } catch (RolNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            System.out.println(RED + e.getMessage() + RESET);
+            return new ResponseEntity<>(usuario, HttpStatus.NOT_FOUND);
+        } catch (DataIntegrityViolationException e) {
+            System.out.println(RED + e.getMessage() + RESET);
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (Exception e) {
+            System.out.println(RED + e.getMessage() + RESET);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
 
@@ -108,20 +122,13 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
     })
     @PutMapping("/{id}")
-    @Transactional
     public ResponseEntity<Usuario> updateUsuario(@PathVariable Long id, @RequestBody Usuario usuarioDetails) {
-        Optional<Usuario> usuario = usuarioService.findById(id);
-        if (usuario.isPresent()) {
-            Usuario updatedUsuario = usuario.get();
-            updatedUsuario.setNombre(usuarioDetails.getNombre());
-            updatedUsuario.setEmail(usuarioDetails.getEmail());
-            updatedUsuario.setPassword(usuarioDetails.getPassword());
-            updatedUsuario.setActivo(usuarioDetails.getActivo());
-            updatedUsuario.setFechaCreacion(usuarioDetails.getFechaCreacion());
-            usuarioService.save(updatedUsuario);
-            return ResponseEntity.ok(updatedUsuario);
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            Usuario usuarioActualizado = usuarioService.updateUsuario(id, usuarioDetails);
+            return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);
+        } catch (UsuarioNotFoundException e) {
+            System.out.println(RED + e.getMessage() + RESET);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -133,11 +140,12 @@ public class UsuarioController {
     })
     @PatchMapping("/updateRole")
     @Transactional
-    public ResponseEntity<Usuario> updateUsuarioRole(@RequestParam(value = "id_usuario") Long usuarioID, @RequestParam(value = "rol") String rol) {
+    public ResponseEntity<Usuario> updateRole(@RequestParam(value = "id_usuario") Long usuarioID, @RequestParam(value = "rol") String rol) {
         try {
-            Usuario usuarioActualizado = usuarioService.asignarRolAUsuario(usuarioID, rol);
+            Usuario usuarioActualizado = usuarioService.updateRolDelUsuario(usuarioID, rol);
             return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);
         } catch (UsuarioNotFoundException | RolNotFoundException e) {
+            System.out.println(RED + e.getMessage() + RESET);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
@@ -145,6 +153,7 @@ public class UsuarioController {
 
     /**
      * Borrado lógico de un usuario.
+     *
      * @param id ID del usuario a desactivar.
      * @return Respuesta de desactivación del usuario.
      */
@@ -154,15 +163,12 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
     })
     @PutMapping("/desactivar/{id}")
-    public ResponseEntity<Usuario> deleteUsuarioLogico(@PathVariable Long id) {
-        Optional<Usuario> usuario = usuarioService.findById(id);
-        if (usuario.isPresent()) {
-            Usuario usuarioExistente = usuario.get();
-            usuarioExistente.setActivo(false);
-            usuarioService.save(usuarioExistente);
-            return ResponseEntity.ok(usuarioExistente);
-        } else {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<Response> deleteUsuarioLogico(@PathVariable Long id) {
+        try {
+            usuarioService.deleteUsuarioLogico(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (UsuarioNotFoundException e) {
+           return handleException(e);
         }
     }
 
@@ -174,19 +180,21 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUsuario(@PathVariable Long id) {
+    public ResponseEntity<Response> deleteUsuario(@PathVariable Long id) {
         try {
-            if (usuarioService.existsById(id)) {
-                usuarioService.deleteById(id);
-                return ResponseEntity.noContent().build();
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (RolNotFoundException e) {
-            throw new RuntimeException(e);
+            usuarioService.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (UsuarioNotFoundException e) {
+            return handleException(e);
         }
     }
 
-
-
+    @ExceptionHandler(UsuarioNotFoundException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Response> handleException(UsuarioNotFoundException unfe) {
+        Response response = Response.errorResponse(NOT_FOUND,
+                unfe.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
 }

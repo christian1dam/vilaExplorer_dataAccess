@@ -6,18 +6,15 @@ import app.VilaExplorer.exception.UsuarioNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UsuarioService {
     List<Usuario> findAll();
 
-    Optional<Usuario> findById(Long id);
+    Usuario findById(Long id) throws UsuarioNotFoundException;
 
     Usuario save(Usuario usuario);
 
-    void deleteById(Long id) throws RolNotFoundException;
-
-    boolean existsById(Long id) throws RolNotFoundException;
+    void deleteById(Long id) throws UsuarioNotFoundException;
 
     Usuario updateRolDelUsuario(Long usuarioId, String rol) throws UsuarioNotFoundException, RolNotFoundException;
 
@@ -26,4 +23,6 @@ public interface UsuarioService {
     Usuario crearUsuarioConRol(Usuario usuario, String rol) throws RolNotFoundException, DataIntegrityViolationException;
 
     Usuario updateUsuario(Long id, Usuario usuarioDetails) throws UsuarioNotFoundException;
+
+    void deleteUsuarioLogico(Long id) throws UsuarioNotFoundException;
 }

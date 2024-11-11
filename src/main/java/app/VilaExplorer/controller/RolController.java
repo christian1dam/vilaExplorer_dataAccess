@@ -22,6 +22,7 @@ import static app.VilaExplorer.controller.Response.NOT_FOUND;
 
 /**
  * Controlador para la API REST de Roles.
+ *
  * @author VilaExplorerAdmin
  * @version 1.0
  */
@@ -43,6 +44,21 @@ public class RolController {
         return rolService.getAll();
     }
 
+    @Operation(summary = "Obtiene un rol filtrado por el nombre")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Rol encontrado en la base de datos", content = @Content(schema = @Schema(implementation = Rol.class))),
+            @ApiResponse(responseCode = "404", description = "Rol no encontrado en la base de datos", content = @Content(schema = @Schema(implementation = Rol.class))),
+    })
+    @GetMapping()
+    public ResponseEntity<?> getRolByNombre(@RequestParam(value = "rol") String rol){
+        try {
+            Rol rolFromDB = rolService.getRolByNombre(rol);
+            return new ResponseEntity<>(rolFromDB, HttpStatus.OK);
+        } catch (RolNotFoundException e) {
+             return handleException(e);
+        }
+    }
+
 
     @Operation(summary = "Añade un nuevo rol")
     @ApiResponses(value = {
@@ -51,10 +67,10 @@ public class RolController {
     @PostMapping("/add")
     @Transactional
     public ResponseEntity<Rol> anyadirRol(@RequestBody Rol rol) {
-        try{
+        try {
             Rol nuevoRol = rolService.anyadirRol(rol);
             return new ResponseEntity<>(nuevoRol, HttpStatus.CREATED);
-        }catch (DataIntegrityViolationException e){
+        } catch (DataIntegrityViolationException e) {
             System.out.println(RED + e.getMessage() + RESET);
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
@@ -64,16 +80,16 @@ public class RolController {
     // Metodo para hacer un borrado lógico de un rol
     @Operation(summary = "Desactiva un rol por su ID (borrado lógico)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Rol desactivado", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Rol desactivado", content = @Content),
             @ApiResponse(responseCode = "404", description = "Rol no encontrado", content = @Content)
     })
     @DeleteMapping("/logical/{id}")
     public ResponseEntity<Response> eliminarRolLogicamentePorID(@PathVariable Long id) {
         try {
-            rolService.eliminarRolPorID(id); // Realiza un borrado lógico
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            rolService.desactivaRolPorID(id); // Realiza un borrado lógico
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (RolNotFoundException rnfe) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return handleException(rnfe);
         }
     }
 
@@ -81,26 +97,24 @@ public class RolController {
     // Metodo para eliminar un rol por su ID fisicamente POCO RECOMENDADO
     @Operation(summary = "Elimina un rol por su ID (borrado físico)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Rol eliminado", content = @Content),
+            @ApiResponse(responseCode = "202", description = "Rol eliminado", content = @Content),
             @ApiResponse(responseCode = "404", description = "Rol no encontrado", content = @Content)
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Response> eliminarRolPorID(@PathVariable Long id) {
         try {
             rolService.eliminarRolPorID(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (RolNotFoundException rnfe) {
-            System.out.println(RED + rnfe.getMessage() + RESET);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return handleException(rnfe);
         }
     }
 
     @ExceptionHandler(RolNotFoundException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<Response>
-    handleException(RolNotFoundException rcnfe) {
-        Response response = Response.errorResonse(NOT_FOUND,
+    public ResponseEntity<Response> handleException(RolNotFoundException rcnfe) {
+        Response response = Response.errorResponse(NOT_FOUND,
                 rcnfe.getMessage());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }

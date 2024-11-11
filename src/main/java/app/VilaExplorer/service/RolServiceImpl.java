@@ -4,6 +4,7 @@ import app.VilaExplorer.domain.Rol;
 import app.VilaExplorer.exception.RolNotFoundException;
 import app.VilaExplorer.repository.RolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,12 +30,18 @@ public class RolServiceImpl implements RolService {
     }
 
     @Override
-    public Rol anyadirRol(Rol rol) {
+    public Rol anyadirRol(Rol rol) throws DataIntegrityViolationException {
+        if(rolRepository.findByNombre(rol.getNombre()).isPresent()){
+            throw new DataIntegrityViolationException("Este rol ya existe en la base de datos");
+        }
         return rolRepository.save(rol);
     }
 
     @Override
-    public Optional<Rol> getRolByNombre(String rol) {
+    public Optional<Rol> getRolByNombre(String rol) throws DataIntegrityViolationException {
+        if (rolRepository.findByNombre(rol).isEmpty()){
+            throw new DataIntegrityViolationException("Este rol no existe en la base de datos.");
+        }
         return rolRepository.findByNombre(rol);
     }
 }

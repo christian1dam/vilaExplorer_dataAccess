@@ -2,6 +2,7 @@ package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.Rol;
 import app.VilaExplorer.exception.RolNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +10,6 @@ import java.util.Optional;
 public interface RolService {
     List<Rol> getAll();
     void eliminarRolPorID(Long id) throws RolNotFoundException;
-    Rol anyadirRol(Rol rol);
-    Optional<Rol> getRolByNombre(String rol);
+    Rol anyadirRol(Rol rol) throws DataIntegrityViolationException;
+    Optional<Rol> getRolByNombre(String rol) throws DataIntegrityViolationException;
 }

@@ -4,6 +4,11 @@ package app.VilaExplorer.controller;
 import app.VilaExplorer.domain.Rol;
 import app.VilaExplorer.exception.RolNotFoundException;
 import app.VilaExplorer.service.RolService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +19,11 @@ import java.util.List;
 
 import static app.VilaExplorer.controller.Response.NOT_FOUND;
 
+/**
+ * Controlador para la API REST de Roles.
+ * @author VilaExplorerAdmin
+ * @version 1.0
+ */
 @RestController
 @RequestMapping(value = "/api/roles")
 public class RolController {
@@ -21,11 +31,20 @@ public class RolController {
     @Autowired
     RolService rolService;
 
+    @Operation(summary = "Obtiene todos los roles")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Roles encontrados", content = @Content(schema = @Schema(implementation = Rol.class)))
+    })
     @GetMapping("/all")
     public List<Rol> getAllRoles() {
         return rolService.getAll();
     }
 
+
+    @Operation(summary = "Añade un nuevo rol")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Rol creado", content = @Content(schema = @Schema(implementation = Rol.class)))
+    })
     @PostMapping("/add")
     @Transactional
     public ResponseEntity<Rol> anyadirRol(@RequestBody Rol rol){
@@ -33,6 +52,30 @@ public class RolController {
         return new ResponseEntity<>(nuevoRol, HttpStatus.CREATED);
     }
 
+
+    // Metodo para hacer un borrado lógico de un rol
+    @Operation(summary = "Desactiva un rol por su ID (borrado lógico)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Rol desactivado", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Rol no encontrado", content = @Content)
+    })
+    @DeleteMapping("/logical/{id}")
+    public ResponseEntity<Response> eliminarRolLogicamentePorID(@PathVariable Long id) {
+        try {
+            rolService.eliminarRolPorID(id); // Realiza un borrado lógico
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (RolNotFoundException rnfe) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+    // Metodo para eliminar un rol por su ID fisicamente POCO RECOMENDADO
+    @Operation(summary = "Elimina un rol por su ID (borrado físico)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Rol eliminado", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Rol no encontrado", content = @Content)
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Response> eliminarRolPorID(@PathVariable Long id) {
         try{

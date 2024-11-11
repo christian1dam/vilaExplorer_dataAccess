@@ -1,3 +1,12 @@
+url swagger:
+http://localhost:8080/swagger-ui/index.html
+
+formato JSom
+url:
+http://localhost:8080/v3/api-docs
+
+
+
 **Guía de Peticiones CRUD para Lugar de Interés utilizando Postman**
 
 Este documento está diseñado para ayudar a realizar peticiones CRUD (Crear, Leer, Actualizar, Desactivar/Eliminar) para la entidad `LugarInteres` utilizando Postman. A continuación se describen las diferentes peticiones HTTP, sus endpoints y ejemplos de uso.

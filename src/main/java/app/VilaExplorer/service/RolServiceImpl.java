@@ -37,4 +37,10 @@ public class RolServiceImpl implements RolService {
     public Optional<Rol> getRolByNombre(String rol) {
         return rolRepository.findByNombre(rol);
     }
+
+    // Metodo para obtener todos los roles activos
+    @Override
+    public List<Rol> getAllActivos() {
+        return rolRepository.findByActivoTrue(); // Solo roles activos
+    }
 }

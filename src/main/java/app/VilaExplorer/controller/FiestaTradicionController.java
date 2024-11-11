@@ -4,6 +4,12 @@ import app.VilaExplorer.domain.FiestaTradicion;
 import app.VilaExplorer.domain.Usuario;
 import app.VilaExplorer.service.FiestaTradicionService;
 import app.VilaExplorer.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,63 +18,61 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+
 /**
- * Controlador de la API REST de fiestas tradicionales
- * en general esta destinada a ser modificada por los administradores
- * los usuarios comunes solo podran ver las fiestas tradicionales
+ * Controlador de fiestas tradicionales.
+ * @Author VilaExplorerAdmin
+ * @Version 1.0
  */
 @RestController
+@Tag(name = "Fiestas", description = "API para la gestión de fiestas tradicionales")
 @RequestMapping("/api/fiestas")
 public class FiestaTradicionController {
 
-    /**
-     * Inyectar el servicio de fiestas tradicionales
-     */
     @Autowired
     private FiestaTradicionService fiestaTradicionService;
 
-    /**
-     * Inyectar el servicio de usuarios
-     */
     @Autowired
-    private UsuarioService usuarioService; // Inyectar el UsuarioService para buscar el objeto Usuario
+    private UsuarioService usuarioService; // Se inyecta el UsuarioService para buscar el objeto Usuario
 
-    /**
-     * Obtener una fiesta tradicional por su id
-     * @param idFiestaTradicion
-     * @return  Fiesta tradicional
-     */
+
+    @Operation(summary = "Obtener una fiesta tradicional por su id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fiesta tradicional encontrada", content = @Content(schema = @Schema(implementation = FiestaTradicion.class))),
+            @ApiResponse(responseCode = "404", description = "Fiesta tradicional no encontrada", content = @Content)
+    })
     @GetMapping("/detalle/{id}")
     public ResponseEntity<FiestaTradicion> getFiestaTradicionById(@PathVariable Long idFiestaTradicion) {
         Optional<FiestaTradicion> fiestaTradicion = fiestaTradicionService.findById(idFiestaTradicion);
         return fiestaTradicion.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    /**
-     * Obtener todas las fiestas tradicionales
-     * @return  Lista de fiestas tradicionales
-     */
+
+    @Operation(summary = "Obtener todas las fiestas tradicionales")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fiestas tradicionales encontradas", content = @Content(schema = @Schema(implementation = FiestaTradicion.class)))
+    })
     @GetMapping("/todos")
     public List<FiestaTradicion> getAllFiestasTradicion() {
         return fiestaTradicionService.findAll();
     }
 
-    /**
-     * Crear una fiesta tradicional
-     * @param fiestaTradicion
-     * @return  Fiesta tradicional creada
-     */
+
+    @Operation(summary = "Crear una fiesta tradicional")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fiesta tradicional creada", content = @Content(schema = @Schema(implementation = FiestaTradicion.class)))
+    })
     @PostMapping("/crear")
     public FiestaTradicion createFiestaTradicion(@RequestBody FiestaTradicion fiestaTradicion) {
         return fiestaTradicionService.save(fiestaTradicion);
     }
 
-    /**
-     * Modificar una fiesta tradicional
-     * @param id
-     * @param fiestaTradicion
-     * @return  Fiesta tradicional modificada
-     */
+
+    @Operation(summary = "Modificar una fiesta tradicional")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fiesta tradicional modificada", content = @Content(schema = @Schema(implementation = FiestaTradicion.class))),
+            @ApiResponse(responseCode = "404", description = "Fiesta tradicional no encontrada", content = @Content)
+    })
     @PutMapping("/modificar/{id}")
     public ResponseEntity<FiestaTradicion> updateFiestaTradicion(@PathVariable Long id, @RequestBody FiestaTradicion fiestaTradicion) {
         Optional<FiestaTradicion> existingFiestaTradicion = fiestaTradicionService.findById(id);
@@ -80,21 +84,25 @@ public class FiestaTradicionController {
         }
     }
 
-    /**
-     * Eliminar una fiesta tradicional
-     * @param id
-     */
+
+
+    @Operation(summary = "Eliminar una fiesta tradicional")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Fiesta tradicional eliminada", content = @Content)
+    })
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<Void> deleteFiestaTradicion(@PathVariable Long id) {
         fiestaTradicionService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Obtener todas las fiestas tradicionales de un autor
-     * @param idAutor
-     * @return  Lista de fiestas tradicionales
-     */
+
+
+    @Operation(summary = "Obtener todas las fiestas tradicionales de un autor")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listado de fiestas tradicionales del autor", content = @Content(schema = @Schema(implementation = FiestaTradicion.class))),
+            @ApiResponse(responseCode = "404", description = "Autor no encontrado", content = @Content)
+    })
     @GetMapping("/autor/{idAutor}")
     public ResponseEntity<List<FiestaTradicion>> getFiestasByAutor(@PathVariable Long idAutor) {
         Optional<Usuario> autor = usuarioService.findById(idAutor);
@@ -106,11 +114,12 @@ public class FiestaTradicionController {
         }
     }
 
-    /**
-     * Buscar fiestas tradicionales por palabra clave parcial o completa en el nombre o descripción
-     * @param keyword
-     * @return  Lista de fiestas tradicionales
-     */
+
+    @Operation(summary = "Buscar fiestas tradicionales por palabra clave")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fiestas tradicionales encontradas", content = @Content(schema = @Schema(implementation = FiestaTradicion.class))),
+            @ApiResponse(responseCode = "204", description = "No se encontraron fiestas tradicionales", content = @Content)
+    })
     @GetMapping("/buscar_palabra")
     public ResponseEntity<List<FiestaTradicion>> searchFiestas(@RequestParam String keyword) {
         List<FiestaTradicion> results = fiestaTradicionService.searchByKeyword(keyword);
@@ -121,12 +130,13 @@ public class FiestaTradicionController {
         }
     }
 
-    /**
-     * Buscar fiestas tradicionales por palabra clave parcial o completa en el nombre o descripción paginado
-     * paginado significa que se mostrara de a 10 elementos por pagina
-     * @param keyword
-     * @return  Lista de fiestas tradicionales
-     */
+
+
+    @Operation(summary = "Buscar fiestas tradicionales por palabra clave con paginacion")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fiestas tradicionales encontradas", content = @Content(schema = @Schema(implementation = FiestaTradicion.class))),
+            @ApiResponse(responseCode = "204", description = "No se encontraron fiestas tradicionales", content = @Content)
+    })
     @GetMapping("/buscar")
     public ResponseEntity<Page<FiestaTradicion>> searchFiestas(@RequestParam String keyword, Pageable pageable) {
         Page<FiestaTradicion> results = fiestaTradicionService.searchByKeyword(keyword, pageable);

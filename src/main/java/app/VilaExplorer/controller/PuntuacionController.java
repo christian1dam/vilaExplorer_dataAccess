@@ -3,6 +3,12 @@ package app.VilaExplorer.controller;
 import app.VilaExplorer.domain.Puntuacion;
 import app.VilaExplorer.enums.TipoEntidad;
 import app.VilaExplorer.service.PuntuacionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,8 +16,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+/**
+ * Controlador para la API REST de Puntuaciones.
+ * @author VilaExplorerAdmin
+ * @version 1.0
+ */
 @RestController
+@Tag(name = "Puntuaciones", description = "API para la gestion de puntuaciones del sistema")
 @RequestMapping("/api/puntuaciones")
 public class PuntuacionController {
 
@@ -19,6 +30,11 @@ public class PuntuacionController {
     private PuntuacionService puntuacionService;
 
     // Obtener todas las puntuaciones de una entidad específica
+    @Operation(summary = "Obtiene todas las puntuaciones de una entidad especifica")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Puntuaciones encontradas", content = @Content(schema = @Schema(implementation = Puntuacion.class))),
+            @ApiResponse(responseCode = "204", description = "No se encontraron puntuaciones", content = @Content)
+    })
     @GetMapping("/entidad/{tipoEntidad}/{idEntidad}")
     public ResponseEntity<List<Puntuacion>> getAllByEntidad(
             @PathVariable TipoEntidad tipoEntidad,
@@ -28,6 +44,11 @@ public class PuntuacionController {
     }
 
     // Obtener promedio de calificación para una entidad específica
+    @Operation(summary = "Obtiene el promedio de calificacion para una entidad especifica")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Promedio de calificacion encontrado", content = @Content(schema = @Schema(implementation = Double.class))),
+            @ApiResponse(responseCode = "204", description = "No se encontraron calificaciones", content = @Content)
+    })
     @GetMapping("/promedio/{tipoEntidad}/{idEntidad}")
     public ResponseEntity<Double> getPromedioCalificacion(
             @PathVariable TipoEntidad tipoEntidad,
@@ -37,6 +58,11 @@ public class PuntuacionController {
     }
 
     // Obtener el conteo de calificaciones por estrella para una entidad específica
+    @Operation(summary = "Obtiene el conteo de calificaciones por estrella para una entidad especifica")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Conteo de calificaciones encontrado", content = @Content(schema = @Schema(implementation = Map.class))),
+            @ApiResponse(responseCode = "204", description = "No se encontraron calificaciones", content = @Content)
+    })
     @GetMapping("/conteo/{tipoEntidad}/{idEntidad}")
     public ResponseEntity<Map<Integer, Long>> getConteoCalificacionesPorEstrella(
             @PathVariable TipoEntidad tipoEntidad,
@@ -46,6 +72,11 @@ public class PuntuacionController {
     }
 
     // Obtener las puntuaciones de un usuario para una entidad específica
+    @Operation(summary = "Obtiene las puntuaciones de un usuario para una entidad especifica")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Puntuaciones encontradas", content = @Content(schema = @Schema(implementation = Puntuacion.class))),
+            @ApiResponse(responseCode = "204", description = "No se encontraron puntuaciones", content = @Content)
+    })
     @GetMapping("/usuario/{idUsuario}/entidad/{tipoEntidad}/{idEntidad}")
     public ResponseEntity<List<Puntuacion>> getPuntuacionesByUsuarioAndEntidad(
             @PathVariable Long idUsuario,
@@ -56,6 +87,11 @@ public class PuntuacionController {
     }
 
     // Obtener todas las puntuaciones realizadas por un usuario en todas las entidades
+    @Operation(summary = "Obtiene todas las puntuaciones realizadas por un usuario")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Puntuaciones encontradas", content = @Content(schema = @Schema(implementation = Puntuacion.class))),
+            @ApiResponse(responseCode = "204", description = "No se encontraron puntuaciones", content = @Content)
+    })
     @GetMapping("/usuario/{idUsuario}")
     public ResponseEntity<List<Puntuacion>> getAllPuntuacionesByUsuario(@PathVariable Long idUsuario) {
         List<Puntuacion> puntuaciones = puntuacionService.findAllByUsuario(idUsuario);
@@ -63,6 +99,11 @@ public class PuntuacionController {
     }
 
     // Filtrar entidades de un tipo específico que tengan una calificación mínima
+    @Operation(summary = "Filtra entidades de un tipo especifico con una calificacion minima")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Entidades encontradas", content = @Content(schema = @Schema(implementation = Long.class))),
+            @ApiResponse(responseCode = "204", description = "No se encontraron entidades con la calificacion minima", content = @Content)
+    })
     @GetMapping("/entidades-con-calificacion/{tipoEntidad}/{calificacionMinima}")
     public ResponseEntity<List<Long>> getEntidadesConCalificacionMinima(
             @PathVariable TipoEntidad tipoEntidad,
@@ -72,13 +113,18 @@ public class PuntuacionController {
     }
 
     /**
-            * Endpoint para actualizar una calificación de una entidad específica por un usuario.
-            * @param idUsuario ID del usuario que actualiza la calificación
+    * Endpoint para actualizar una calificación de una entidad específica por un usuario.
+     * @param idUsuario ID del usuario que actualiza la calificación
      * @param idEntidad ID de la entidad calificada
      * @param tipoEntidad Tipo de entidad (PLATO, LUGAR_INTERES, FIESTA_TRADICION)
      * @param nuevaPuntuacion Nueva calificación
      * @return Puntuacion actualizada
      */
+    @Operation(summary = "Actualiza una calificacion de una entidad especifica por un usuario")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Puntuacion actualizada", content = @Content(schema = @Schema(implementation = Puntuacion.class))),
+            @ApiResponse(responseCode = "404", description = "Puntuacion no encontrada", content = @Content)
+    })
     @PutMapping("/actualizar")
     public ResponseEntity<Puntuacion> actualizarPuntuacion(
             @RequestParam Long idUsuario,

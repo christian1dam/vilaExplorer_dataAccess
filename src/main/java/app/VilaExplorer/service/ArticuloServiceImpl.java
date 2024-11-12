@@ -43,7 +43,9 @@ public class ArticuloServiceImpl implements ArticuloService {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(Long id) throws ArticuloNotFoundException {
+        if(articuloRepository.findById(id).isEmpty())
+            throw new ArticuloNotFoundException("El articulo no existe en la base de datos");
         articuloRepository.deleteById(id);
     }
 

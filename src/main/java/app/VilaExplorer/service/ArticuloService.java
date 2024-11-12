@@ -2,15 +2,15 @@ package app.VilaExplorer.service;
 
 
 import app.VilaExplorer.domain.Articulo;
-import app.VilaExplorer.domain.Usuario;
+import app.VilaExplorer.exception.ArticuloNotFoundException;
+import app.VilaExplorer.exception.UsuarioNotFoundException;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ArticuloService {
-    Optional<Articulo> findById(Long id);
-    List<Articulo> findAll();
+    Articulo findById(Long id) throws ArticuloNotFoundException;
+    List<Articulo> findAll() throws ArticuloNotFoundException;
     Articulo save(Articulo articulo);
     void deleteById(Long id);
-    List<Articulo> findByAutor(Long usuario); // Buscar artículos por ID de autor
+    List<Articulo> findByAutor(Long usuario) throws UsuarioNotFoundException; // Buscar artículos por ID de autor
 }

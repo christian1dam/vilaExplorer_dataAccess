@@ -2,6 +2,7 @@ package app.VilaExplorer.controller;
 
 
 import app.VilaExplorer.domain.Articulo;
+import app.VilaExplorer.exception.ArticuloNotFoundException;
 import app.VilaExplorer.service.ArticuloService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,6 +11,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -37,8 +40,13 @@ public class ArticuloController {
     })
     @GetMapping("/detalle/{id}")
     public ResponseEntity<Articulo> getArticuloById(@PathVariable Long id) {
-        Optional<Articulo> articulo = articuloService.findById(id);
-        return articulo.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        try{
+            Articulo articulo = articuloService.findById(id);
+            return new ResponseEntity<>(articulo, HttpStatus.OK);
+        } catch (ArticuloNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 
@@ -48,11 +56,15 @@ public class ArticuloController {
             @ApiResponse(responseCode = "404", description = "Articulos no encontrados")
     })
     @GetMapping("/todos")
-    public List<Articulo> getAllArticulos() {
-        return articuloService.findAll();
+    public ResponseEntity<List<Articulo>> getAllArticulos() {
+        try {
+             List<Articulo> articulos = articuloService.findAll();
+             return new ResponseEntity<>(articulos, HttpStatus.OK);
+        } catch (ArticuloNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
-
-
 
     @Operation(summary = "Crear un articulo")
     @ApiResponses(value = {

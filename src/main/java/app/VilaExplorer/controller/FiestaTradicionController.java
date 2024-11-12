@@ -2,6 +2,8 @@ package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.FiestaTradicion;
 import app.VilaExplorer.domain.Usuario;
+import app.VilaExplorer.exception.FiestaTradicionNotFound;
+import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.service.FiestaTradicionService;
 import app.VilaExplorer.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,14 +15,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
+import static app.VilaExplorer.controller.Response.NOT_FOUND;
+
 /**
  * Controlador de fiestas tradicionales.
+ *
  * @Author VilaExplorerAdmin
  * @Version 1.0
  */
@@ -32,19 +38,20 @@ public class FiestaTradicionController {
     @Autowired
     private FiestaTradicionService fiestaTradicionService;
 
-    @Autowired
-    private UsuarioService usuarioService; // Se inyecta el UsuarioService para buscar el objeto Usuario
-
-
     @Operation(summary = "Obtener una fiesta tradicional por su id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fiesta tradicional encontrada", content = @Content(schema = @Schema(implementation = FiestaTradicion.class))),
             @ApiResponse(responseCode = "404", description = "Fiesta tradicional no encontrada", content = @Content)
     })
     @GetMapping("/detalle/{id}")
-    public ResponseEntity<FiestaTradicion> getFiestaTradicionById(@PathVariable Long idFiestaTradicion) {
-        Optional<FiestaTradicion> fiestaTradicion = fiestaTradicionService.findById(idFiestaTradicion);
-        return fiestaTradicion.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<FiestaTradicion> getFiestaTradicionById(@PathVariable Long id) {
+        try {
+            FiestaTradicion fiesta = fiestaTradicionService.findById(id);
+            return new ResponseEntity<>(fiesta, HttpStatus.OK);
+        } catch (FiestaTradicionNotFound e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 
@@ -63,10 +70,15 @@ public class FiestaTradicionController {
             @ApiResponse(responseCode = "200", description = "Fiesta tradicional creada", content = @Content(schema = @Schema(implementation = FiestaTradicion.class)))
     })
     @PostMapping("/crear")
-    public FiestaTradicion createFiestaTradicion(@RequestBody FiestaTradicion fiestaTradicion) {
-        return fiestaTradicionService.save(fiestaTradicion);
+    public ResponseEntity<FiestaTradicion> createFiestaTradicion(@RequestBody FiestaTradicion fiestaTradicion, @RequestParam(value = "autor") Long idAutor) {
+        try {
+            FiestaTradicion fiestaCreada = fiestaTradicionService.save(fiestaTradicion, idAutor);
+            return new ResponseEntity<>(fiestaCreada, HttpStatus.OK);
+        } catch (UsuarioNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
-
 
     @Operation(summary = "Modificar una fiesta tradicional")
     @ApiResponses(value = {
@@ -75,15 +87,14 @@ public class FiestaTradicionController {
     })
     @PutMapping("/modificar/{id}")
     public ResponseEntity<FiestaTradicion> updateFiestaTradicion(@PathVariable Long id, @RequestBody FiestaTradicion fiestaTradicion) {
-        Optional<FiestaTradicion> existingFiestaTradicion = fiestaTradicionService.findById(id);
-        if (existingFiestaTradicion.isPresent()) {
-            fiestaTradicion.setIdFiestaTradicion(id);
-            return ResponseEntity.ok(fiestaTradicionService.save(fiestaTradicion));
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            FiestaTradicion fiestaActualizada = fiestaTradicionService.updateFiestaTradicion(id, fiestaTradicion);
+            return new ResponseEntity<>(fiestaActualizada, HttpStatus.OK);
+        } catch (FiestaTradicionNotFound e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
 
 
     @Operation(summary = "Eliminar una fiesta tradicional")
@@ -91,11 +102,14 @@ public class FiestaTradicionController {
             @ApiResponse(responseCode = "204", description = "Fiesta tradicional eliminada", content = @Content)
     })
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<Void> deleteFiestaTradicion(@PathVariable Long id) {
-        fiestaTradicionService.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Response> deleteFiestaTradicion(@PathVariable Long id) {
+        try {
+            fiestaTradicionService.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (FiestaTradicionNotFound e) {
+            return handleException(e);
+        }
     }
-
 
 
     @Operation(summary = "Obtener todas las fiestas tradicionales de un autor")
@@ -105,12 +119,12 @@ public class FiestaTradicionController {
     })
     @GetMapping("/autor/{idAutor}")
     public ResponseEntity<List<FiestaTradicion>> getFiestasByAutor(@PathVariable Long idAutor) {
-        Optional<Usuario> autor = usuarioService.findById(idAutor);
-        if (autor.isPresent()) {
-            List<FiestaTradicion> fiestas = fiestaTradicionService.findByAutor(autor.get());
-            return ResponseEntity.ok(fiestas);
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            List<FiestaTradicion> fiestasPorAutor = fiestaTradicionService.getFiestaByAutor(idAutor);
+            return new ResponseEntity<>(fiestasPorAutor, HttpStatus.OK);
+        } catch (UsuarioNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -122,30 +136,38 @@ public class FiestaTradicionController {
     })
     @GetMapping("/buscar_palabra")
     public ResponseEntity<List<FiestaTradicion>> searchFiestas(@RequestParam String keyword) {
-        List<FiestaTradicion> results = fiestaTradicionService.searchByKeyword(keyword);
-        if (results.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.ok(results);
+        try {
+            List<FiestaTradicion> results = fiestaTradicionService.searchByKeyword(keyword);
+            return new ResponseEntity<>(results, HttpStatus.OK);
+        } catch (FiestaTradicionNotFound e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
 
-
-    @Operation(summary = "Buscar fiestas tradicionales por palabra clave con paginacion")
+    @Operation(summary = "Buscar fiestas tradicionales por palabra clave con paginación")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fiestas tradicionales encontradas", content = @Content(schema = @Schema(implementation = FiestaTradicion.class))),
             @ApiResponse(responseCode = "204", description = "No se encontraron fiestas tradicionales", content = @Content)
     })
     @GetMapping("/buscar")
     public ResponseEntity<Page<FiestaTradicion>> searchFiestas(@RequestParam String keyword, Pageable pageable) {
-        Page<FiestaTradicion> results = fiestaTradicionService.searchByKeyword(keyword, pageable);
-        if (results.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.ok(results);
+        try {
+            Page<FiestaTradicion> results = fiestaTradicionService.searchByKeyword(keyword, pageable);
+            return new ResponseEntity<>(results, HttpStatus.OK);
+        } catch (FiestaTradicionNotFound e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-
+    @ExceptionHandler(FiestaTradicionNotFound.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Response> handleException(FiestaTradicionNotFound ftnf) {
+        Response response = Response.errorResponse(NOT_FOUND,
+                ftnf.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
 }

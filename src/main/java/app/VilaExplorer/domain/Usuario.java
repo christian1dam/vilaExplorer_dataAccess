@@ -46,7 +46,6 @@ public class Usuario {
     @Column(nullable = false)
     @NotBlank
     @Schema(description = "Contraseña del usuario", example = "passwordSeguro123", requiredMode = Schema.RequiredMode.REQUIRED)
-    @JsonIgnore
     private String password;
 
     @Column(name = "fecha_creacion", nullable = false)

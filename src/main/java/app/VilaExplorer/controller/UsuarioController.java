@@ -139,7 +139,6 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuario o rol no encontrado", content = @Content)
     })
     @PatchMapping("/updateRole")
-    @Transactional
     public ResponseEntity<Usuario> updateRole(@RequestParam(value = "id_usuario") Long usuarioID, @RequestParam(value = "rol") String rol) {
         try {
             Usuario usuarioActualizado = usuarioService.updateRolDelUsuario(usuarioID, rol);

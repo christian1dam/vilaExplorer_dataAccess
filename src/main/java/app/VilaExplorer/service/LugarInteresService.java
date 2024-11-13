@@ -1,16 +1,27 @@
 package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.LugarInteres;
+import app.VilaExplorer.exception.CoordenadasNotFoundException;
+import app.VilaExplorer.exception.LugarInteresNotActiveException;
+import app.VilaExplorer.exception.LugarInteresNotFoundException;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface LugarInteresService {
-    Optional<LugarInteres> findById(Long id);
-    List<LugarInteres> findAll();
-    List<LugarInteres> findAllActivos();
-    LugarInteres save(LugarInteres lugarInteres);
-    void deleteByIdLogico(Long id);//borrado logico para cambiar el estado de activo a false
+    LugarInteres findById(Long id) throws LugarInteresNotFoundException;
 
+    List<LugarInteres> findAll() throws LugarInteresNotFoundException;
+
+    List<LugarInteres> findAllActivos() throws LugarInteresNotFoundException;
+
+    LugarInteres save(LugarInteres lugarInteres) throws CoordenadasNotFoundException;
+
+    void deleteByIdLogico(Long id) throws LugarInteresNotFoundException;//borrado logico para cambiar el estado de activo a false
+
+    LugarInteres findLugarInteresActivoByID(Long id) throws LugarInteresNotFoundException, LugarInteresNotActiveException;
+
+    LugarInteres updateLugarInteres(Long id, LugarInteres lugarInteresDetalle) throws LugarInteresNotFoundException;
+
+    LugarInteres desactivarLugarInteres(Long id) throws LugarInteresNotFoundException;
 }
 

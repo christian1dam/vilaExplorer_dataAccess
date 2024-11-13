@@ -2,6 +2,7 @@ package app.VilaExplorer.repository;
 
 import app.VilaExplorer.domain.FiestaTradicion;
 import app.VilaExplorer.domain.Usuario;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,4 +35,6 @@ public interface FiestaTradicionRepository extends JpaRepository<FiestaTradicion
      */
     @Query("SELECT f FROM FiestaTradicion f WHERE LOWER(f.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(f.descripcion) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<FiestaTradicion> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    boolean findByNombre(@NotBlank String nombre);
 }

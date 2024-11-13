@@ -7,6 +7,7 @@ import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.repository.FiestaTradicionRepository;
 import app.VilaExplorer.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -54,9 +55,11 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
      */
     @Override
     @Transactional
-    public FiestaTradicion save(FiestaTradicion fiestaTradicion, Long idAutor) throws UsuarioNotFoundException {
+    public FiestaTradicion save(FiestaTradicion fiestaTradicion, Long idAutor) throws UsuarioNotFoundException, DataIntegrityViolationException {
         if (usuarioRepository.findById(idAutor).isEmpty())
             throw new UsuarioNotFoundException("El usuario introducido no existe en la base de datos");
+        if  (fiestaTradicionRepository.findByNombre(fiestaTradicion.getNombre()))
+            throw new DataIntegrityViolationException("Esta fiesta tradición ya se encuentra en la base de datos");
         fiestaTradicion.setAutor(usuarioRepository.findById(idAutor).get());
         fiestaTradicionRepository.save(fiestaTradicion);
         return fiestaTradicion;
@@ -110,7 +113,7 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
     }
 
     @Override
-    public List<FiestaTradicion> getFiestaByAutor(Long idAutor) throws UsuarioNotFoundException {
+    public List<FiestaTradicion> getListaFiestasByAutor(Long idAutor) throws UsuarioNotFoundException {
         if (usuarioRepository.findById(idAutor).isEmpty())
             throw new UsuarioNotFoundException("El usuario no existe en la base de datos");
         Usuario autor = usuarioRepository.findById(idAutor).get();

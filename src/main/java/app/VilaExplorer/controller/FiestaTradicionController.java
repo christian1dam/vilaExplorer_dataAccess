@@ -1,11 +1,9 @@
 package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.FiestaTradicion;
-import app.VilaExplorer.domain.Usuario;
 import app.VilaExplorer.exception.FiestaTradicionNotFound;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.service.FiestaTradicionService;
-import app.VilaExplorer.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -20,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import static app.VilaExplorer.controller.Response.NOT_FOUND;
 
@@ -77,6 +75,9 @@ public class FiestaTradicionController {
         } catch (UsuarioNotFoundException e) {
             System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch(DataIntegrityViolationException e){
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
     }
 
@@ -120,7 +121,7 @@ public class FiestaTradicionController {
     @GetMapping("/autor/{idAutor}")
     public ResponseEntity<List<FiestaTradicion>> getFiestasByAutor(@PathVariable Long idAutor) {
         try {
-            List<FiestaTradicion> fiestasPorAutor = fiestaTradicionService.getFiestaByAutor(idAutor);
+            List<FiestaTradicion> fiestasPorAutor = fiestaTradicionService.getListaFiestasByAutor(idAutor);
             return new ResponseEntity<>(fiestasPorAutor, HttpStatus.OK);
         } catch (UsuarioNotFoundException e) {
             System.out.println(e.getMessage());

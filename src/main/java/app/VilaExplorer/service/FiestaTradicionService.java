@@ -4,6 +4,7 @@ import app.VilaExplorer.domain.FiestaTradicion;
 import app.VilaExplorer.domain.Usuario;
 import app.VilaExplorer.exception.FiestaTradicionNotFound;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,7 +16,7 @@ public interface FiestaTradicionService {
 
     List<FiestaTradicion> findAll();
 
-    FiestaTradicion save(FiestaTradicion fiestaTradicion, Long idAutor) throws UsuarioNotFoundException;
+    FiestaTradicion save(FiestaTradicion fiestaTradicion, Long idAutor) throws UsuarioNotFoundException, DataIntegrityViolationException;
 
     void deleteById(Long id) throws FiestaTradicionNotFound;
 
@@ -28,7 +29,7 @@ public interface FiestaTradicionService {
     // paginado significa que se mostrara de a 10 elementos por pagina
     Page<FiestaTradicion> searchByKeyword(String keyword, Pageable pageable) throws FiestaTradicionNotFound;
 
-    List<FiestaTradicion> getFiestaByAutor(Long idAutor) throws UsuarioNotFoundException;
+    List<FiestaTradicion> getListaFiestasByAutor(Long idAutor) throws UsuarioNotFoundException;
 
     FiestaTradicion updateFiestaTradicion(Long id, FiestaTradicion fiestaTradicion) throws FiestaTradicionNotFound;
 }

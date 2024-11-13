@@ -2,7 +2,6 @@ package app.VilaExplorer.service;
 
 
 import app.VilaExplorer.domain.Articulo;
-import app.VilaExplorer.domain.Usuario;
 import app.VilaExplorer.exception.ArticuloNotFoundException;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.repository.ArticuloRepository;

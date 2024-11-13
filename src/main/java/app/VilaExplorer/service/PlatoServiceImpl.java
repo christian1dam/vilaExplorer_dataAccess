@@ -5,10 +5,10 @@ import app.VilaExplorer.domain.Usuario;
 import app.VilaExplorer.repository.UsuarioRepository;
 import app.VilaExplorer.repository.PlatoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PlatoServiceImpl implements PlatoService {
@@ -19,12 +19,16 @@ public class PlatoServiceImpl implements PlatoService {
     private UsuarioRepository usuarioRepository;
 
     @Override
-    public Optional<Plato> findById(Long id) {
-        return platoRepository.findById(id);
+    public Plato findById(Long id) throws PlatoNotFoundException {
+        if (platoRepository.findById(id).isEmpty())
+            throw new PlatoNotFoundException("Este ID " + id + " no se encuentra en la base de datos");
+        return platoRepository.findById(id).get();
     }
 
     @Override
-    public List<Plato> findAll() {
+    public List<Plato> findAll() throws PlatoNotFoundException {
+        if (platoRepository.findAll().isEmpty())
+            throw new PlatoNotFoundException("Actualmente la base de datos no cuenta con registros de LugarInteres");
         return platoRepository.findAll();
     }
 
@@ -34,7 +38,9 @@ public class PlatoServiceImpl implements PlatoService {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(Long id) throws PlatoNotFoundException {
+        if (platoRepository.findById(id).isEmpty())
+            throw new PlatoNotFoundException("Este ID " + id + " no se encuentra en la base de datos");
         platoRepository.deleteById(id);
     }
 
@@ -51,5 +57,30 @@ public class PlatoServiceImpl implements PlatoService {
         plato.setEstado(true); // Marca el plato como aprobado
 
         return platoRepository.save(plato);
+    }
+
+    @Override
+    public Plato createPlato(Plato plato) throws DataIntegrityViolationException {
+        if (platoRepository.findByNombre(plato.getNombre()).isPresent()) {
+            throw new DataIntegrityViolationException("Este email ya existe en la base de datos.");
+        }
+        return platoRepository.save(plato);
+    }
+
+    @Override
+    public Plato updatePlato(Long id, Plato platoDetalles) throws PlatoNotFoundException {
+        if (platoRepository.findById(id).isEmpty())
+            throw new PlatoNotFoundException("Este ID " + id + " no se encuentra en la base de datos");
+
+        Plato platoFromDB = platoRepository.findById(id).get();
+
+        platoFromDB.setNombre(platoDetalles.getNombre());
+        platoFromDB.setDescripcion(platoDetalles.getDescripcion());
+        platoFromDB.setIngredientes(platoDetalles.getIngredientes());
+        platoFromDB.setReceta(platoDetalles.getReceta());
+        platoFromDB.setTipoPlato(platoDetalles.getTipoPlato());
+        platoFromDB.setAutor(platoDetalles.getAutor());
+
+        return platoRepository.save(platoFromDB);
     }
 }

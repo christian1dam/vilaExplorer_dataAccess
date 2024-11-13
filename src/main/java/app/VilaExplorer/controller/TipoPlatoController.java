@@ -1,6 +1,8 @@
 package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.TipoPlato;
+import app.VilaExplorer.exception.TipoPlatoNotFoundException;
+import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.service.TipoPlatoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -8,14 +10,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
+import static app.VilaExplorer.controller.Response.NOT_FOUND;
+
 /**
  * Controlador para la API REST de Tipos de Plato.
+ *
  * @author VilaExplorerAdmin
  * @version 1.0
  */
@@ -33,8 +39,14 @@ public class TipoPlatoController {
             @ApiResponse(responseCode = "200", description = "Tipos de plato encontrados", content = @Content(schema = @Schema(implementation = TipoPlato.class)))
     })
     @GetMapping("/all")
-    public List<TipoPlato> getAllTiposPlato() {
-        return tipoPlatoService.findAll();
+    public ResponseEntity<List<TipoPlato>> getAllTiposPlato() {
+        try {
+            List<TipoPlato> tipoPlatoList = tipoPlatoService.findAll();
+            return new ResponseEntity<>(tipoPlatoList, HttpStatus.OK);
+        } catch (TipoPlatoNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 
@@ -44,8 +56,13 @@ public class TipoPlatoController {
             @ApiResponse(responseCode = "200", description = "Tipos de plato activos encontrados", content = @Content(schema = @Schema(implementation = TipoPlato.class)))
     })
     @GetMapping("/activos")
-    public List<TipoPlato> getAllTiposPlatoActivos() {
-        return tipoPlatoService.findAllActivos();
+    public ResponseEntity<?> getAllTiposPlatoActivos() {
+        try {
+            List<TipoPlato> tipoPlatoList = tipoPlatoService.findAllActivos();
+            return new ResponseEntity<>(tipoPlatoList, HttpStatus.OK);
+        } catch (TipoPlatoNotFoundException e) {
+            return handleException(e);
+        }
     }
 
 
@@ -57,8 +74,13 @@ public class TipoPlatoController {
     })
     @GetMapping("/id/{id}")
     public ResponseEntity<TipoPlato> getTipoPlatoById(@PathVariable Long id) {
-        Optional<TipoPlato> tipoPlato = tipoPlatoService.findById(id);
-        return tipoPlato.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            TipoPlato plato = tipoPlatoService.findById(id);
+            return new ResponseEntity<>(plato, HttpStatus.OK);
+        } catch (TipoPlatoNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 
@@ -80,9 +102,13 @@ public class TipoPlatoController {
             @ApiResponse(responseCode = "200", description = "Tipo de plato eliminado lógicamente", content = @Content)
     })
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<String> deleteTipoPlatoLogico(@PathVariable Long id) {
-        tipoPlatoService.deleteByIdLogico(id);
-        return ResponseEntity.ok("Tipo de plato eliminado lógicamente");
+    public ResponseEntity<Response> deleteTipoPlatoLogico(@PathVariable Long id) {
+        try {
+            tipoPlatoService.deleteByIdLogico(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (TipoPlatoNotFoundException e) {
+            return handleException(e);
+        }
     }
 
 
@@ -94,5 +120,14 @@ public class TipoPlatoController {
     @GetMapping("/categoria/{categoriaId}")
     public List<TipoPlato> getTiposPlatoByCategoriaId(@PathVariable Long categoriaId) {
         return tipoPlatoService.findByCategoriaId(categoriaId);
+    }
+
+    @ExceptionHandler(TipoPlatoNotFoundException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Response> handleException(TipoPlatoNotFoundException tpnfe) {
+        Response response = Response.errorResponse(NOT_FOUND,
+                tpnfe.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }

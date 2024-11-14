@@ -23,7 +23,9 @@ public class TipoPlatoServiceimpl implements TipoPlatoService {
     }
 
     @Override
-    public List<TipoPlato> findAll() {
+    public List<TipoPlato> findAll() throws TipoPlatoNotFoundException {
+        if (tipoPlatoRepository.findAll().isEmpty())
+            throw new TipoPlatoNotFoundException("No hay TipoPlato en la base de datos");
         return tipoPlatoRepository.findAll();
     }
 

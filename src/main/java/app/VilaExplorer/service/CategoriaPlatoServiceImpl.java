@@ -7,6 +7,7 @@ import app.VilaExplorer.repository.CategoriaPlatoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -50,12 +51,12 @@ public class CategoriaPlatoServiceImpl implements CategoriaPlatoService {
     }
 
     @Override
+    @Transactional
     public CategoriaPlato updateCategoriaPlato(Long id, CategoriaPlato categoriaPlato) throws CategoriaPlatoNotFoundException {
         if (categoriaPlatoRepository.findById(id).isEmpty())
             throw new CategoriaPlatoNotFoundException("El ID " + id + " no pertenece a ninguna categoría");
         CategoriaPlato categoriaPlatoFromDB = categoriaPlatoRepository.findById(id).get();
 
-        categoriaPlatoFromDB.setIdCategoriaPlato(categoriaPlato.getIdCategoriaPlato());
         categoriaPlatoFromDB.setNombreCategoria(categoriaPlato.getNombreCategoria());
         categoriaPlatoFromDB.setActivo(categoriaPlato.getActivo());
 

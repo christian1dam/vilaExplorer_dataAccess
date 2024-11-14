@@ -115,7 +115,14 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuarioRepository.save(usuarioExistente);
     }
 
-//    Solamente se llama a este metodo despues de haber hecho las validaciones de usuario y rol.
+    @Override
+    public Usuario findUser(String email, String password) throws UsuarioNotFoundException {
+        if (usuarioRepository.findByEmailAndPassword(email, password).isEmpty())
+            throw new UsuarioNotFoundException("Este usuario no existe en la base de datos");
+        return usuarioRepository.findByEmailAndPassword(email, password).get();
+    }
+
+    //    Solamente se llama a este metodo despues de haber hecho las validaciones de usuario y rol.
     private Usuario asignarRolAUsuario(Usuario usuario, String rol) {
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
         assert rolRepository.findByNombre(rol).isPresent();

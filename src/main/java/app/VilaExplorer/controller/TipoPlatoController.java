@@ -35,9 +35,7 @@ public class TipoPlatoController {
 
     // Obtener todos los tipos de plato (incluye los desactivados)
     @Operation(summary = "Obtiene todos los tipos de plato, incluyendo los desactivados")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Tipos de plato encontrados", content = @Content(schema = @Schema(implementation = TipoPlato.class)))
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Tipos de plato encontrados", content = @Content(schema = @Schema(implementation = TipoPlato.class)))})
     @GetMapping("/all")
     public ResponseEntity<List<TipoPlato>> getAllTiposPlato() {
         try {
@@ -52,9 +50,7 @@ public class TipoPlatoController {
 
     // Obtener todos los tipos de plato activos
     @Operation(summary = "Obtiene todos los tipos de plato activos")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Tipos de plato activos encontrados", content = @Content(schema = @Schema(implementation = TipoPlato.class)))
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Tipos de plato activos encontrados", content = @Content(schema = @Schema(implementation = TipoPlato.class)))})
     @GetMapping("/activos")
     public ResponseEntity<?> getAllTiposPlatoActivos() {
         try {
@@ -68,11 +64,8 @@ public class TipoPlatoController {
 
     // Obtener un tipo de plato por ID
     @Operation(summary = "Obtiene un tipo de plato por su ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Tipo de plato encontrado", content = @Content(schema = @Schema(implementation = TipoPlato.class))),
-            @ApiResponse(responseCode = "404", description = "Tipo de plato no encontrado", content = @Content)
-    })
-    @GetMapping("/id/{id}")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Tipo de plato encontrado", content = @Content(schema = @Schema(implementation = TipoPlato.class))), @ApiResponse(responseCode = "404", description = "Tipo de plato no encontrado", content = @Content)})
+    @GetMapping("/{id}")
     public ResponseEntity<TipoPlato> getTipoPlatoById(@PathVariable Long id) {
         try {
             TipoPlato plato = tipoPlatoService.findById(id);
@@ -86,9 +79,7 @@ public class TipoPlatoController {
 
     // Crear o actualizar un tipo de plato
     @Operation(summary = "Crea o actualiza un tipo de plato")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Tipo de plato creado o actualizado", content = @Content(schema = @Schema(implementation = TipoPlato.class)))
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Tipo de plato creado o actualizado", content = @Content(schema = @Schema(implementation = TipoPlato.class)))})
     @PostMapping("/crear")
     public ResponseEntity<TipoPlato> createOrUpdateTipoPlato(@RequestBody TipoPlato tipoPlato) {
         TipoPlato savedTipoPlato = tipoPlatoService.save(tipoPlato);
@@ -98,9 +89,7 @@ public class TipoPlatoController {
 
     // Borrado lógico de un tipo de plato por ID
     @Operation(summary = "Elimina un tipo de plato de forma lógica")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Tipo de plato eliminado lógicamente", content = @Content)
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Tipo de plato eliminado lógicamente", content = @Content)})
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<Response> deleteTipoPlatoLogico(@PathVariable Long id) {
         try {
@@ -114,9 +103,7 @@ public class TipoPlatoController {
 
     // Obtener todos los tipos de plato activos por ID de categoría
     @Operation(summary = "Obtiene todos los tipos de plato activos por ID de categoría")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Tipos de plato activos encontrados para la categoría", content = @Content(schema = @Schema(implementation = TipoPlato.class)))
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Tipos de plato activos encontrados para la categoría", content = @Content(schema = @Schema(implementation = TipoPlato.class)))})
     @GetMapping("/categoria/{categoriaId}")
     public List<TipoPlato> getTiposPlatoByCategoriaId(@PathVariable Long categoriaId) {
         return tipoPlatoService.findByCategoriaId(categoriaId);
@@ -126,8 +113,7 @@ public class TipoPlatoController {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Response> handleException(TipoPlatoNotFoundException tpnfe) {
-        Response response = Response.errorResponse(NOT_FOUND,
-                tpnfe.getMessage());
+        Response response = Response.errorResponse(NOT_FOUND, tpnfe.getMessage());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }

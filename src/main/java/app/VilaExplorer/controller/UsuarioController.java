@@ -2,6 +2,7 @@ package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.Usuario;
 import app.VilaExplorer.exception.RolNotFoundException;
+import app.VilaExplorer.exception.TipoPlatoNotFoundException;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.management.relation.RelationServiceNotRegisteredException;
 import java.util.List;
 
 import static app.VilaExplorer.controller.Response.NOT_FOUND;
@@ -81,6 +83,16 @@ public class UsuarioController {
             return new ResponseEntity<>(usuarios, HttpStatus.OK);
         } catch (RolNotFoundException e) {
             System.out.println(RED + e.getMessage() + RESET);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/signIn")
+    public ResponseEntity<Usuario> getUsuario(@RequestParam(value = "nombre") String nombre, @RequestParam(value = "password") String password){
+        try{
+            Usuario usuarioFromDB = usuarioService.findUser(nombre, password);
+            return new ResponseEntity<>(usuarioFromDB, HttpStatus.OK);
+        } catch (UsuarioNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

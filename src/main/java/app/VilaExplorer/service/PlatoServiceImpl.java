@@ -2,6 +2,7 @@ package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.Plato;
 import app.VilaExplorer.domain.Usuario;
+import app.VilaExplorer.exception.PlatoNotFoundException;
 import app.VilaExplorer.repository.UsuarioRepository;
 import app.VilaExplorer.repository.PlatoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class PlatoServiceImpl implements PlatoService {
     @Override
     public Plato createPlato(Plato plato) throws DataIntegrityViolationException {
         if (platoRepository.findByNombre(plato.getNombre()).isPresent()) {
-            throw new DataIntegrityViolationException("Este email ya existe en la base de datos.");
+            throw new DataIntegrityViolationException("Este plato ya existe en la base de datos.");
         }
         return platoRepository.save(plato);
     }

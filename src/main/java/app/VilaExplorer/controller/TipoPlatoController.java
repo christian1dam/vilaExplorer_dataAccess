@@ -109,6 +109,20 @@ public class TipoPlatoController {
         return tipoPlatoService.findByCategoriaId(categoriaId);
     }
 
+    @PutMapping("/activar/{id}")
+    public ResponseEntity<TipoPlato> activarTipoPlato(@PathVariable Long id, @RequestParam(value = "activo") String activo){
+        try{
+            TipoPlato tipoPlato = tipoPlatoService.activarTipoPlato(id, activo);
+            return new ResponseEntity<>(tipoPlato, HttpStatus.OK);
+        } catch (TipoPlatoNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e){
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+    }
+
     @ExceptionHandler(TipoPlatoNotFoundException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)

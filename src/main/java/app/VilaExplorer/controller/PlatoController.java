@@ -2,6 +2,7 @@ package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.Plato;
 import app.VilaExplorer.exception.PlatoNotFoundException;
+import app.VilaExplorer.exception.RolNotFoundException;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.service.PlatoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -109,7 +110,7 @@ public class PlatoController {
         try {
             Plato platoAprobado = platoService.aprobarPlato(platoId, aprobadorId);
             return new ResponseEntity<>(platoAprobado, HttpStatus.OK);
-        } catch (PlatoNotFoundException | UsuarioNotFoundException e) {
+        } catch (PlatoNotFoundException | UsuarioNotFoundException | RolNotFoundException e) {
             System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

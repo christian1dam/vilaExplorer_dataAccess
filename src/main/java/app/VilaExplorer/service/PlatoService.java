@@ -2,6 +2,7 @@ package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.Plato;
 import app.VilaExplorer.exception.PlatoNotFoundException;
+import app.VilaExplorer.exception.RolNotFoundException;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -17,7 +18,7 @@ public interface PlatoService {
     void deleteById(Long id) throws PlatoNotFoundException;
 
     //metodo para aprobar un plato
-    Plato aprobarPlato(Long platoId, Long aprobadorId) throws PlatoNotFoundException, UsuarioNotFoundException;
+    Plato aprobarPlato(Long platoId, Long aprobadorId) throws PlatoNotFoundException, UsuarioNotFoundException, RolNotFoundException;
 
     Plato createPlato(Plato plato) throws DataIntegrityViolationException;
 

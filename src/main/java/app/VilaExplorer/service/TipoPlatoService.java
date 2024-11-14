@@ -22,4 +22,6 @@ public interface TipoPlatoService {
 
     // Obtener todos los tipos de plato activos por ID de categoría
     List<TipoPlato> findByCategoriaId(Long categoriaId);
+
+    TipoPlato activarTipoPlato(Long id, String activo) throws TipoPlatoNotFoundException, IllegalArgumentException;
 }

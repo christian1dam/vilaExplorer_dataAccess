@@ -4,8 +4,11 @@ import app.VilaExplorer.domain.TipoPlato;
 import app.VilaExplorer.exception.TipoPlatoNotFoundException;
 import app.VilaExplorer.repository.TipoPlatoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.StyledEditorKit;
+import java.util.IllegalFormatCodePointException;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,5 +56,19 @@ public class TipoPlatoServiceimpl implements TipoPlatoService {
     @Override
     public List<TipoPlato> findByCategoriaId(Long categoriaId) {
         return tipoPlatoRepository.findByCategoriaPlato_IdCategoriaPlatoAndActivoTrue(categoriaId);
+    }
+
+    @Override
+    public TipoPlato activarTipoPlato(Long id, String activo) throws TipoPlatoNotFoundException, IllegalArgumentException {
+        if (tipoPlatoRepository.findById(id).isEmpty())
+            throw new TipoPlatoNotFoundException("El ID " + id + " no existe en la base de datos");
+        TipoPlato tipoPlatoFromDB = tipoPlatoRepository.findById(id).get();
+
+        if (!activo.equalsIgnoreCase("True") && !activo.equalsIgnoreCase("False")) {
+            throw new IllegalArgumentException("Se ha introducido un `True` o un  `False` mal escrito");
+        }
+
+        tipoPlatoFromDB.setActivo(Boolean.parseBoolean(activo));
+        return tipoPlatoRepository.save(tipoPlatoFromDB);
     }
 }

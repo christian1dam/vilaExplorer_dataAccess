@@ -27,7 +27,7 @@ import static app.VilaExplorer.controller.Response.NOT_FOUND;
  * @version 1.0
  */
 @RestController
-@RequestMapping(value = "/api/roles")
+@RequestMapping(value = "/rol")
 public class RolController {
     private static final String RESET = "\u001B[0m";
     private static final String RED = "\u001B[31m";

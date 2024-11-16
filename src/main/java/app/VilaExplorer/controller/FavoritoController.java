@@ -29,7 +29,7 @@ import static app.VilaExplorer.controller.Response.NOT_FOUND;
  */
 @RestController
 @Tag(name = "Favoritos", description = "API para la gestión de favoritos")
-@RequestMapping("/api/favoritos")
+@RequestMapping("/favorito")
 public class FavoritoController {
 
 

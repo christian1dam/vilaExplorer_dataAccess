@@ -27,7 +27,7 @@ import static app.VilaExplorer.controller.Response.NOT_FOUND;
  */
 @RestController
 @Tag(name = "Categorias de plato", description = "API para la gestión de categorías de plato")
-    @RequestMapping("/api/categorias-plato")
+    @RequestMapping("categoria_plato")
 public class CategoriaPlatoController {
 
     @Autowired

@@ -27,7 +27,7 @@ import static app.VilaExplorer.controller.Response.NOT_FOUND;
  */
 
 @RestController
-@RequestMapping("/api/tipos-plato")
+@RequestMapping("/tipo_plato")
 public class TipoPlatoController {
 
     @Autowired

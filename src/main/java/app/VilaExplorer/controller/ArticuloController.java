@@ -28,7 +28,7 @@ import static app.VilaExplorer.controller.Response.NOT_FOUND;
 
 @RestController
 @Tag(name = "Articulos", description = "API para la gestión de articulos")
-@RequestMapping("/api/articulos")
+@RequestMapping("articulo")
 public class ArticuloController {
 
     @Autowired

@@ -30,7 +30,7 @@ import static app.VilaExplorer.controller.Response.NOT_FOUND;
  */
 @RestController
 @Tag(name = "Fiestas", description = "API para la gestión de fiestas tradicionales")
-@RequestMapping("/api/fiestas")
+@RequestMapping("/fiesta_tradicion")
 public class FiestaTradicionController {
 
     @Autowired

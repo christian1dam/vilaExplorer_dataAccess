@@ -30,7 +30,7 @@ import static app.VilaExplorer.controller.Response.NOT_FOUND;
  */
 @Controller
 @Tag(name = "Lugares de Interes", description = "API para la gestion de lugares de interes del sistema")
-@RequestMapping("/api/platos")
+@RequestMapping("/plato")
 public class PlatoController {
 
     @Autowired

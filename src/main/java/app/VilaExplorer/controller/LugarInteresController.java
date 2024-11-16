@@ -28,7 +28,7 @@ import static app.VilaExplorer.controller.Response.NOT_FOUND;
  */
 @RestController
 @Tag(name = "Lugares de Interes", description = "API para la gestion de lugares de interes del sistema")
-@RequestMapping("/api/lugares")
+@RequestMapping("/lugar_interes")
 public class LugarInteresController {
 
     @Autowired

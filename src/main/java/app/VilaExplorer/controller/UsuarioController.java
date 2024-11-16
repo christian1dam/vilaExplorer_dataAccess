@@ -2,7 +2,6 @@ package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.Usuario;
 import app.VilaExplorer.exception.RolNotFoundException;
-import app.VilaExplorer.exception.TipoPlatoNotFoundException;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.management.relation.RelationServiceNotRegisteredException;
 import java.util.List;
 
 import static app.VilaExplorer.controller.Response.NOT_FOUND;
@@ -31,7 +29,7 @@ import static app.VilaExplorer.controller.Response.NOT_FOUND;
  * @version 1.0
  */
 @RestController
-@RequestMapping("/api/usuario")
+@RequestMapping("usuario")
 public class UsuarioController {
     private static final String RESET = "\u001B[0m";
     private static final String RED = "\u001B[31m";

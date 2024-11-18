@@ -19,6 +19,14 @@ public interface FiestaTradicionRepository extends JpaRepository<FiestaTradicion
      */
     List<FiestaTradicion> findByAutor_IdUsuario(Usuario autor);
 
+    /**
+     * Encuentra todas las fiestas tradicionales de un autor activas
+     * @param idAutor
+     */
+    @Query("SELECT f FROM FiestaTradicion f WHERE f.activo = true AND f.autor.idUsuario = :idAutor")
+    List<FiestaTradicion> findActiveByAutor(@Param("idAutor") Long idAutor);
+
+
 
     /**
      * Busca fiestas tradicionales por palabra clave parcial o completa en el nombre o descripción
@@ -34,4 +42,30 @@ public interface FiestaTradicionRepository extends JpaRepository<FiestaTradicion
      */
     @Query("SELECT f FROM FiestaTradicion f WHERE LOWER(f.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(f.descripcion) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<FiestaTradicion> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+
+    /**
+     * Encuentra todas las fiestas tradicionales activas
+     */
+    @Query("SELECT f FROM FiestaTradicion f WHERE f.activo = true")
+    List<FiestaTradicion> findAllActive();
+
+
+    /**
+     * Encuentra todas las fiestas tradicionales activas sin paginación
+     */
+    @Query("SELECT f FROM FiestaTradicion f WHERE f.activo = true AND " +
+            "(LOWER(f.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(f.descripcion) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    List<FiestaTradicion> searchActiveByKeyword(@Param("keyword") String keyword);
+
+
+    /**
+     * Encuentra todas las fiestas tradicionales activas con paginación
+     */
+    @Query("SELECT f FROM FiestaTradicion f WHERE f.activo = true AND " +
+            "(LOWER(f.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(f.descripcion) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<FiestaTradicion> searchActiveByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
 }

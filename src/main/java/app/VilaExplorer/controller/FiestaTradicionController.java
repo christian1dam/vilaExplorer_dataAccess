@@ -36,17 +36,57 @@ public class FiestaTradicionController {
     @Autowired
     private UsuarioService usuarioService; // Se inyecta el UsuarioService para buscar el objeto Usuario
 
+    // Buscar fiestas tradicionales activas
+    @GetMapping("/activas")
+    public List<FiestaTradicion> getAllFiestasTradicionActivas() {
+        return fiestaTradicionService.findAllActive();
+    }
+
+    // Buscar fiestas tradicionales activas por palabra clave
+    @GetMapping("/buscar_activos")
+    public ResponseEntity<List<FiestaTradicion>> searchFiestasActivas(@RequestParam String keyword) {
+        List<FiestaTradicion> results = fiestaTradicionService.searchActiveByKeyword(keyword);
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.ok(results);
+        }
+    }
+
+    // Buscar fiestas tradicionales activas por palabra clave con paginacion
+    @GetMapping("/buscar_activos_paginados")
+    public ResponseEntity<Page<FiestaTradicion>> searchFiestasActivasPaginadas(@RequestParam String keyword, Pageable pageable) {
+        Page<FiestaTradicion> results = fiestaTradicionService.searchActiveByKeyword(keyword, pageable);
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.ok(results);
+        }
+    }
+
+    // Buscar fiestas tradicionales activas de un autor
+    @GetMapping("/activas/autor/{idAutor}")
+    public ResponseEntity<List<FiestaTradicion>> getFiestasActivasByAutor(@PathVariable Long idAutor) {
+        List<FiestaTradicion> fiestas = fiestaTradicionService.findActiveByAutor(idAutor);
+        if (fiestas.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(fiestas);
+    }
+
+
 
     @Operation(summary = "Obtener una fiesta tradicional por su id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fiesta tradicional encontrada", content = @Content(schema = @Schema(implementation = FiestaTradicion.class))),
             @ApiResponse(responseCode = "404", description = "Fiesta tradicional no encontrada", content = @Content)
     })
-    @GetMapping("/detalle/{id}")
+    @GetMapping("/detalle/{idFiestaTradicion}")
     public ResponseEntity<FiestaTradicion> getFiestaTradicionById(@PathVariable Long idFiestaTradicion) {
         Optional<FiestaTradicion> fiestaTradicion = fiestaTradicionService.findById(idFiestaTradicion);
         return fiestaTradicion.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
 
 
     @Operation(summary = "Obtener todas las fiestas tradicionales")
@@ -59,6 +99,9 @@ public class FiestaTradicionController {
     }
 
 
+
+
+
     @Operation(summary = "Crear una fiesta tradicional")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fiesta tradicional creada", content = @Content(schema = @Schema(implementation = FiestaTradicion.class)))
@@ -67,6 +110,9 @@ public class FiestaTradicionController {
     public FiestaTradicion createFiestaTradicion(@RequestBody FiestaTradicion fiestaTradicion) {
         return fiestaTradicionService.save(fiestaTradicion);
     }
+
+
+
 
 
     @Operation(summary = "Modificar una fiesta tradicional")
@@ -87,6 +133,7 @@ public class FiestaTradicionController {
 
 
 
+    // Eliminar una fiesta tradicional de forma física
     @Operation(summary = "Eliminar una fiesta tradicional")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Fiesta tradicional eliminada", content = @Content)
@@ -95,6 +142,18 @@ public class FiestaTradicionController {
     public ResponseEntity<Void> deleteFiestaTradicion(@PathVariable Long id) {
         fiestaTradicionService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+
+    // Eliminar una fiesta tradicional de forma lógica
+    @DeleteMapping("/eliminar/logico/{id}")
+    public ResponseEntity<Void> deleteFiestaTradicionLogico(@PathVariable Long id) {
+        try {
+            fiestaTradicionService.deleteLogicallyById(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 
@@ -114,6 +173,23 @@ public class FiestaTradicionController {
             return ResponseEntity.notFound().build();
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     @Operation(summary = "Buscar fiestas tradicionales por palabra clave")

@@ -54,6 +54,21 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
         fiestaTradicionRepository.deleteById(idfiestaTradicion);
     }
 
+
+    @Override
+    public void deleteLogicallyById(Long id) {
+        FiestaTradicion fiesta = fiestaTradicionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("FiestaTradicion no encontrada con ID: " + id));
+        fiesta.setActivo(false); // Marcar como no activa
+        fiestaTradicionRepository.save(fiesta); // Guardar los cambios
+    }
+
+
+
+
+
+
+
     /**
      * Encuentra todas las fiestas tradicionales de un autor
      * @param autor //objeto de tipo Usuario
@@ -81,5 +96,29 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
     public Page<FiestaTradicion> searchByKeyword(String keyword, Pageable pageable) {
         return fiestaTradicionRepository.searchByKeyword(keyword, pageable);
     }
+
+
+    @Override
+    public List<FiestaTradicion> findAllActive() {
+        return fiestaTradicionRepository.findAllActive();
+    }
+
+    @Override
+    public List<FiestaTradicion> searchActiveByKeyword(String keyword) {
+        return fiestaTradicionRepository.searchActiveByKeyword(keyword);
+    }
+
+    @Override
+    public Page<FiestaTradicion> searchActiveByKeyword(String keyword, Pageable pageable) {
+        return fiestaTradicionRepository.searchActiveByKeyword(keyword, pageable);
+    }
+
+    @Override
+    public List<FiestaTradicion> findActiveByAutor(Long idAutor) {
+        return fiestaTradicionRepository.findActiveByAutor(idAutor);
+    }
+
+
+
 
 }

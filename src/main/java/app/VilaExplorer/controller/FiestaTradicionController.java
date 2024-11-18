@@ -2,6 +2,7 @@ package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.FiestaTradicion;
 import app.VilaExplorer.domain.Usuario;
+import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.service.FiestaTradicionService;
 import app.VilaExplorer.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -104,8 +105,8 @@ public class FiestaTradicionController {
             @ApiResponse(responseCode = "404", description = "Autor no encontrado", content = @Content)
     })
     @GetMapping("/autor/{idAutor}")
-    public ResponseEntity<List<FiestaTradicion>> getFiestasByAutor(@PathVariable Long idAutor) {
-        Optional<Usuario> autor = usuarioService.findById(idAutor);
+    public ResponseEntity<List<FiestaTradicion>> getFiestasByAutor(@PathVariable Long idAutor) throws UsuarioNotFoundException {
+        Optional<Usuario> autor = Optional.ofNullable(usuarioService.findById(idAutor));
         if (autor.isPresent()) {
             List<FiestaTradicion> fiestas = fiestaTradicionService.findByAutor(autor.get());
             return ResponseEntity.ok(fiestas);

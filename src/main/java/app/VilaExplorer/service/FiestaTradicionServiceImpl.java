@@ -6,19 +6,14 @@ import app.VilaExplorer.exception.FiestaTradicionNotFound;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.repository.FiestaTradicionRepository;
 import app.VilaExplorer.repository.UsuarioRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Base64;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FiestaTradicionServiceImpl implements FiestaTradicionService {
@@ -32,7 +27,7 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
 
     /**
      * Encuentra todas las fiestas tradicionales de un autor
-     * @param idAutor
+     * @param idFiestaTradicion
      */
     @Override
     public FiestaTradicion findById(Long idFiestaTradicion) throws FiestaTradicionNotFound {
@@ -124,6 +119,26 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
         if (fiestaTradicionRepository.searchByKeyword(keyword, pageable).isEmpty())
             throw new FiestaTradicionNotFound("No existen fiestas con esta palabra clave");
         return fiestaTradicionRepository.searchByKeyword(keyword, pageable);
+    }
+
+    @Override
+    public List<FiestaTradicion> findAllActive() {
+        return List.of();
+    }
+
+    @Override
+    public List<FiestaTradicion> searchActiveByKeyword(String keyword) {
+        return List.of();
+    }
+
+    @Override
+    public Page<FiestaTradicion> searchActiveByKeyword(String keyword, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public List<FiestaTradicion> findActiveByAutor(Long idAutor) {
+        return List.of();
     }
 
     @Override

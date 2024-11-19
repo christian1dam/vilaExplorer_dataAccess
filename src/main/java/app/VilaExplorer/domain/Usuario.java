@@ -37,9 +37,9 @@ public class Usuario {
     @Schema(description = "Nombre del usuario", example = "Juan Perez", requiredMode = Schema.RequiredMode.REQUIRED)
     private String nombre;
 
-    @Column(nullable = false, unique = true)
-    @NotBlank
-    @Email
+    @Column(nullable = false)
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "Formato de email no válido")
     @Schema(description = "Correo electrónico único del usuario", example = "juan.perez@ejemplo.com", requiredMode = Schema.RequiredMode.REQUIRED)
     private String email;
 

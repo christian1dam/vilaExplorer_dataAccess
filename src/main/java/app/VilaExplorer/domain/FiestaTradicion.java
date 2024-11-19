@@ -43,6 +43,12 @@ public class FiestaTradicion {
     @Column(name = "imagen", nullable = false)
     private String imagen;
 
+    @Schema(description = "Indica si la fiesta o tradición está activa", requiredMode = RequiredMode.REQUIRED)
+    @NotBlank
+    @Column(name = "activo", nullable = false)
+    private Boolean activo = true;
+
+
     @Schema(description = "Usuario autor que ingresó la información de la fiesta o tradición", requiredMode = RequiredMode.REQUIRED)
     @ManyToOne
     @JoinColumn(name = "id_autor", nullable = false, foreignKey = @ForeignKey(name = "FK_fiesta_tradicion_usuario"))

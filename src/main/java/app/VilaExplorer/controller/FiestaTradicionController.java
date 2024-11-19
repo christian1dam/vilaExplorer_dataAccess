@@ -1,7 +1,6 @@
 package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.FiestaTradicion;
-import app.VilaExplorer.domain.Usuario;
 import app.VilaExplorer.exception.FiestaTradicionNotFound;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.service.FiestaTradicionService;
@@ -20,13 +19,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import static app.VilaExplorer.controller.Response.NOT_FOUND;
 
 /**
  * Controlador de fiestas tradicionales.
- *
  * @Author VilaExplorerAdmin
  * @Version 1.0
  */
@@ -37,6 +34,49 @@ public class FiestaTradicionController {
 
     @Autowired
     private FiestaTradicionService fiestaTradicionService;
+
+    @Autowired
+    private UsuarioService usuarioService; // Se inyecta el UsuarioService para buscar el objeto Usuario
+
+    // Buscar fiestas tradicionales activas
+    @GetMapping("/activas")
+    public List<FiestaTradicion> getAllFiestasTradicionActivas() {
+        return fiestaTradicionService.findAllActive();
+    }
+
+    // Buscar fiestas tradicionales activas por palabra clave
+    @GetMapping("/buscar_activos")
+    public ResponseEntity<List<FiestaTradicion>> searchFiestasActivas(@RequestParam String keyword) {
+        List<FiestaTradicion> results = fiestaTradicionService.searchActiveByKeyword(keyword);
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.ok(results);
+        }
+    }
+
+    // Buscar fiestas tradicionales activas por palabra clave con paginacion
+    @GetMapping("/buscar_activos_paginados")
+    public ResponseEntity<Page<FiestaTradicion>> searchFiestasActivasPaginadas(@RequestParam String keyword, Pageable pageable) {
+        Page<FiestaTradicion> results = fiestaTradicionService.searchActiveByKeyword(keyword, pageable);
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.ok(results);
+        }
+    }
+
+    // Buscar fiestas tradicionales activas de un autor
+    @GetMapping("/activas/autor/{idAutor}")
+    public ResponseEntity<List<FiestaTradicion>> getFiestasActivasByAutor(@PathVariable Long idAutor) {
+        List<FiestaTradicion> fiestas = fiestaTradicionService.findActiveByAutor(idAutor);
+        if (fiestas.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(fiestas);
+    }
+
+
 
     @Operation(summary = "Obtener una fiesta tradicional por su id")
     @ApiResponses(value = {
@@ -80,6 +120,7 @@ public class FiestaTradicionController {
         }
     }
 
+
     @Operation(summary = "Modificar una fiesta tradicional")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fiesta tradicional modificada", content = @Content(schema = @Schema(implementation = FiestaTradicion.class))),
@@ -97,6 +138,8 @@ public class FiestaTradicionController {
     }
 
 
+
+    // Eliminar una fiesta tradicional de forma física
     @Operation(summary = "Eliminar una fiesta tradicional")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Fiesta tradicional eliminada", content = @Content)
@@ -110,6 +153,19 @@ public class FiestaTradicionController {
             return handleException(e);
         }
     }
+
+
+    // Eliminar una fiesta tradicional de forma lógica
+    @DeleteMapping("/eliminar/logico/{id}")
+    public ResponseEntity<Void> deleteFiestaTradicionLogico(@PathVariable Long id) {
+        try {
+            fiestaTradicionService.deleteLogicallyById(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 
 
     @Operation(summary = "Obtener todas las fiestas tradicionales de un autor")
@@ -146,7 +202,8 @@ public class FiestaTradicionController {
     }
 
 
-    @Operation(summary = "Buscar fiestas tradicionales por palabra clave con paginación")
+
+    @Operation(summary = "Buscar fiestas tradicionales por palabra clave con paginacion")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fiestas tradicionales encontradas", content = @Content(schema = @Schema(implementation = FiestaTradicion.class))),
             @ApiResponse(responseCode = "204", description = "No se encontraron fiestas tradicionales", content = @Content)

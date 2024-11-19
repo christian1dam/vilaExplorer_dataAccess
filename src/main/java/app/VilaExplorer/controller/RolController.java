@@ -44,6 +44,8 @@ public class RolController {
         return rolService.getAll();
     }
 
+
+
     @Operation(summary = "Obtiene un rol filtrado por el nombre")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Rol encontrado en la base de datos", content = @Content(schema = @Schema(implementation = Rol.class))),

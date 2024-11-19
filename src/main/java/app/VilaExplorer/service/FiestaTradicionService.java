@@ -19,14 +19,23 @@ public interface FiestaTradicionService {
 
     void deleteById(Long id) throws FiestaTradicionNotFound;
 
+    void deleteLogicallyById(Long id);
+
     List<FiestaTradicion> findByAutor(Usuario autor);
 
     // para buscar por palabra clave parcial o completa en el nombre o descripción
     List<FiestaTradicion> searchByKeyword(String keyword) throws FiestaTradicionNotFound;
 
+
     // para buscar por palabra clave parcial o completa en el nombre o descripción paginado
     // paginado significa que se mostrara de a 10 elementos por pagina
-    Page<FiestaTradicion> searchByKeyword(String keyword, Pageable pageable) throws FiestaTradicionNotFound;
+    Page<FiestaTradicion> searchByKeyword(String keyword, Pageable pageable);
+
+    List<FiestaTradicion> findAllActive();
+    List<FiestaTradicion> searchActiveByKeyword(String keyword);
+    Page<FiestaTradicion> searchActiveByKeyword(String keyword, Pageable pageable);
+    List<FiestaTradicion> findActiveByAutor(Long idAutor);
+
 
     List<FiestaTradicion> getFiestaByAutor(Long idAutor) throws UsuarioNotFoundException;
 

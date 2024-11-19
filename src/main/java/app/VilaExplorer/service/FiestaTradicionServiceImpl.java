@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,8 +25,7 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
 
     /**
      * Encuentra todas las fiestas tradicionales de un autor
-     *
-     * @param idFiestaTradicion
+     * @param idAutor
      */
     @Override
     public FiestaTradicion findById(Long idFiestaTradicion) throws FiestaTradicionNotFound {
@@ -38,8 +36,7 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
 
     /**
      * Encuentra todas las fiestas tradicionales
-     *
-     * @return Lista de fiestas tradicionales
+     * @return  Lista de fiestas tradicionales
      */
     @Override
     public List<FiestaTradicion> findAll() {
@@ -48,9 +45,8 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
 
     /**
      * Guarda una fiesta tradicional
-     *
      * @param fiestaTradicion
-     * @return
+     * @return  Fiesta tradicional guardada
      */
     @Override
     @Transactional
@@ -64,7 +60,6 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
 
     /**
      * Elimina una fiesta tradicional por su id
-     *
      * @param idfiestaTradicion
      */
     @Override
@@ -73,6 +68,16 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
             throw new FiestaTradicionNotFound(NOT_FOUND);
         fiestaTradicionRepository.deleteById(idfiestaTradicion);
     }
+
+
+    @Override
+    public void deleteLogicallyById(Long id) {
+        FiestaTradicion fiesta = fiestaTradicionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("FiestaTradicion no encontrada con ID: " + id));
+        fiesta.setActivo(false); // Marcar como no activa
+        fiestaTradicionRepository.save(fiesta); // Guardar los cambios
+    }
+
 
     /**
      * Encuentra todas las fiestas tradicionales de un autor
@@ -99,7 +104,6 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
     /**
      * Busca fiestas tradicionales por palabra clave parcial o completa en el nombre o descripción Paginado
      * paginado significa que se mostrara de a 10 elementos por pagina
-     *
      * @param keyword
      */
     @Override

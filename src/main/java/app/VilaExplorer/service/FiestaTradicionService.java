@@ -30,7 +30,7 @@ public interface FiestaTradicionService {
 
     // para buscar por palabra clave parcial o completa en el nombre o descripción paginado
     // paginado significa que se mostrara de a 10 elementos por pagina
-    Page<FiestaTradicion> searchByKeyword(String keyword, Pageable pageable);
+    Page<FiestaTradicion> searchByKeyword(String keyword, Pageable pageable) throws FiestaTradicionNotFound;
 
     List<FiestaTradicion> findAllActive();
     List<FiestaTradicion> searchActiveByKeyword(String keyword);

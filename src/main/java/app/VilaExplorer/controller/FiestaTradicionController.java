@@ -4,6 +4,7 @@ import app.VilaExplorer.domain.FiestaTradicion;
 import app.VilaExplorer.exception.FiestaTradicionNotFound;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.service.FiestaTradicionService;
+import app.VilaExplorer.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

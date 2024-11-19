@@ -14,61 +14,32 @@ import java.util.List;
 
 @Repository
 public interface FiestaTradicionRepository extends JpaRepository<FiestaTradicion, Long> {
-    /**
-     * Encuentra todas las fiestas tradicionales de un autor
-     * @param autor
-     */
+
     List<FiestaTradicion> findByAutor_IdUsuario(Usuario autor);
 
-    /**
-     * Encuentra todas las fiestas tradicionales de un autor activas
-     * @param idAutor
-     */
     @Query("SELECT f FROM FiestaTradicion f WHERE f.activo = true AND f.autor.idUsuario = :idAutor")
     List<FiestaTradicion> findActiveByAutor(@Param("idAutor") Long idAutor);
 
+    @Query("SELECT f FROM FiestaTradicion f WHERE LOWER(f.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(f.descripcion) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<FiestaTradicion> searchByKeywordList(@Param("keyword") String keyword);
 
+    @Query("SELECT f FROM FiestaTradicion f WHERE LOWER(f.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(f.descripcion) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    Page<FiestaTradicion> searchByKeywordPage(@Param("keyword") String keyword, Pageable pageable);
 
-    /**
-     * Busca fiestas tradicionales por palabra clave parcial o completa en el nombre o descripción
-     * @param keyword
-     */
-    @Query("SELECT f FROM FiestaTradicion f WHERE LOWER(f.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) OR f.descripcion LIKE CONCAT('%', :keyword, '%')")
-    List<FiestaTradicion> searchByKeyword(@Param("keyword") String keyword);
+    List<FiestaTradicion> findByNombre(@NotBlank String nombre);
 
-    /**
-     * Busca fiestas tradicionales por palabra clave parcial o completa en el nombre o descripción Paginado
-     * paginado significa que se mostrara de a 10 elementos por pagina
-     * @param keyword
-     */
-    @Query("SELECT f FROM FiestaTradicion f WHERE LOWER(f.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) OR f.descripcion LIKE CONCAT('%', :keyword, '%')")
-    Page<FiestaTradicion> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
-
-    boolean findByNombre(@NotBlank String nombre);
-
-
-    /**
-     * Encuentra todas las fiestas tradicionales activas
-     */
     @Query("SELECT f FROM FiestaTradicion f WHERE f.activo = true")
     List<FiestaTradicion> findAllActive();
 
-
-    /**
-     * Encuentra todas las fiestas tradicionales activas sin paginación
-     */
     @Query("SELECT f FROM FiestaTradicion f WHERE f.activo = true AND " +
             "(LOWER(f.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(f.descripcion) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-    List<FiestaTradicion> searchActiveByKeyword(@Param("keyword") String keyword);
+    List<FiestaTradicion> searchActiveByKeywordList(@Param("keyword") String keyword);
 
-
-    /**
-     * Encuentra todas las fiestas tradicionales activas con paginación
-     */
     @Query("SELECT f FROM FiestaTradicion f WHERE f.activo = true AND " +
             "(LOWER(f.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(f.descripcion) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-    Page<FiestaTradicion> searchActiveByKeyword(@Param("keyword") String keyword, Pageable pageable);
-
+    Page<FiestaTradicion> searchActiveByKeywordPage(@Param("keyword") String keyword, Pageable pageable);
 }

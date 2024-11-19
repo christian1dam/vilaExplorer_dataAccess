@@ -59,7 +59,7 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
     public FiestaTradicion save(FiestaTradicion fiestaTradicion, Long idAutor) throws UsuarioNotFoundException, DataIntegrityViolationException {
         if (usuarioRepository.findById(idAutor).isEmpty())
             throw new UsuarioNotFoundException("El usuario introducido no existe en la base de datos");
-        if (fiestaTradicionRepository.findByNombre(fiestaTradicion.getNombre()))
+        if (!fiestaTradicionRepository.findByNombre(fiestaTradicion.getNombre()).isEmpty())
             throw new DataIntegrityViolationException("Esta fiesta tradición ya se encuentra en la base de datos");
         fiestaTradicion.setAutor(usuarioRepository.findById(idAutor).get());
         fiestaTradicionRepository.save(fiestaTradicion);
@@ -104,9 +104,9 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
      */
     @Override
     public List<FiestaTradicion> searchByKeyword(String keyword) throws FiestaTradicionNotFound {
-        if (fiestaTradicionRepository.searchByKeyword(keyword).isEmpty())
+        if (fiestaTradicionRepository.searchByKeywordList(keyword).isEmpty())
             throw new FiestaTradicionNotFound("No existen fiestas con esta palabra clave");
-        return fiestaTradicionRepository.searchByKeyword(keyword);
+        return fiestaTradicionRepository.searchByKeywordList(keyword);
     }
 
     /**
@@ -116,9 +116,9 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
      */
     @Override
     public Page<FiestaTradicion> searchByKeyword(String keyword, Pageable pageable) throws FiestaTradicionNotFound {
-        if (fiestaTradicionRepository.searchByKeyword(keyword, pageable).isEmpty())
+        if (fiestaTradicionRepository.searchByKeywordPage(keyword, pageable).isEmpty())
             throw new FiestaTradicionNotFound("No existen fiestas con esta palabra clave");
-        return fiestaTradicionRepository.searchByKeyword(keyword, pageable);
+        return fiestaTradicionRepository.searchByKeywordPage(keyword, pageable);
     }
 
     @Override

@@ -45,10 +45,9 @@ public class FiestaTradicion {
     @Column(name = "fecha", nullable = false)
     private String fecha;
 
-    @Lob
     @Schema(description = "Descripción de la fiesta o tradición", example = "Una celebración con desfiles, disfraces y actividades culturales", requiredMode = RequiredMode.REQUIRED)
     @NotBlank
-    @Column(name = "descripcion", nullable = false)
+    @Column(name = "descripcion", columnDefinition = "TEXT", nullable = false)
     private String descripcion;
 
     @Schema(description = "URL de la imagen representativa de la fiesta o tradición", example = "https://example.com/images/carnaval.jpg", requiredMode = RequiredMode.REQUIRED)

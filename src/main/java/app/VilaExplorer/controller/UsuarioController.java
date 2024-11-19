@@ -88,6 +88,8 @@ public class UsuarioController {
         }
     }
 
+
+
     // Crear un nuevo usuario
     @Operation(summary = "Crea un nuevo usuario")
     @ApiResponses(value = {
@@ -98,20 +100,22 @@ public class UsuarioController {
     })
     @PostMapping("/add")
     public ResponseEntity<Usuario> createUsuario(@RequestBody Usuario usuario, @RequestParam(value = "rol") String rol) {
+        System.out.println("Usuario recibido: " + usuario);
         try {
             Usuario usuarioConRol = usuarioService.crearUsuarioConRol(usuario, rol);
             return new ResponseEntity<>(usuarioConRol, HttpStatus.CREATED);
         } catch (RolNotFoundException e) {
-            System.out.println(RED + e.getMessage() + RESET);
+            System.out.println("Error: " + e.getMessage());
             return new ResponseEntity<>(usuario, HttpStatus.NOT_FOUND);
         } catch (DataIntegrityViolationException e) {
-            System.out.println(RED + e.getMessage() + RESET);
+            System.out.println("Error: " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (Exception e) {
-            System.out.println(RED + e.getMessage() + RESET);
+            System.out.println("Error: " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
     // Actualizar un usuario existente

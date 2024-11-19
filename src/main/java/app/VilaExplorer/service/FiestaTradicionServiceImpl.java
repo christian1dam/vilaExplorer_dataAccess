@@ -7,11 +7,18 @@ import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.repository.FiestaTradicionRepository;
 import app.VilaExplorer.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FiestaTradicionServiceImpl implements FiestaTradicionService {
@@ -31,7 +38,9 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
     public FiestaTradicion findById(Long idFiestaTradicion) throws FiestaTradicionNotFound {
         if (fiestaTradicionRepository.findById(idFiestaTradicion).isEmpty())
             throw new FiestaTradicionNotFound(NOT_FOUND);
-        return fiestaTradicionRepository.findById(idFiestaTradicion).get();
+        FiestaTradicion fiesta = fiestaTradicionRepository.findById(idFiestaTradicion).get();
+        fiesta.setImagen(fiesta.getImagenBase64());
+        return fiesta;
     }
 
     /**
@@ -40,7 +49,9 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
      */
     @Override
     public List<FiestaTradicion> findAll() {
-        return fiestaTradicionRepository.findAll();
+        List<FiestaTradicion> fiestas = fiestaTradicionRepository.findAll();
+        fiestas.forEach(FiestaTradicion::setImagenBase64FromPath); // Convertir la imagen a Base64
+        return fiestas;
     }
 
     /**
@@ -50,9 +61,11 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
      */
     @Override
     @Transactional
-    public FiestaTradicion save(FiestaTradicion fiestaTradicion, Long idAutor) throws UsuarioNotFoundException {
+    public FiestaTradicion save(FiestaTradicion fiestaTradicion, Long idAutor) throws UsuarioNotFoundException, DataIntegrityViolationException {
         if (usuarioRepository.findById(idAutor).isEmpty())
             throw new UsuarioNotFoundException("El usuario introducido no existe en la base de datos");
+        if (fiestaTradicionRepository.findByNombre(fiestaTradicion.getNombre()))
+            throw new DataIntegrityViolationException("Esta fiesta tradición ya se encuentra en la base de datos");
         fiestaTradicion.setAutor(usuarioRepository.findById(idAutor).get());
         fiestaTradicionRepository.save(fiestaTradicion);
         return fiestaTradicion;
@@ -114,7 +127,7 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
     }
 
     @Override
-    public List<FiestaTradicion> getFiestaByAutor(Long idAutor) throws UsuarioNotFoundException {
+    public List<FiestaTradicion> getListaFiestasByAutor(Long idAutor) throws UsuarioNotFoundException {
         if (usuarioRepository.findById(idAutor).isEmpty())
             throw new UsuarioNotFoundException("El usuario no existe en la base de datos");
         Usuario autor = usuarioRepository.findById(idAutor).get();

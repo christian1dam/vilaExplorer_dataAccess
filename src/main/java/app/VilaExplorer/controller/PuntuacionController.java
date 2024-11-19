@@ -23,7 +23,7 @@ import java.util.Optional;
  */
 @RestController
 @Tag(name = "Puntuaciones", description = "API para la gestion de puntuaciones del sistema")
-@RequestMapping("/api/puntuaciones")
+@RequestMapping("/puntuacion")
 public class PuntuacionController {
 
     @Autowired

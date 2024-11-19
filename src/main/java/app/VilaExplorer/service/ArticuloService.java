@@ -11,6 +11,6 @@ public interface ArticuloService {
     Articulo findById(Long id) throws ArticuloNotFoundException;
     List<Articulo> findAll() throws ArticuloNotFoundException;
     Articulo save(Articulo articulo);
-    void deleteById(Long id);
+    void deleteById(Long id) throws ArticuloNotFoundException;
     List<Articulo> findByAutor(Long usuario) throws UsuarioNotFoundException; // Buscar artículos por ID de autor
 }

@@ -1,6 +1,7 @@
 package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.Usuario;
+import app.VilaExplorer.domain.UsuarioRolID;
 import app.VilaExplorer.exception.RolNotFoundException;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,4 +26,6 @@ public interface UsuarioService {
     Usuario updateUsuario(Long id, Usuario usuarioDetails) throws UsuarioNotFoundException;
 
     void deleteUsuarioLogico(Long id) throws UsuarioNotFoundException;
+
+    Usuario findUser(String email, String password) throws UsuarioNotFoundException;
 }

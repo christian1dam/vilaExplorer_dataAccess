@@ -1,6 +1,9 @@
 package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.LugarInteres;
+import app.VilaExplorer.exception.CoordenadasNotFoundException;
+import app.VilaExplorer.exception.LugarInteresNotActiveException;
+import app.VilaExplorer.exception.LugarInteresNotFoundException;
 import app.VilaExplorer.service.LugarInteresService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -9,49 +12,63 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+
+import static app.VilaExplorer.controller.Response.NOT_FOUND;
+
 /**
  * Controlador para la API REST de Lugares de Interes.
+ *
  * @author VilaExplorerAdmin
  * @version 1.0
  */
 @RestController
 @Tag(name = "Lugares de Interes", description = "API para la gestion de lugares de interes del sistema")
-@RequestMapping("/api/lugares")
+@RequestMapping("/lugar_interes")
 public class LugarInteresController {
 
     @Autowired
     private LugarInteresService lugarInteresService;
 
-     @Operation(summary = "Obtiene un lugar de interes por su ID")
-     @ApiResponses(value = {
-             @ApiResponse(responseCode = "200", description = "Lugar de interes encontrado", content = @Content(schema = @Schema(implementation = LugarInteres.class))),
-             @ApiResponse(responseCode = "404", description = "Lugar de interes no encontrado", content = @Content)
-     })
+    @Operation(summary = "Obtiene un lugar de interes por su ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lugar de interes encontrado", content = @Content(schema = @Schema(implementation = LugarInteres.class))),
+            @ApiResponse(responseCode = "404", description = "Lugar de interes no encontrado", content = @Content)
+    })
     @GetMapping("/detalle-completo/{id}")
     public ResponseEntity<LugarInteres> getLugarInteresById(@PathVariable Long id) {
-        Optional<LugarInteres> lugarInteres = lugarInteresService.findById(id);
-        return lugarInteres.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            LugarInteres lugarInteres = lugarInteresService.findById(id);
+            return new ResponseEntity<>(lugarInteres, HttpStatus.OK);
+        } catch (LugarInteresNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 
     @Operation(summary = "Obtiene un lugar de interes activo por su ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lugar de interes activo encontrado", content = @Content(schema = @Schema(implementation = LugarInteres.class))),
-            @ApiResponse(responseCode = "404", description = "Lugar de interes no encontrado o no esta activo", content = @Content)
+            @ApiResponse(responseCode = "404", description = "Lugar de interes no encontrado", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Lugar de interes no esta activo", content = @Content)
     })
     @GetMapping("/detalle/{id}")
     public ResponseEntity<LugarInteres> getLugarInteresActivoById(@PathVariable Long id) {
-        Optional<LugarInteres> lugarInteres = lugarInteresService.findById(id);
-        return lugarInteres.filter(LugarInteres::getActivo)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            LugarInteres lugarInteres = lugarInteresService.findLugarInteresActivoByID(id);
+            return new ResponseEntity<>(lugarInteres, HttpStatus.OK);
+        } catch (LugarInteresNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (LugarInteresNotActiveException e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
     }
-
 
 
     @Operation(summary = "Obtiene todos los lugares de interes")
@@ -59,10 +76,15 @@ public class LugarInteresController {
             @ApiResponse(responseCode = "200", description = "Listado de lugares de interes", content = @Content(schema = @Schema(implementation = LugarInteres.class)))
     })
     @GetMapping("/todos")
-    public List<LugarInteres> getAllLugaresInteres() {
-        return lugarInteresService.findAll();
+    public ResponseEntity<List<LugarInteres>> getAllLugaresInteres() {
+        try {
+            List<LugarInteres> lugaresInteres = lugarInteresService.findAll();
+            return new ResponseEntity<>(lugaresInteres, HttpStatus.OK);
+        } catch (LugarInteresNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
-
 
 
     @Operation(summary = "Obtiene todos los lugares de interes activos")
@@ -70,29 +92,30 @@ public class LugarInteresController {
             @ApiResponse(responseCode = "200", description = "Listado de lugares de interes activos", content = @Content(schema = @Schema(implementation = LugarInteres.class)))
     })
     @GetMapping("/activos")
-    public List<LugarInteres> getAllLugaresInteresActivos() {
-        return lugarInteresService.findAllActivos();
+    public ResponseEntity<List<LugarInteres>> getAllLugaresInteresActivos() {
+        try {
+            List<LugarInteres> lugaresInteresActivos = lugarInteresService.findAllActivos();
+            return new ResponseEntity<>(lugaresInteresActivos, HttpStatus.OK);
+        } catch (LugarInteresNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 
     @Operation(summary = "Crea un nuevo lugar de interes")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lugar de interes creado", content = @Content(schema = @Schema(implementation = LugarInteres.class))),
-            @ApiResponse(responseCode = "400", description = "Datos proporcionados invalidos o faltan coordenadas", content = @Content)
+            @ApiResponse(responseCode = "404", description = "Coordenadas no introducidas", content = @Content)
     })
     @PostMapping("/crear")
-    public ResponseEntity<LugarInteres> createLugarInteres(@RequestBody LugarInteres lugarInteres) {
-        // Validar que se hayan enviado coordenadas
-        if (lugarInteres.getCoordenadas() == null || lugarInteres.getCoordenadas().isEmpty()) {
-            return ResponseEntity.badRequest().body(null); // Es obligatorio tener al menos un par de coordenadas
+//  Aqui cambio el ResponseEntity<LugarInteres> por ResponseEntity<?> para poder devolver tanto el objeto JSON LugarInteres como la Response con la excepcion.
+    public ResponseEntity<?> createLugarInteres(@RequestBody LugarInteres lugarInteres) {
+        try {
+            LugarInteres lugarInteresCreado = lugarInteresService.save(lugarInteres);
+            return new ResponseEntity<>(lugarInteresCreado, HttpStatus.OK);
+        } catch (CoordenadasNotFoundException e) {
+            return handleException(e);
         }
-
-        // Asociar cada coordenada al lugar de interés
-        lugarInteres.getCoordenadas().forEach(coordenada -> coordenada.setLugarInteres(lugarInteres));
-
-        // Guardar el lugar de interés junto con las coordenadas asociadas
-        LugarInteres savedLugarInteres = lugarInteresService.save(lugarInteres);
-        return ResponseEntity.ok(savedLugarInteres);
     }
 
 
@@ -103,43 +126,30 @@ public class LugarInteresController {
     })
     @PutMapping("/modificar/{id}")
     public ResponseEntity<LugarInteres> updateLugarInteres(@PathVariable Long id, @RequestBody LugarInteres lugarInteresDetalle) {
-        LugarInteres lugarInteres = lugarInteresService.findById(id)
-                .orElseThrow(() -> new RuntimeException("No se encontró el lugar de interés con el id: " + id));
-
-        if (!lugarInteres.getActivo()) {
-            return ResponseEntity.notFound().build();
+        try {
+            LugarInteres lugarInteres = lugarInteresService.updateLugarInteres(id, lugarInteresDetalle);
+            return new ResponseEntity<>(lugarInteres, HttpStatus.OK);
+        } catch (LugarInteresNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        // Actualizando los atributos de LugarInteres
-        lugarInteres.setNombreLugar(lugarInteresDetalle.getNombreLugar());
-        lugarInteres.setDescripcion(lugarInteresDetalle.getDescripcion());
-        lugarInteres.setImagen(lugarInteresDetalle.getImagen());
-        lugarInteres.setTipoLugar(lugarInteresDetalle.getTipoLugar());
-        lugarInteres.setFechaAlta(lugarInteresDetalle.getFechaAlta());
-
-        // Gestionar las coordenadas: eliminar las existentes y añadir las nuevas
-        lugarInteres.getCoordenadas().clear();
-        lugarInteres.getCoordenadas().addAll(lugarInteresDetalle.getCoordenadas());
-        lugarInteresDetalle.getCoordenadas().forEach(coordenada -> coordenada.setLugarInteres(lugarInteres));
-
-        return ResponseEntity.ok(lugarInteresService.save(lugarInteres));
     }
 
 
-    @Operation(summary = "Desactiva un lugar de interes por su ID")
+    @Operation(summary = "Desactiva un lugar de interés por su ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lugar de interes desactivado", content = @Content(schema = @Schema(implementation = LugarInteres.class))),
             @ApiResponse(responseCode = "404", description = "Lugar de interes no encontrado", content = @Content)
     })
     @PutMapping("/desactivar/{id}")
     public ResponseEntity<LugarInteres> desactivarLugarInteres(@PathVariable Long id) {
-        LugarInteres lugarInteres = lugarInteresService.findById(id)
-                .orElseThrow(() -> new RuntimeException("No se encontró el lugar de interés con el id: " + id));
-
-        // Cambiar el estado a inactivo (borrado lógico)
-        lugarInteres.setActivo(false);
-
-        return ResponseEntity.ok(lugarInteresService.save(lugarInteres));
+        try {
+            LugarInteres lugarInteres = lugarInteresService.desactivarLugarInteres(id);
+            return new ResponseEntity<>(lugarInteres, HttpStatus.OK);
+        } catch (LugarInteresNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 
@@ -149,9 +159,31 @@ public class LugarInteresController {
             @ApiResponse(responseCode = "404", description = "Lugar de interes no encontrado", content = @Content)
     })
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<String> deleteLugarInteres(@PathVariable Long id) {
-        lugarInteresService.deleteByIdLogico(id);
-        return ResponseEntity.ok("Lugar de interés eliminado lógicamente");
+    public ResponseEntity<Response> deleteLugarInteres(@PathVariable Long id) {
+
+        try {
+            lugarInteresService.deleteByIdLogico(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (LugarInteresNotFoundException e) {
+            return handleException(e);
+        }
     }
 
+    @ExceptionHandler({LugarInteresNotFoundException.class})
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Response> handleException(LugarInteresNotFoundException linf) {
+        Response response = Response.errorResponse(NOT_FOUND,
+                linf.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CoordenadasNotFoundException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Response> handleException(CoordenadasNotFoundException cnfe) {
+        Response response = Response.errorResponse(NOT_FOUND,
+                cnfe.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
 }

@@ -29,7 +29,7 @@ import static app.VilaExplorer.controller.Response.NOT_FOUND;
  * @version 1.0
  */
 @RestController
-@RequestMapping("/api/usuario")
+@RequestMapping("usuario")
 public class UsuarioController {
     private static final String RESET = "\u001B[0m";
     private static final String RED = "\u001B[31m";
@@ -81,6 +81,17 @@ public class UsuarioController {
             return new ResponseEntity<>(usuarios, HttpStatus.OK);
         } catch (RolNotFoundException e) {
             System.out.println(RED + e.getMessage() + RESET);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/signIn")
+    public ResponseEntity<Usuario> getUsuario(@RequestParam(value = "nombre") String nombre, @RequestParam(value = "password") String password){
+        try{
+            Usuario usuarioFromDB = usuarioService.findUser(nombre, password);
+            System.out.println(usuarioFromDB.getNombre());
+            return new ResponseEntity<>(usuarioFromDB, HttpStatus.OK);
+        } catch (UsuarioNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

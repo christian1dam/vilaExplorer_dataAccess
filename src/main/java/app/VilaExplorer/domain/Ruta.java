@@ -12,6 +12,7 @@ import java.util.List;
 
 /**
  * Clase que representa una ruta en el sistema.
+ *
  * @author VilaExplorerAdmin
  * @version 1.0
  */

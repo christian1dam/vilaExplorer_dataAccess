@@ -2,13 +2,16 @@ package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.Plato;
 import app.VilaExplorer.domain.Usuario;
+import app.VilaExplorer.exception.PlatoNotFoundException;
+import app.VilaExplorer.exception.RolNotFoundException;
+import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.repository.UsuarioRepository;
 import app.VilaExplorer.repository.PlatoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PlatoServiceImpl implements PlatoService {
@@ -19,13 +22,19 @@ public class PlatoServiceImpl implements PlatoService {
     private UsuarioRepository usuarioRepository;
 
     @Override
-    public Optional<Plato> findById(Long id) {
-        return platoRepository.findById(id);
+    public Plato findById(Long id) throws PlatoNotFoundException {
+        if (platoRepository.findById(id).isEmpty())
+            throw new PlatoNotFoundException("Este ID " + id + " no se encuentra en la base de datos");
+        Plato plato = platoRepository.findById(id).get();
+        plato.setImagen(plato.getImagenBase64());
+        return plato;
     }
 
     @Override
     public List<Plato> findAll() {
-        return platoRepository.findAll();
+        List<Plato> platos = platoRepository.findAll();
+        platos.forEach(Plato::setImagenBase64FromPath); // Convertir la imagen a Base64
+        return platos;
     }
 
     @Override
@@ -34,22 +43,69 @@ public class PlatoServiceImpl implements PlatoService {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(Long id) throws PlatoNotFoundException {
+        if (platoRepository.findById(id).isEmpty())
+            throw new PlatoNotFoundException("Este ID " + id + " no se encuentra en la base de datos");
         platoRepository.deleteById(id);
     }
 
     // Implementación  para aprobar un plato
     @Override
-    public Plato aprobarPlato(Long platoId, Long aprobadorId) {
-        Plato plato = platoRepository.findById(platoId)
-                .orElseThrow(() -> new RuntimeException("No se encontró el plato con el id: " + platoId));
+    public Plato aprobarPlato(Long platoId, Long aprobadorId) throws PlatoNotFoundException, UsuarioNotFoundException, RolNotFoundException {
+        if (platoRepository.findById(platoId).isEmpty())
+            throw new PlatoNotFoundException("Este ID de PLATO " + platoId + " no se encuentra en la base de datos");
 
-        Usuario aprobador = usuarioRepository.findById(aprobadorId)
-                .orElseThrow(() -> new RuntimeException("No se encontró el aprobador con el id: " + aprobadorId));
+        if (usuarioRepository.findById(aprobadorId).isEmpty())
+            throw new UsuarioNotFoundException("Este ID de USUARIO " + aprobadorId + " no se encuentra en la base de datos");
 
-        plato.setAprobador(aprobador);
-        plato.setEstado(true); // Marca el plato como aprobado
+        Usuario usuarioFromDB = usuarioRepository.findById(aprobadorId).get();
+        if (usuarioFromDB.getRolActual().getNombre().equalsIgnoreCase("cliente")) {
+            throw new RolNotFoundException("El ID que has introducido no pertenece a ningún administrador o redactor que pueda aprobar la solicitud");
+        }
 
+        Plato platoFromDB = platoRepository.findById(platoId).get();
+        platoFromDB.setAprobador(usuarioFromDB);
+        platoFromDB.setEstado(true);
+
+        return platoRepository.save(platoFromDB);
+    }
+
+    @Override
+    public Plato createPlato(Plato plato) throws DataIntegrityViolationException {
+        if (platoRepository.findByNombre(plato.getNombre()).isPresent()) {
+            throw new DataIntegrityViolationException("Este plato ya existe en la base de datos.");
+        }
         return platoRepository.save(plato);
+    }
+
+    @Override
+    public Plato updatePlato(Long id, Plato platoDetalles) throws PlatoNotFoundException {
+        if (platoRepository.findById(id).isEmpty())
+            throw new PlatoNotFoundException("Este ID " + id + " no se encuentra en la base de datos");
+
+        Plato platoFromDB = platoRepository.findById(id).get();
+
+        // Si se quiere actualizar el plato sin modificar el tipo de la receta o el autor
+        if (platoDetalles.getAutor() != null && platoDetalles.getTipoPlato() != null) {
+
+            platoFromDB.setNombre(platoDetalles.getNombre());
+            platoFromDB.setDescripcion(platoDetalles.getDescripcion());
+            platoFromDB.setIngredientes(platoDetalles.getIngredientes());
+            platoFromDB.setReceta(platoDetalles.getReceta());
+            platoFromDB.setEstado(platoDetalles.isEstado());
+
+            return platoRepository.save(platoFromDB);
+
+        }
+
+        platoFromDB.setNombre(platoDetalles.getNombre());
+        platoFromDB.setDescripcion(platoDetalles.getDescripcion());
+        platoFromDB.setIngredientes(platoDetalles.getIngredientes());
+        platoFromDB.setReceta(platoDetalles.getReceta());
+        platoFromDB.setEstado(platoDetalles.isEstado());
+        platoFromDB.setTipoPlato(platoDetalles.getTipoPlato());
+        platoFromDB.setAutor(platoDetalles.getAutor());
+
+        return platoRepository.save(platoFromDB);
     }
 }

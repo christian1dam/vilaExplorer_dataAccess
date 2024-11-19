@@ -21,7 +21,7 @@ import java.util.Optional;
  * @version 1.0
  */
 @RestController
-@RequestMapping("/api/tipos-lugar")
+@RequestMapping("/tipo_lugar_interes")
 public class TipoLugarInteresController {
 
     @Autowired

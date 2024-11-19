@@ -2,7 +2,6 @@ package app.VilaExplorer.service;
 
 
 import app.VilaExplorer.domain.Articulo;
-import app.VilaExplorer.domain.Usuario;
 import app.VilaExplorer.exception.ArticuloNotFoundException;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.repository.ArticuloRepository;
@@ -43,7 +42,9 @@ public class ArticuloServiceImpl implements ArticuloService {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(Long id) throws ArticuloNotFoundException {
+        if(articuloRepository.findById(id).isEmpty())
+            throw new ArticuloNotFoundException("El articulo no existe en la base de datos");
         articuloRepository.deleteById(id);
     }
 

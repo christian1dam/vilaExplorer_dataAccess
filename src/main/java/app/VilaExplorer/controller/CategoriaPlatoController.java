@@ -1,6 +1,7 @@
 package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.CategoriaPlato;
+import app.VilaExplorer.exception.CategoriaPlatoNotFoundException;
 import app.VilaExplorer.service.CategoriaPlatoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -9,20 +10,24 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+
+import static app.VilaExplorer.controller.Response.NOT_FOUND;
 
 /**
  * Controlador de categorías de plato
+ *
  * @Author VilaExplorerAdmin
  * @Version 1.0
  */
 @RestController
 @Tag(name = "Categorias de plato", description = "API para la gestión de categorías de plato")
-@RequestMapping("/api/categorias-plato")
+    @RequestMapping("categoria_plato")
 public class CategoriaPlatoController {
 
     @Autowired
@@ -36,8 +41,13 @@ public class CategoriaPlatoController {
     })
     @GetMapping("/detalle/{id}")
     public ResponseEntity<CategoriaPlato> getCategoriaPlatoById(@PathVariable Long id) {
-        Optional<CategoriaPlato> categoriaPlato = categoriaPlatoService.findById(id);
-        return categoriaPlato.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            CategoriaPlato categoriaPlato = categoriaPlatoService.findById(id);
+            return new ResponseEntity<>(categoriaPlato, HttpStatus.OK);
+        } catch (CategoriaPlatoNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 
@@ -51,7 +61,7 @@ public class CategoriaPlatoController {
     }
 
 
-        @Operation(summary = "Obtiene todas las categorias de plato activas")
+    @Operation(summary = "Obtiene todas las categorias de plato activas")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Listado de categorias de plato activas", content = @Content(schema = @Schema(implementation = CategoriaPlato.class)))
     })
@@ -63,11 +73,18 @@ public class CategoriaPlatoController {
 
     @Operation(summary = "Crea una nueva categoría de plato")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Categoria de plato creada", content = @Content(schema = @Schema(implementation = CategoriaPlato.class)))
+            @ApiResponse(responseCode = "200", description = "Categoria de plato creada", content = @Content(schema = @Schema(implementation = CategoriaPlato.class))),
+            @ApiResponse(responseCode = "409", description = "Conflicto: el objeto ya existe en la base de datos", content = @Content(schema = @Schema(implementation = CategoriaPlato.class)))
     })
     @PostMapping("/crear")
-    public CategoriaPlato createCategoriaPlato(@RequestBody CategoriaPlato categoriaPlato) {
-        return categoriaPlatoService.save(categoriaPlato);
+    public ResponseEntity<CategoriaPlato> createCategoriaPlato(@RequestBody CategoriaPlato categoriaPlato) {
+        try {
+            CategoriaPlato nueva = categoriaPlatoService.crearCategoriaPlato(categoriaPlato);
+            return new ResponseEntity<>(nueva, HttpStatus.CREATED);
+        } catch (DataIntegrityViolationException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
     }
 
 
@@ -78,12 +95,12 @@ public class CategoriaPlatoController {
     })
     @PutMapping("/modificar/{id}")
     public ResponseEntity<CategoriaPlato> updateCategoriaPlato(@PathVariable Long id, @RequestBody CategoriaPlato categoriaPlato) {
-        Optional<CategoriaPlato> existingCategoriaPlato = categoriaPlatoService.findById(id);
-        if (existingCategoriaPlato.isPresent()) {
-            categoriaPlato.setIdCategoriaPlato(id); // Actualiza el campo 'idCategoria'
-            return ResponseEntity.ok(categoriaPlatoService.save(categoriaPlato));
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            CategoriaPlato categoriaActualizada = categoriaPlatoService.updateCategoriaPlato(id, categoriaPlato);
+            return new ResponseEntity<>(categoriaActualizada, HttpStatus.OK);
+        } catch (CategoriaPlatoNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -96,8 +113,21 @@ public class CategoriaPlatoController {
             @ApiResponse(responseCode = "404", description = "Categoria de plato no encontrada", content = @Content)
     })
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<Void> deleteCategoriaPlatoLogico(@PathVariable Long id) {
-        categoriaPlatoService.deleteByIdLogico(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Response> deleteCategoriaPlatoLogico(@PathVariable Long id) {
+        try {
+            categoriaPlatoService.deleteByIdLogico(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (CategoriaPlatoNotFoundException e) {
+            return handleException(e);
+        }
+    }
+
+    @ExceptionHandler(CategoriaPlatoNotFoundException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Response> handleException(CategoriaPlatoNotFoundException cpnfe) {
+        Response response = Response.errorResponse(NOT_FOUND,
+                cpnfe.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }

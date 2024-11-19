@@ -21,7 +21,7 @@ import java.util.Optional;
  * @version 1.0
  */
 @RestController
-@RequestMapping("/api/rutas")
+@RequestMapping("/ruta")
 public class RutaController {
 
     @Autowired

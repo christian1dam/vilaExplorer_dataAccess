@@ -12,26 +12,27 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
+
+import static app.VilaExplorer.controller.Response.NOT_FOUND;
 
 /**
  * Controlador que permite gestional los articulos redactados
+ *
  * @Author vilaExplorerAdmin
  * @Version 1.0
  */
 
 @RestController
 @Tag(name = "Articulos", description = "API para la gestión de articulos")
-@RequestMapping("/api/articulos")
+@RequestMapping("articulo")
 public class ArticuloController {
 
     @Autowired
     private ArticuloService articuloService;
-
 
     @Operation(summary = "Obtener un articulo por su id")
     @ApiResponses(value = {
@@ -40,7 +41,7 @@ public class ArticuloController {
     })
     @GetMapping("/detalle/{id}")
     public ResponseEntity<Articulo> getArticuloById(@PathVariable Long id) {
-        try{
+        try {
             Articulo articulo = articuloService.findById(id);
             return new ResponseEntity<>(articulo, HttpStatus.OK);
         } catch (ArticuloNotFoundException e) {
@@ -48,7 +49,6 @@ public class ArticuloController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
 
     @Operation(summary = "Obtener todos los articulos")
     @ApiResponses(value = {
@@ -58,8 +58,8 @@ public class ArticuloController {
     @GetMapping("/todos")
     public ResponseEntity<List<Articulo>> getAllArticulos() {
         try {
-             List<Articulo> articulos = articuloService.findAll();
-             return new ResponseEntity<>(articulos, HttpStatus.OK);
+            List<Articulo> articulos = articuloService.findAll();
+            return new ResponseEntity<>(articulos, HttpStatus.OK);
         } catch (ArticuloNotFoundException e) {
             System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -82,8 +82,21 @@ public class ArticuloController {
             @ApiResponse(responseCode = "404", description = "Articulo no encontrado", content = @Content)
     })
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<Void> deleteArticulo(@PathVariable Long id) {
-        articuloService.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Response> deleteArticulo(@PathVariable Long id) {
+        try {
+            articuloService.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (ArticuloNotFoundException e) {
+            return handleException(e);
+        }
+    }
+
+    @ExceptionHandler(ArticuloNotFoundException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Response> handleException(ArticuloNotFoundException anfe) {
+        Response response = Response.errorResponse(NOT_FOUND,
+                anfe.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }

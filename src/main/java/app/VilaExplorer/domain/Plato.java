@@ -8,10 +8,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Base64;
+
 /**
  * Clase que representa la entidad Plato en la base de datos
- * @autor VilaExplorerAdmin
+ *
  * @version 1.0
+ * @autor VilaExplorerAdmin
  */
 @Entity
 @Data
@@ -51,6 +58,14 @@ public class Plato {
     @Schema(description = "Estado de aprobación del plato (true si ha sido aprobado)", example = "false", requiredMode = Schema.RequiredMode.REQUIRED)
     private boolean estado = false; // Inicialmente falso hasta que sea aprobado
 
+    @Column(name = "imagen_path")
+    @Schema(description = "Ruta de la imagen del plato", example = "images/platos/paella.jpg")
+    private String imagen;
+
+    @Schema(description = "Imagen representativa en formato Base64", example = "data:image/jpeg;base64,...")
+    @Transient
+    private String imagenBase64;
+
     @ManyToOne
     @JoinColumn(name = "id_tipo_plato", nullable = false)
     @NotNull
@@ -67,4 +82,21 @@ public class Plato {
     @JoinColumn(name = "id_aprobador", foreignKey = @ForeignKey(name = "FK_plato_usuario_aprobador"))
     @Schema(description = "Usuario que aprobó el plato")
     private Usuario aprobador; //Permite valores nulos hasta que sea aprobado el plato
+
+    // Método para convertir la imagen a Base64 y devolverla como String
+    public String getImagenBase64() {
+        Path imagePath = Paths.get(this.imagen);
+        try {
+            byte[] imageBytes = Files.readAllBytes(imagePath);
+            return Base64.getEncoder().encodeToString(imageBytes);
+        } catch (IOException e) {
+            System.out.println("Error al leer la imagen: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // Método para establecer la imagenBase64
+    public void setImagenBase64FromPath() {
+        this.imagenBase64 = getImagenBase64();
+    }
 }

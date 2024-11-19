@@ -16,6 +16,7 @@ import java.util.List;
 public interface FiestaTradicionRepository extends JpaRepository<FiestaTradicion, Long> {
     /**
      * Encuentra todas las fiestas tradicionales de un autor
+     *
      * @param autor
      */
     List<FiestaTradicion> findByAutor_IdUsuario(Usuario autor);
@@ -23,17 +24,19 @@ public interface FiestaTradicionRepository extends JpaRepository<FiestaTradicion
 
     /**
      * Busca fiestas tradicionales por palabra clave parcial o completa en el nombre o descripción
+     *
      * @param keyword
      */
-    @Query("SELECT f FROM FiestaTradicion f WHERE LOWER(f.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(f.descripcion) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    @Query("SELECT f FROM FiestaTradicion f WHERE LOWER(f.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) OR f.descripcion LIKE CONCAT('%', :keyword, '%')")
     List<FiestaTradicion> searchByKeyword(@Param("keyword") String keyword);
 
     /**
      * Busca fiestas tradicionales por palabra clave parcial o completa en el nombre o descripción Paginado
      * paginado significa que se mostrara de a 10 elementos por pagina
+     *
      * @param keyword
      */
-    @Query("SELECT f FROM FiestaTradicion f WHERE LOWER(f.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(f.descripcion) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    @Query("SELECT f FROM FiestaTradicion f WHERE LOWER(f.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) OR f.descripcion LIKE CONCAT('%', :keyword, '%')")
     Page<FiestaTradicion> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     boolean findByNombre(@NotBlank String nombre);

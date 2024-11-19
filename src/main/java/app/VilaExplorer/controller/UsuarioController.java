@@ -89,6 +89,7 @@ public class UsuarioController {
     public ResponseEntity<Usuario> getUsuario(@RequestParam(value = "nombre") String nombre, @RequestParam(value = "password") String password){
         try{
             Usuario usuarioFromDB = usuarioService.findUser(nombre, password);
+            System.out.println(usuarioFromDB.getNombre());
             return new ResponseEntity<>(usuarioFromDB, HttpStatus.OK);
         } catch (UsuarioNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

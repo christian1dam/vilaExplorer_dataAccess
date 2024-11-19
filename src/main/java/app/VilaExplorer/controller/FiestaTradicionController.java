@@ -58,8 +58,14 @@ public class FiestaTradicionController {
             @ApiResponse(responseCode = "200", description = "Fiestas tradicionales encontradas", content = @Content(schema = @Schema(implementation = FiestaTradicion.class)))
     })
     @GetMapping("/todos")
-    public List<FiestaTradicion> getAllFiestasTradicion() {
-        return fiestaTradicionService.findAll();
+    public ResponseEntity<List<FiestaTradicion>> getAllFiestasTradiciones() {
+        try {
+            List<FiestaTradicion> fiestasTradiciones = fiestaTradicionService.findAll();
+            return new ResponseEntity<>(fiestasTradiciones, HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println("Error al obtener las fiestas: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
@@ -75,7 +81,7 @@ public class FiestaTradicionController {
         } catch (UsuarioNotFoundException e) {
             System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch(DataIntegrityViolationException e){
+        } catch (DataIntegrityViolationException e) {
             System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }

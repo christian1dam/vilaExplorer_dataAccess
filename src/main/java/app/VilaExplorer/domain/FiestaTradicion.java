@@ -52,7 +52,7 @@ public class FiestaTradicion {
 
     @Schema(description = "URL de la imagen representativa de la fiesta o tradición", example = "https://example.com/images/carnaval.jpg", requiredMode = RequiredMode.REQUIRED)
     @NotBlank
-    @Column(name = "imagen", nullable = false)
+    @Column(name = "imagen", nullable = true)
     private String imagen;
 
     @Schema(description = "Imagen representativa en formato Base64", example = "data:image/jpeg;base64,...")

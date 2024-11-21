@@ -121,7 +121,7 @@ public class UsuarioController {
         }
     }
 
-
+//----------PUT--------
     // Actualizar un usuario existente
     @Operation(summary = "Actualiza un usuario existente")
     @ApiResponses(value = {

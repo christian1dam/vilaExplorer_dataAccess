@@ -39,6 +39,9 @@ public class FiestaTradicionController {
     @Autowired
     private UsuarioService usuarioService; // Se inyecta el UsuarioService para buscar el objeto Usuario
 
+
+    //******GET********
+
     // Buscar fiestas tradicionales activas
     @GetMapping("/activas")
     public List<FiestaTradicion> getAllFiestasTradicionActivas() {
@@ -77,8 +80,6 @@ public class FiestaTradicionController {
         return ResponseEntity.ok(fiestas);
     }
 
-
-
     @Operation(summary = "Obtener una fiesta tradicional por su id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fiesta tradicional encontrada", content = @Content(schema = @Schema(implementation = FiestaTradicion.class))),
@@ -112,6 +113,9 @@ public class FiestaTradicionController {
     }
 
 
+
+    //******POST********
+
     @Operation(summary = "Crear una fiesta tradicional")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fiesta tradicional creada", content = @Content(schema = @Schema(implementation = FiestaTradicion.class)))
@@ -131,6 +135,8 @@ public class FiestaTradicionController {
     }
 
 
+    //******PUT********
+
     @Operation(summary = "Modificar una fiesta tradicional")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fiesta tradicional modificada", content = @Content(schema = @Schema(implementation = FiestaTradicion.class))),
@@ -148,6 +154,8 @@ public class FiestaTradicionController {
     }
 
 
+
+    //*****DELETE********
 
     // Eliminar una fiesta tradicional de forma física
     @Operation(summary = "Eliminar una fiesta tradicional")
@@ -177,6 +185,8 @@ public class FiestaTradicionController {
     }
 
 
+
+    //******OTROS********
 
     @Operation(summary = "Obtener todas las fiestas tradicionales de un autor")
     @ApiResponses(value = {

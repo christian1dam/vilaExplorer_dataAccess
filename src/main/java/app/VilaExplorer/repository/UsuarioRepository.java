@@ -1,10 +1,14 @@
 package app.VilaExplorer.repository;
 
 import app.VilaExplorer.domain.Usuario;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.scheduling.support.SimpleTriggerContext;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -20,4 +24,10 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByEmail(String email);
 
     Optional<Usuario> findByEmailAndPassword(String email, String password);
+
+    Optional<Usuario> findByNombre(String username) throws UsernameNotFoundException;
+
+    boolean existsByNombre(String username);
+
+    boolean existsByEmail(String email);
 }

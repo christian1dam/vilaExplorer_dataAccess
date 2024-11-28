@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,6 +44,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Usuarios encontrados", content = @Content(schema = @Schema(implementation = Usuario.class)))
     })
     @GetMapping("/getAll")
+    @PreAuthorize("hasRole('Cliente')")
     public List<Usuario> getAllUsuarios() {
         //Cuando no se manipulan los header de la respuesta no es necesario devolver un ResponseEntity
         return usuarioService.findAll();
@@ -86,8 +88,8 @@ public class UsuarioController {
     }
 
     @GetMapping("/signIn")
-    public ResponseEntity<Usuario> getUsuario(@RequestParam(value = "nombre") String nombre, @RequestParam(value = "password") String password){
-        try{
+    public ResponseEntity<Usuario> getUsuario(@RequestParam(value = "nombre") String nombre, @RequestParam(value = "password") String password) {
+        try {
             Usuario usuarioFromDB = usuarioService.findUser(nombre, password);
             System.out.println(usuarioFromDB.getNombre());
             return new ResponseEntity<>(usuarioFromDB, HttpStatus.OK);
@@ -174,7 +176,7 @@ public class UsuarioController {
             usuarioService.deleteUsuarioLogico(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (UsuarioNotFoundException e) {
-           return handleException(e);
+            return handleException(e);
         }
     }
 

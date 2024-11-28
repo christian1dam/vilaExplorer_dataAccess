@@ -1,7 +1,6 @@
 package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.Usuario;
-import app.VilaExplorer.domain.UsuarioRolID;
 import app.VilaExplorer.exception.RolNotFoundException;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;

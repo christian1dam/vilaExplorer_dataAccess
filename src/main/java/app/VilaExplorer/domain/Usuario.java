@@ -1,6 +1,5 @@
 package app.VilaExplorer.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -9,13 +8,15 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * Clase que representa un Usuario en el sistema.
+ *
  * @Author VilaExplorerAdmin
  * @Version 1.0
  */
@@ -25,8 +26,6 @@ import java.util.List;
 @Entity
 @Table(name = "usuario")
 public class Usuario {
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
@@ -58,7 +57,8 @@ public class Usuario {
     private Boolean activo = true;
 
     // Relación muchos a muchos a través de UsuarioRol
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY) // FetchType.LAZY en lugar de EAGER
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // FetchType.LAZY en lugar de EAGER
     @JsonManagedReference
     @Schema(description = "Lista de roles históricos asociados al usuario")
     private List<UsuarioRol> roles = new ArrayList<>();
@@ -68,4 +68,12 @@ public class Usuario {
     @JoinColumn(name = "id_rol_actual")
     @Schema(description = "Rol actual asignado al usuario")
     private Rol rolActual;
+
+    public Usuario(String nombre, @Email String email, String password, LocalDateTime date, boolean activo) {
+        this.nombre = nombre;
+        this.email = email;
+        this.password = password;
+        this.fechaCreacion = LocalDate.from(date);
+        this.activo = activo;
+    }
 }

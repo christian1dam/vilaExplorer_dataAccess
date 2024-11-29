@@ -20,9 +20,6 @@ public class JwtUtils {
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-    @Value("${bezkoder.app.jwtSecret}")
-    private String jwtSecret;
-
     @Value("${bezkoder.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 

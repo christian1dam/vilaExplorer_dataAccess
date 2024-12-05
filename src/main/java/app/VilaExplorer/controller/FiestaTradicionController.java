@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -101,6 +102,7 @@ public class FiestaTradicionController {
             @ApiResponse(responseCode = "200", description = "Fiestas tradicionales encontradas", content = @Content(schema = @Schema(implementation = FiestaTradicion.class)))
     })
     @GetMapping("/todos")
+    @PreAuthorize("hasRole('Cliente')")
     public ResponseEntity<List<FiestaTradicion>> getAllFiestasTradiciones() {
         try {
             List<FiestaTradicion> fiestasTradiciones = fiestaTradicionService.findAll();

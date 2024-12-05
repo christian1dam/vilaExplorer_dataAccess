@@ -44,7 +44,6 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Usuarios encontrados", content = @Content(schema = @Schema(implementation = Usuario.class)))
     })
     @GetMapping("/getAll")
-    @PreAuthorize("hasRole('Cliente')")
     public List<Usuario> getAllUsuarios() {
         //Cuando no se manipulan los header de la respuesta no es necesario devolver un ResponseEntity
         return usuarioService.findAll();
@@ -58,6 +57,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
     })
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('Cliente')")
     public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long id) {
         try {
             Usuario usuario = usuarioService.findById(id);

@@ -69,11 +69,11 @@ public class Usuario {
     @Schema(description = "Rol actual asignado al usuario")
     private Rol rolActual;
 
-    public Usuario(String nombre, @Email String email, String password, LocalDateTime date, boolean activo) {
+    public Usuario(String nombre, @Email String email, String password, LocalDateTime fechaCreacion, boolean activo) {
         this.nombre = nombre;
         this.email = email;
         this.password = password;
-        this.fechaCreacion = LocalDate.from(date);
+        this.fechaCreacion = LocalDate.from(fechaCreacion);
         this.activo = activo;
     }
 }

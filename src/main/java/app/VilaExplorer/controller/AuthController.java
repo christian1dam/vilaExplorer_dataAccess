@@ -27,11 +27,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-//https://github.com/bezkoder/spring-boot-spring-security-jwt-authentication
-//http://localhost:8080/api/auth/signup?username=Pepe&email=pepe@gmail.com&password=1234&role=admin
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class AuthController {
     @Autowired
     AuthenticationManager authenticationManager;
@@ -55,17 +53,10 @@ public class AuthController {
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-
-        System.out.println("esta autenticado??  " + authentication.isAuthenticated());
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
-
-        List<String> roles1 = jwtUtils.getRolesFromJwtToken(jwt); // Este método debes implementarlo si no lo tienes
-        System.out.println("Roles: " + roles1);
-
-        System.out.println("CLAVE JWT PARA USUARIO " + jwt);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
@@ -80,6 +71,7 @@ public class AuthController {
                                 userDetails.getId(),
                                 userDetails.getUsername(),
                                 userDetails.getEmail(),
+                                userDetails.getPassword(),
                                 roles
                         )
         );

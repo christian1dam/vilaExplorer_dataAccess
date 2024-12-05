@@ -2,6 +2,7 @@ package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.Puntuacion;
 import app.VilaExplorer.enums.TipoEntidad;
+import app.VilaExplorer.exception.PlatoNotFoundException;
 import app.VilaExplorer.repository.PuntuacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,9 @@ public class PuntuacionServiceImpl implements PuntuacionService {
 
     @Autowired
     private PuntuacionRepository puntuacionRepository;
+
+    @Autowired
+    private PlatoService platoService; // Inyección de dependencia de PlatoService
 
     /* Metodo que devuelve todas las puntuaciones de una entidad
     Se necesita el ID de la entidad y el tipo de entidad
@@ -111,7 +115,7 @@ public class PuntuacionServiceImpl implements PuntuacionService {
     }
 
     @Override
-    public Puntuacion updatePuntuacion(Long idUsuario, Long idEntidad, TipoEntidad tipoEntidad, Integer nuevaPuntuacion) {
+    public Puntuacion updatePuntuacion(Long idUsuario, Long idEntidad, TipoEntidad tipoEntidad, Integer nuevaPuntuacion) throws PlatoNotFoundException {
         Puntuacion puntuacion = puntuacionRepository
                 .findByUsuario_IdUsuarioAndIdEntidadAndTipoEntidad(idUsuario, idEntidad, tipoEntidad)
                 .stream()
@@ -119,7 +123,26 @@ public class PuntuacionServiceImpl implements PuntuacionService {
                 .orElseThrow(() -> new RuntimeException("Puntuación no encontrada para la entidad especificada"));
 
         puntuacion.setPuntuacion(nuevaPuntuacion);
-        return puntuacionRepository.save(puntuacion);
+        Puntuacion updatedPuntuacion = puntuacionRepository.save(puntuacion);
+
+        // Actualizar la puntuación media del plato
+        if (tipoEntidad == TipoEntidad.PLATO) {
+            platoService.actualizarPuntuacionMediaPlato(idEntidad);
+        }
+
+        return updatedPuntuacion;
+    }
+
+    @Override
+    public Puntuacion createPuntuacion(Puntuacion puntuacion) throws PlatoNotFoundException {
+        Puntuacion nuevaPuntuacion = puntuacionRepository.save(puntuacion);
+
+        // Actualizar la puntuación media del plato
+        if (puntuacion.getTipoEntidad() == TipoEntidad.PLATO) {
+            platoService.actualizarPuntuacionMediaPlato(puntuacion.getIdEntidad());
+        }
+
+        return nuevaPuntuacion;
     }
 
 

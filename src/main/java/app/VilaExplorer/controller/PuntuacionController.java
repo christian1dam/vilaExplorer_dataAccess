@@ -2,6 +2,7 @@ package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.Puntuacion;
 import app.VilaExplorer.enums.TipoEntidad;
+import app.VilaExplorer.exception.PlatoNotFoundException;
 import app.VilaExplorer.service.PuntuacionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +30,8 @@ public class PuntuacionController {
 
     @Autowired
     private PuntuacionService puntuacionService;
+
+    //-----GET----- OBTENER PUNTUACIONES
 
     // Obtener todas las puntuaciones de una entidad específica
     @Operation(summary = "Obtiene todas las puntuaciones de una entidad especifica")
@@ -112,6 +116,29 @@ public class PuntuacionController {
         return entidades.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(entidades);
     }
 
+
+    //-----POST----- CREAR PUNTUACIONES
+
+    @Operation(summary = "Crea una nueva puntuación para una entidad específica")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Puntuación creada", content = @Content(schema = @Schema(implementation = Puntuacion.class))),
+            @ApiResponse(responseCode = "400", description = "Datos proporcionados inválidos", content = @Content)
+    })
+    @PostMapping("/crear")
+    public ResponseEntity<Puntuacion> createPuntuacion(@RequestBody Puntuacion puntuacion) {
+        try {
+            Puntuacion nuevaPuntuacion = puntuacionService.createPuntuacion(puntuacion);
+            return new ResponseEntity<>(nuevaPuntuacion, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+
+
+
+
     /**
     * Endpoint para actualizar una calificación de una entidad específica por un usuario.
      * @param idUsuario ID del usuario que actualiza la calificación
@@ -130,7 +157,7 @@ public class PuntuacionController {
             @RequestParam Long idUsuario,
             @RequestParam Long idEntidad,
             @RequestParam TipoEntidad tipoEntidad,
-            @RequestParam Integer nuevaPuntuacion) {
+            @RequestParam Integer nuevaPuntuacion) throws PlatoNotFoundException {
 
         Puntuacion puntuacionActualizada = puntuacionService.updatePuntuacion(idUsuario, idEntidad, tipoEntidad, nuevaPuntuacion);
         return ResponseEntity.ok(puntuacionActualizada);

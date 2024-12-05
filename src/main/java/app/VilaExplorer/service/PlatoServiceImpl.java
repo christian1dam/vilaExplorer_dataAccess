@@ -108,4 +108,23 @@ public class PlatoServiceImpl implements PlatoService {
 
         return platoRepository.save(platoFromDB);
     }
+
+    // Implementación para actualizar la puntuación media de un plato
+    @Override
+    public void actualizarPuntuacionMediaPlato(Long platoId) throws PlatoNotFoundException {
+        // Verificar que el plato existe en la base de datos
+        Plato plato = platoRepository.findById(platoId)
+                .orElseThrow(() -> new PlatoNotFoundException("El plato con ID " + platoId + " no se encuentra en la base de datos"));
+
+        // Calcular la puntuación media utilizando el método del repositorio
+        Double puntuacionMedia = platoRepository.findAveragePuntuacionByPlatoId(platoId);
+
+        // Actualizar la puntuación media en el objeto Plato y guardarlo en la base de datos
+        if (puntuacionMedia != null) {
+            plato.setPuntuacionMediaPlato(puntuacionMedia);
+            platoRepository.save(plato);
+        }
+    }
+
+
 }

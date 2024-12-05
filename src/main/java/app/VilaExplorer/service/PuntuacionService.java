@@ -2,6 +2,7 @@ package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.Puntuacion;
 import app.VilaExplorer.enums.TipoEntidad;
+import app.VilaExplorer.exception.PlatoNotFoundException;
 
 import java.util.List;
 import java.util.Map;
@@ -35,5 +36,13 @@ public interface PuntuacionService {
      * @param nuevaPuntuacion Nueva calificación a asignar
      * @return Puntuacion actualizada
      */
-    Puntuacion updatePuntuacion(Long idUsuario, Long idEntidad, TipoEntidad tipoEntidad, Integer nuevaPuntuacion);
+    Puntuacion updatePuntuacion(Long idUsuario, Long idEntidad, TipoEntidad tipoEntidad, Integer nuevaPuntuacion) throws PlatoNotFoundException;
+
+
+    /**
+     * Crea una nueva puntuación para una entidad específica
+     * @param puntuacion Nueva puntuación a crear
+     * @return Puntuacion creada
+     */
+    Puntuacion createPuntuacion(Puntuacion puntuacion) throws PlatoNotFoundException;
 }

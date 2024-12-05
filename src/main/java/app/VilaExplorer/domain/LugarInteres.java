@@ -45,6 +45,11 @@ public class LugarInteres {
     @Schema(description = "Fecha de alta del lugar de interés", example = "2023-06-15", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDate fechaAlta;
 
+    //Agregado para calcular la puntuacion media
+    @Column(name = "puntuacion_media_lugar")
+    @Schema(description = "Puntuacion mecia de Lugar de interes", example = "4.5")
+    private double puntuacionMediaLugar;
+
     @Column(name = "imagen", nullable = false)
     @NotBlank
     @Schema(description = "URL de la imagen representativa del lugar de interés", example = "https://example.com/imagen.jpg", requiredMode = Schema.RequiredMode.REQUIRED)

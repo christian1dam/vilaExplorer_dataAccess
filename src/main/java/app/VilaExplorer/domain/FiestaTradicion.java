@@ -50,6 +50,10 @@ public class FiestaTradicion {
     @Column(name = "descripcion", columnDefinition = "TEXT", nullable = false)
     private String descripcion;
 
+    @Column(name = "puntuacion_media_plato")
+    @Schema(description = "Puntuacion media de plato", example = "4.5")
+    private double puntuacionMediaPlato;
+
     @Schema(description = "URL de la imagen representativa de la fiesta o tradición", example = "https://example.com/images/carnaval.jpg", requiredMode = RequiredMode.REQUIRED)
     @NotBlank
     @Column(name = "imagen", nullable = false)

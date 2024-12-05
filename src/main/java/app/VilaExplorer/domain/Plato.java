@@ -58,6 +58,10 @@ public class Plato {
     @Schema(description = "Estado de aprobación del plato (true si ha sido aprobado)", example = "false", requiredMode = Schema.RequiredMode.REQUIRED)
     private boolean estado = false; // Inicialmente falso hasta que sea aprobado
 
+    @Column(name = "puntuacion_media_plato")
+    @Schema(description = "Puntuacion media de plato", example = "4.5")
+    private double puntuacionMediaPlato;
+
     @Column(name = "imagen_path")
     @Schema(description = "Ruta de la imagen del plato", example = "images/platos/paella.jpg")
     private String imagen;

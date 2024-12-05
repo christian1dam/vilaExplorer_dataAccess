@@ -23,4 +23,8 @@ public interface PlatoService {
     Plato createPlato(Plato plato) throws DataIntegrityViolationException;
 
     Plato updatePlato(Long id, Plato platoDetalles) throws PlatoNotFoundException;
+
+    //metodo para actualizar la puntuacion media de un plato
+    void actualizarPuntuacionMediaPlato(Long platoId) throws PlatoNotFoundException;
+
 }

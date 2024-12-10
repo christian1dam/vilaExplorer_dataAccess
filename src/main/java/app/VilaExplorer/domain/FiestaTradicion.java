@@ -50,9 +50,9 @@ public class FiestaTradicion {
     @Column(name = "descripcion", columnDefinition = "TEXT", nullable = false)
     private String descripcion;
 
-    @Column(name = "puntuacion_media_plato")
-    @Schema(description = "Puntuacion media de plato", example = "4.5")
-    private double puntuacionMediaPlato;
+    @Column(name = "puntuacion_media_tradicion")
+    @Schema(description = "Puntuacion media de tradicion", example = "4.5")
+    private double puntuacionMediaTradicion = 0.0;
 
     @Schema(description = "URL de la imagen representativa de la fiesta o tradición", example = "https://example.com/images/carnaval.jpg", requiredMode = RequiredMode.REQUIRED)
     @NotBlank
@@ -74,7 +74,7 @@ public class FiestaTradicion {
     @JoinColumn(name = "id_autor", nullable = false, foreignKey = @ForeignKey(name = "FK_fiesta_tradicion_usuario"))
     private Usuario autor;
 
-    // Método para convertir la imagen a Base64 y devolverla como String
+    // Metodo para convertir la imagen a Base64 y devolverla como String
     public String getImagenBase64() {
         Path imagePath = Paths.get(this.imagen);
         try {

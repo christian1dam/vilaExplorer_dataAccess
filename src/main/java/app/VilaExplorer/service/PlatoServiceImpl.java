@@ -116,7 +116,7 @@ public class PlatoServiceImpl implements PlatoService {
         Plato plato = platoRepository.findById(platoId)
                 .orElseThrow(() -> new PlatoNotFoundException("El plato con ID " + platoId + " no se encuentra en la base de datos"));
 
-        // Calcular la puntuación media utilizando el método del repositorio
+        // Calcular la puntuación media utilizando el metodo del repositorio
         Double puntuacionMedia = platoRepository.findAveragePuntuacionByPlatoId(platoId);
 
         // Actualizar la puntuación media en el objeto Plato y guardarlo en la base de datos
@@ -125,6 +125,45 @@ public class PlatoServiceImpl implements PlatoService {
             platoRepository.save(plato);
         }
     }
+
+    // Implementación para borrar lógicamente un plato
+    @Override
+    public void borrarLogico(Long platoId) throws PlatoNotFoundException {
+        Plato plato = platoRepository.findById(platoId)
+                .orElseThrow(() -> new PlatoNotFoundException("Plato con ID " + platoId + " no encontrado"));
+
+        plato.setEliminado(true);
+        platoRepository.save(plato);
+    }
+
+    // Implementación para encontrar platos aprobados y no eliminados
+    @Override
+    public List<Plato> findAprobadosNoEliminados() {
+        return platoRepository.findByEstadoTrueAndEliminadoFalse();
+    }
+
+    // Implementación para encontrar platos no aprobados
+    @Override
+    public List<Plato> findNoAprobados() {
+        return platoRepository.findByEstadoFalse();
+    }
+
+    // Implementación para encontrar platos eliminados
+    @Override
+    public List<Plato> findEliminados() {
+        return platoRepository.findByEliminadoTrue();
+    }
+
+
+    // Implementación para encontrar platos no aprobados y no eliminados
+    @Override
+    public List<Plato> findNoAprobadosNoEliminados() {
+        return platoRepository.findByEstadoFalseAndEliminadoFalse();
+    }
+
+
+
+
 
 
 }

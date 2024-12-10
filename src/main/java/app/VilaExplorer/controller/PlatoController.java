@@ -37,6 +37,8 @@ public class PlatoController {
     @Autowired
     private PlatoService platoService;
 
+    //-----GET----- OBTENER PLATOS
+
     @Operation(summary = "Obtiene un plato por su ID")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Plato encontrado", content = @Content(schema = @Schema(implementation = Plato.class))), @ApiResponse(responseCode = "404", description = "Plato no encontrado", content = @Content)})
     @GetMapping("/detalle/{id}")
@@ -50,6 +52,7 @@ public class PlatoController {
         }
     }
 
+    //-----GET----- OBTENER TODOS LOS PLATOS INCLUYENDO LOS NO APROBADOS Y LOS ELMINADOS LOGICAMENTE
     @Operation(summary = "Obtiene todos los platos")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Listado de platos", content = @Content(schema = @Schema(implementation = Plato.class)))})
     @GetMapping("/todos")
@@ -64,6 +67,63 @@ public class PlatoController {
         }
     }
 
+    // Obtener platos aprobados y no eliminados
+    @Operation(summary = "Obtiene los platos aprobados y no eliminados")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Listado de platos aprobados", content = @Content(schema = @Schema(implementation = Plato.class)))})
+    @GetMapping("/aprobados")
+    @PreAuthorize("hasRole('Cliente')")
+    public ResponseEntity<List<Plato>> getPlatosAprobados() {
+        try {
+            List<Plato> platos = platoService.findAprobadosNoEliminados();
+            return new ResponseEntity<>(platos, HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    // Obtener platos no aprobados
+    @GetMapping("/no-aprobados")
+    public ResponseEntity<List<Plato>> getPlatosNoAprobados() {
+        try {
+            List<Plato> platos = platoService.findNoAprobados();
+            return platos.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(platos);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Obtener platos eliminados
+    @GetMapping("/eliminados")
+    public ResponseEntity<List<Plato>> getPlatosEliminados() {
+        try {
+            List<Plato> platos = platoService.findEliminados();
+            return platos.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(platos);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Obtener platos no aprobados y no eliminados
+    @GetMapping("/no-aprobados-no-eliminados")
+    public ResponseEntity<List<Plato>> getPlatosNoAprobadosNoEliminados() {
+        try {
+            List<Plato> platos = platoService.findNoAprobadosNoEliminados();
+            return platos.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(platos);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
+
+
+    //-----POST----- CREAR PLATO
     @Operation(summary = "Crea un nuevo plato")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Plato creado", content = @Content(schema = @Schema(implementation = Plato.class))), @ApiResponse(responseCode = "400", description = "Datos proporcionados invalidos", content = @Content)})
     @PostMapping("/crear")
@@ -78,6 +138,7 @@ public class PlatoController {
     }
 
 
+    //-----PUT----- ACTUALIZAR PLATO
     // actualizar un plato existente
     @Operation(summary = "Modifica un plato por su ID")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Plato modificado", content = @Content(schema = @Schema(implementation = Plato.class))), @ApiResponse(responseCode = "404", description = "Plato no encontrado", content = @Content)})
@@ -93,18 +154,7 @@ public class PlatoController {
     }
 
 
-    @Operation(summary = "Elimina un plato por su ID")
-    @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Plato eliminado", content = @Content), @ApiResponse(responseCode = "404", description = "Plato no encontrado", content = @Content)})
-    @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<Response> deletePlato(@PathVariable Long id) {
-        try {
-            platoService.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (PlatoNotFoundException e) {
-            return handleException(e);
-        }
-    }
-
+    //-----PUT----- APROBAR PLATO
     @Operation(summary = "Aprueba un plato por su ID")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Plato aprobado", content = @Content(schema = @Schema(implementation = Plato.class))), @ApiResponse(responseCode = "404", description = "Plato o aprobador no encontrado", content = @Content)})
     @PutMapping("/aprobar/{platoId}/{aprobadorId}")
@@ -118,6 +168,37 @@ public class PlatoController {
         }
     }
 
+    //-----PUT----- BORRAR LOGICAMENTE PLATO
+    @Operation(summary = "Realiza el borrado lógico de un plato por su ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Plato marcado como eliminado"),
+            @ApiResponse(responseCode = "404", description = "Plato no encontrado")
+    })
+    @PutMapping("/borrar-logico/{id}")
+    public ResponseEntity<String> borrarLogico(@PathVariable Long id) {
+        try {
+            platoService.borrarLogico(id);
+            return ResponseEntity.ok("Plato eliminado lógicamente con éxito");
+        } catch (PlatoNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    //-----DELETE----- ELIMINAR PLATO -----NO RECOMENDADO
+    @Operation(summary = "Elimina un plato por su ID")
+    @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Plato eliminado", content = @Content), @ApiResponse(responseCode = "404", description = "Plato no encontrado", content = @Content)})
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<Response> deletePlato(@PathVariable Long id) {
+        try {
+            platoService.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (PlatoNotFoundException e) {
+            return handleException(e);
+        }
+    }
+
+
+    // Manejo de excepciones
     @ExceptionHandler(PlatoNotFoundException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)

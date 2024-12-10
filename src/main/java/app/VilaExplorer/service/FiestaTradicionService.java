@@ -41,4 +41,9 @@ public interface FiestaTradicionService {
     List<FiestaTradicion> getListaFiestasByAutor(Long idAutor) throws UsuarioNotFoundException;
 
     FiestaTradicion updateFiestaTradicion(Long id, FiestaTradicion fiestaTradicion) throws FiestaTradicionNotFound;
+
+    // Metodo adicional: Calcular promedio de puntuación de una fiesta o tradición específica
+    void actualizarPuntuacionMediaTradicion(Long idTradicion) throws FiestaTradicionNotFound;
+
+
 }

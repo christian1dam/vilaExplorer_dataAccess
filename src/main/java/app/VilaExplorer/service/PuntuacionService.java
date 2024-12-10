@@ -45,4 +45,15 @@ public interface PuntuacionService {
      * @return Puntuacion creada
      */
     Puntuacion createPuntuacion(Puntuacion puntuacion) throws PlatoNotFoundException;
+
+    //Metodos especificos para el calculo de la calificacion media de cada entidad PLato, Lugar de interes, Fiesta tradicion
+    // Obtener promedio de calificación para un plato
+    Optional<Double> getPromedioCalificacionPlato(Long idPlato);
+
+    // Obtener promedio de calificación para una tradición
+    Optional<Double> getPromedioCalificacionTradicion(Long idTradicion);
+
+    // Obtener promedio de calificación para un lugar de interés
+    Optional<Double> getPromedioCalificacionLugarInteres(Long idLugarInteres);
+
 }

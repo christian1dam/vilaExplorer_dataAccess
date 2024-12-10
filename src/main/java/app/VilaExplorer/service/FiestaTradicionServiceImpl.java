@@ -162,4 +162,21 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
         return fiestaTradicionRepository.save(fiestaTradicionFromDB);
     }
 
+    // Metodo adicional: Calcular promedio de puntuación de una fiesta o tradición específica
+    @Override
+    public void actualizarPuntuacionMediaTradicion(Long idTradicion) throws FiestaTradicionNotFound {
+        FiestaTradicion tradicion = fiestaTradicionRepository.findById(idTradicion)
+                .orElseThrow(() -> new FiestaTradicionNotFound("La tradición con ID " + idTradicion + " no se encuentra en la base de datos"));
+
+        // Calcular la puntuación media
+        Double puntuacionMedia = fiestaTradicionRepository.findAveragePuntuacionByTradicionId(idTradicion);
+
+        // Actualizar la puntuación media en el objeto FiestaTradicion
+        if (puntuacionMedia != null) {
+            tradicion.setPuntuacionMediaTradicion(puntuacionMedia);
+            fiestaTradicionRepository.save(tradicion);
+        }
+    }
+
+
 }

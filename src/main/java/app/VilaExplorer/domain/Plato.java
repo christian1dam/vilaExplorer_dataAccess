@@ -60,7 +60,7 @@ public class Plato {
 
     @Column(name = "puntuacion_media_plato")
     @Schema(description = "Puntuacion media de plato", example = "4.5")
-    private double puntuacionMediaPlato;
+    private double puntuacionMediaPlato = 0.0;
 
     @Column(name = "imagen_path")
     @Schema(description = "Ruta de la imagen del plato", example = "images/platos/paella.jpg")
@@ -86,6 +86,13 @@ public class Plato {
     @JoinColumn(name = "id_aprobador", foreignKey = @ForeignKey(name = "FK_plato_usuario_aprobador"))
     @Schema(description = "Usuario que aprobó el plato")
     private Usuario aprobador; //Permite valores nulos hasta que sea aprobado el plato
+
+    //Agregado para hacer un borrado lógico
+    @Column(name = "eliminado", nullable = false)
+    @Schema(description = "Indica si el plato está eliminado (borrado lógico)", example = "false", requiredMode = Schema.RequiredMode.REQUIRED)
+    private boolean eliminado = false; // Inicialmente false, no eliminado
+
+
 
     // Método para convertir la imagen a Base64 y devolverla como String
     public String getImagenBase64() {

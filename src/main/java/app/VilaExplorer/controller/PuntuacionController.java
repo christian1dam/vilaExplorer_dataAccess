@@ -135,10 +135,6 @@ public class PuntuacionController {
     }
 
 
-
-
-
-
     /**
     * Endpoint para actualizar una calificación de una entidad específica por un usuario.
      * @param idUsuario ID del usuario que actualiza la calificación
@@ -162,6 +158,29 @@ public class PuntuacionController {
         Puntuacion puntuacionActualizada = puntuacionService.updatePuntuacion(idUsuario, idEntidad, tipoEntidad, nuevaPuntuacion);
         return ResponseEntity.ok(puntuacionActualizada);
     }
+
+
+    //------------------------------------------------------------------------------------------------
+
+    //Endopoint para obtener el promedio de calificacion  de una entidad especifica
+    @GetMapping("/promedio/plato/{idPlato}")
+    public ResponseEntity<Double> getPromedioCalificacionPlato(@PathVariable Long idPlato) {
+        Optional<Double> promedio = puntuacionService.getPromedioCalificacionPlato(idPlato);
+        return promedio.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/promedio/tradicion/{idTradicion}")
+    public ResponseEntity<Double> getPromedioCalificacionTradicion(@PathVariable Long idTradicion) {
+        Optional<Double> promedio = puntuacionService.getPromedioCalificacionTradicion(idTradicion);
+        return promedio.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/promedio/lugar-interes/{idLugarInteres}")
+    public ResponseEntity<Double> getPromedioCalificacionLugarInteres(@PathVariable Long idLugarInteres) {
+        Optional<Double> promedio = puntuacionService.getPromedioCalificacionLugarInteres(idLugarInteres);
+        return promedio.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
 
 
 }

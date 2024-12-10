@@ -15,6 +15,7 @@ import java.util.List;
 @Repository
 public interface FiestaTradicionRepository extends JpaRepository<FiestaTradicion, Long> {
 
+
     List<FiestaTradicion> findByAutor_IdUsuario(Usuario autor);
 
     @Query("SELECT f FROM FiestaTradicion f WHERE f.activo = true AND f.autor.idUsuario = :idAutor")
@@ -42,4 +43,9 @@ public interface FiestaTradicionRepository extends JpaRepository<FiestaTradicion
             "(LOWER(f.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(f.descripcion) LIKE LOWER(CONCAT('%', :keyword, '%')))")
     Page<FiestaTradicion> searchActiveByKeywordPage(@Param("keyword") String keyword, Pageable pageable);
+
+    // Metodo adicional: Calcular promedio de puntuación de una fiesta o tradición específica
+    @Query("SELECT AVG(p.puntuacion) FROM Puntuacion p WHERE p.tipoEntidad = 'TRADICION' AND p.idEntidad = :idTradicion")
+    Double findAveragePuntuacionByTradicionId(@Param("idTradicion") Long idTradicion);
+
 }

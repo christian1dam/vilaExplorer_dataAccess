@@ -145,5 +145,22 @@ public class PuntuacionServiceImpl implements PuntuacionService {
         return nuevaPuntuacion;
     }
 
+    //Metodos especificos para el calculo de la calificacion media de cada entidad PLato, Lugar de interes, Fiesta tradicion
+
+    @Override
+    public Optional<Double> getPromedioCalificacionPlato(Long idPlato) {
+        return getPromedioCalificacion(idPlato, TipoEntidad.PLATO);
+    }
+
+    @Override
+    public Optional<Double> getPromedioCalificacionTradicion(Long idTradicion) {
+        return getPromedioCalificacion(idTradicion, TipoEntidad.FIESTA_TRADICION);
+    }
+
+    @Override
+    public Optional<Double> getPromedioCalificacionLugarInteres(Long idLugarInteres) {
+        return getPromedioCalificacion(idLugarInteres, TipoEntidad.LUGAR_INTERES);
+    }
+
 
 }

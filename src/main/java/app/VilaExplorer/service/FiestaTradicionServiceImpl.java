@@ -2,9 +2,11 @@ package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.FiestaTradicion;
 import app.VilaExplorer.domain.Usuario;
+import app.VilaExplorer.enums.TipoEntidad;
 import app.VilaExplorer.exception.FiestaTradicionNotFound;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.repository.FiestaTradicionRepository;
+import app.VilaExplorer.repository.PuntuacionRepository;
 import app.VilaExplorer.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PuntuacionRepository puntuacionRepository;
 
     /**
      * Encuentra todas las fiestas tradicionales de un autor
@@ -164,18 +169,14 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
 
     // Metodo adicional: Calcular promedio de puntuación de una fiesta o tradición específica
     @Override
-    public void actualizarPuntuacionMediaTradicion(Long idTradicion) throws FiestaTradicionNotFound {
+    public void actualizarPuntuacionMediaTradicion(Long idTradicion) {
+        Double promedio = puntuacionRepository
+                .findAveragePuntuacionByEntidad(idTradicion, TipoEntidad.FIESTA_TRADICION)
+                .orElse(0.0);
         FiestaTradicion tradicion = fiestaTradicionRepository.findById(idTradicion)
-                .orElseThrow(() -> new FiestaTradicionNotFound("La tradición con ID " + idTradicion + " no se encuentra en la base de datos"));
-
-        // Calcular la puntuación media
-        Double puntuacionMedia = fiestaTradicionRepository.findAveragePuntuacionByTradicionId(idTradicion);
-
-        // Actualizar la puntuación media en el objeto FiestaTradicion
-        if (puntuacionMedia != null) {
-            tradicion.setPuntuacionMediaTradicion(puntuacionMedia);
-            fiestaTradicionRepository.save(tradicion);
-        }
+                .orElseThrow(() -> new RuntimeException("Tradición no encontrada"));
+        tradicion.setPuntuacionMediaTradicion(promedio);
+        fiestaTradicionRepository.save(tradicion);
     }
 
 

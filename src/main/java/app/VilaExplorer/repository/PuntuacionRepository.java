@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PuntuacionRepository extends JpaRepository<Puntuacion, Long> {
@@ -26,7 +27,7 @@ public interface PuntuacionRepository extends JpaRepository<Puntuacion, Long> {
 
     // Metodo adicional: Calcular promedio de puntuación de una entidad específica
     @Query("SELECT AVG(p.puntuacion) FROM Puntuacion p WHERE p.idEntidad = :idEntidad AND p.tipoEntidad = :tipoEntidad")
-    Double findAveragePuntuacionByEntidad(@Param("idEntidad") Long idEntidad, @Param("tipoEntidad") TipoEntidad tipoEntidad);
+    Optional<Double> findAveragePuntuacionByEntidad(@Param("idEntidad") Long idEntidad, @Param("tipoEntidad") TipoEntidad tipoEntidad);
 
     // Metodo adicional: Contar puntuaciones agrupadas por estrellas para una entidad específica
     @Query("SELECT p.puntuacion, COUNT(p) FROM Puntuacion p WHERE p.idEntidad = :idEntidad AND p.tipoEntidad = :tipoEntidad GROUP BY p.puntuacion")

@@ -2,6 +2,7 @@ package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.Puntuacion;
 import app.VilaExplorer.enums.TipoEntidad;
+import app.VilaExplorer.exception.FiestaTradicionNotFound;
 import app.VilaExplorer.exception.PlatoNotFoundException;
 import app.VilaExplorer.repository.PuntuacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,14 @@ public class PuntuacionServiceImpl implements PuntuacionService {
     private PuntuacionRepository puntuacionRepository;
 
     @Autowired
-    private PlatoService platoService; // Inyección de dependencia de PlatoService
+    private PlatoService platoService; // Servicio de platos
+
+    @Autowired
+    private FiestaTradicionService fiestaTradicionService; // Servicio de fiestas y tradiciones
+
+    @Autowired
+    private LugarInteresService lugarInteresService; // Servicio de lugares de interés
+
 
     /* Metodo que devuelve todas las puntuaciones de una entidad
     Se necesita el ID de la entidad y el tipo de entidad
@@ -28,7 +36,6 @@ public class PuntuacionServiceImpl implements PuntuacionService {
         * @param tipoEntidad Tipo de entidad
         * @return Lista de puntuaciones de la entidad
     */
-
     @Override
     public List<Puntuacion> findAllByEntidad(Long idEntidad, TipoEntidad tipoEntidad) {
         return puntuacionRepository.findByIdEntidadAndTipoEntidad(idEntidad, tipoEntidad);
@@ -114,8 +121,11 @@ public class PuntuacionServiceImpl implements PuntuacionService {
         return entidadesFiltradas;
     }
 
+    //----- Metodos para actualizar y/o crear puntuaciones
+
+    //Metodo que Crea y/o Actualiza la puntuación de un usuario para una entidad específica este es el recomendado usar
     @Override
-    public Puntuacion updatePuntuacion(Long idUsuario, Long idEntidad, TipoEntidad tipoEntidad, Integer nuevaPuntuacion) throws PlatoNotFoundException {
+    public Puntuacion updatePuntuacion(Long idUsuario, Long idEntidad, TipoEntidad tipoEntidad, Integer nuevaPuntuacion) throws RuntimeException, PlatoNotFoundException, FiestaTradicionNotFound {
         Puntuacion puntuacion = puntuacionRepository
                 .findByUsuario_IdUsuarioAndIdEntidadAndTipoEntidad(idUsuario, idEntidad, tipoEntidad)
                 .stream()
@@ -125,21 +135,29 @@ public class PuntuacionServiceImpl implements PuntuacionService {
         puntuacion.setPuntuacion(nuevaPuntuacion);
         Puntuacion updatedPuntuacion = puntuacionRepository.save(puntuacion);
 
-        // Actualizar la puntuación media del plato
+        // Actualizar la puntuación media según el tipo de entidad
         if (tipoEntidad == TipoEntidad.PLATO) {
             platoService.actualizarPuntuacionMediaPlato(idEntidad);
+        } else if (tipoEntidad == TipoEntidad.FIESTA_TRADICION) {
+            fiestaTradicionService.actualizarPuntuacionMediaTradicion(idEntidad);
+        } else if (tipoEntidad == TipoEntidad.LUGAR_INTERES) {
+            lugarInteresService.actualizarPuntuacionMediaLugarInteres(idEntidad);
         }
 
         return updatedPuntuacion;
     }
 
     @Override
-    public Puntuacion createPuntuacion(Puntuacion puntuacion) throws PlatoNotFoundException {
+    public Puntuacion createPuntuacion(Puntuacion puntuacion) throws RuntimeException, PlatoNotFoundException, FiestaTradicionNotFound {
         Puntuacion nuevaPuntuacion = puntuacionRepository.save(puntuacion);
 
-        // Actualizar la puntuación media del plato
+        // Actualizar la puntuación media según el tipo de entidad
         if (puntuacion.getTipoEntidad() == TipoEntidad.PLATO) {
             platoService.actualizarPuntuacionMediaPlato(puntuacion.getIdEntidad());
+        } else if (puntuacion.getTipoEntidad() == TipoEntidad.FIESTA_TRADICION) {
+            fiestaTradicionService.actualizarPuntuacionMediaTradicion(puntuacion.getIdEntidad());
+        } else if (puntuacion.getTipoEntidad() == TipoEntidad.LUGAR_INTERES) {
+            lugarInteresService.actualizarPuntuacionMediaLugarInteres(puntuacion.getIdEntidad());
         }
 
         return nuevaPuntuacion;

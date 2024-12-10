@@ -1,10 +1,12 @@
 package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.LugarInteres;
+import app.VilaExplorer.enums.TipoEntidad;
 import app.VilaExplorer.exception.CoordenadasNotFoundException;
 import app.VilaExplorer.exception.LugarInteresNotActiveException;
 import app.VilaExplorer.exception.LugarInteresNotFoundException;
 import app.VilaExplorer.repository.LugarInteresRepository;
+import app.VilaExplorer.repository.PuntuacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,9 @@ public class LugarInteresServiceImpl implements LugarInteresService {
 
     @Autowired
     private LugarInteresRepository lugarInteresRepository;
+
+    @Autowired
+    private PuntuacionRepository puntuacionRepository;
 
     @Override
     public LugarInteres updateLugarInteres(Long id, LugarInteres lugarInteresDetalle) throws LugarInteresNotFoundException {
@@ -106,4 +111,17 @@ public class LugarInteresServiceImpl implements LugarInteresService {
             throw new LugarInteresNotActiveException("El LugarInteres al que quieres acceder no está activo");
         else return lugarInteres;
     }
+
+    @Override
+    public void actualizarPuntuacionMediaLugarInteres(Long idLugarInteres) {
+        Double promedio = puntuacionRepository
+                .findAveragePuntuacionByEntidad(idLugarInteres, TipoEntidad.LUGAR_INTERES)
+                .orElse(0.0);
+        LugarInteres lugarInteres = lugarInteresRepository.findById(idLugarInteres)
+                .orElseThrow(() -> new RuntimeException("Lugar de interés no encontrado"));
+        lugarInteres.setPuntuacionMediaLugar(promedio); // Actualiza la puntuación media
+        lugarInteresRepository.save(lugarInteres); // Guarda el cambio
+    }
+
+
 }

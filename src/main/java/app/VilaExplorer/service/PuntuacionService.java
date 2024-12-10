@@ -2,6 +2,7 @@ package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.Puntuacion;
 import app.VilaExplorer.enums.TipoEntidad;
+import app.VilaExplorer.exception.FiestaTradicionNotFound;
 import app.VilaExplorer.exception.PlatoNotFoundException;
 
 import java.util.List;
@@ -28,6 +29,10 @@ public interface PuntuacionService {
     // Filtrar entidades que tengan un promedio de calificación igual o superior a un valor específico
     List<Long> findEntidadesConCalificacionMinima(TipoEntidad tipoEntidad, double calificacionMinima);
 
+
+
+    //-------------------------------------------------------------------------------------------------------------
+
     /**
      * Actualiza la puntuación de un usuario para una entidad específica
      * @param idUsuario ID del usuario que realiza la calificación
@@ -36,7 +41,7 @@ public interface PuntuacionService {
      * @param nuevaPuntuacion Nueva calificación a asignar
      * @return Puntuacion actualizada
      */
-    Puntuacion updatePuntuacion(Long idUsuario, Long idEntidad, TipoEntidad tipoEntidad, Integer nuevaPuntuacion) throws PlatoNotFoundException;
+    Puntuacion updatePuntuacion(Long idUsuario, Long idEntidad, TipoEntidad tipoEntidad, Integer nuevaPuntuacion) throws PlatoNotFoundException, FiestaTradicionNotFound;
 
 
     /**
@@ -44,7 +49,12 @@ public interface PuntuacionService {
      * @param puntuacion Nueva puntuación a crear
      * @return Puntuacion creada
      */
-    Puntuacion createPuntuacion(Puntuacion puntuacion) throws PlatoNotFoundException;
+    Puntuacion createPuntuacion(Puntuacion puntuacion) throws PlatoNotFoundException, FiestaTradicionNotFound;
+
+    //-------------------------------------------------------------------------------------------------------------
+
+
+
 
     //Metodos especificos para el calculo de la calificacion media de cada entidad PLato, Lugar de interes, Fiesta tradicion
     // Obtener promedio de calificación para un plato

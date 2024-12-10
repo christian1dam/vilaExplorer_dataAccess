@@ -2,6 +2,8 @@ package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.Puntuacion;
 import app.VilaExplorer.enums.TipoEntidad;
+import app.VilaExplorer.exception.FiestaTradicionNotFound;
+import app.VilaExplorer.exception.LugarInteresNotFoundException;
 import app.VilaExplorer.exception.PlatoNotFoundException;
 import app.VilaExplorer.service.PuntuacionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -153,7 +155,7 @@ public class PuntuacionController {
             @RequestParam Long idUsuario,
             @RequestParam Long idEntidad,
             @RequestParam TipoEntidad tipoEntidad,
-            @RequestParam Integer nuevaPuntuacion) throws PlatoNotFoundException {
+            @RequestParam Integer nuevaPuntuacion) throws PlatoNotFoundException, FiestaTradicionNotFound, LugarInteresNotFoundException {
 
         Puntuacion puntuacionActualizada = puntuacionService.updatePuntuacion(idUsuario, idEntidad, tipoEntidad, nuevaPuntuacion);
         return ResponseEntity.ok(puntuacionActualizada);

@@ -23,5 +23,8 @@ public interface LugarInteresService {
     LugarInteres updateLugarInteres(Long id, LugarInteres lugarInteresDetalle) throws LugarInteresNotFoundException;
 
     LugarInteres desactivarLugarInteres(Long id) throws LugarInteresNotFoundException;
+
+    void actualizarPuntuacionMediaLugarInteres(Long idLugarInteres);
+
 }
 

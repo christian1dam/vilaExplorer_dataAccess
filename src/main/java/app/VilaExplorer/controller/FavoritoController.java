@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,6 +44,7 @@ public class FavoritoController {
             @ApiResponse(responseCode = "404", description = "Favorito no encontrado", content = @Content)
     })
     @GetMapping("/detalle/{id}")
+    @PreAuthorize("hasRole('Cliente') or hasRole('Administrador')")
     public ResponseEntity<Favorito> getFavoritoById(@PathVariable Long id) {
         try {
             Favorito favorito = favoritoService.findById(id);
@@ -59,6 +61,7 @@ public class FavoritoController {
             @ApiResponse(responseCode = "200", description = "Favoritos encontrados", content = @Content(schema = @Schema(implementation = Favorito.class)))
     })
     @GetMapping("/todos")
+    @PreAuthorize("hasRole('Administrador')")
     public List<Favorito> getAllFavoritos() {
         return favoritoService.findAll();
     }
@@ -69,6 +72,7 @@ public class FavoritoController {
             @ApiResponse(responseCode = "200", description = "Favoritos encontrados", content = @Content(schema = @Schema(implementation = Favorito.class)))
     })
     @GetMapping("/usuario/{idUsuario}")
+    @PreAuthorize("hasRole('Cliente') or hasRole('Administrador')")
     public List<Favorito> getFavoritosByUsuario(@PathVariable Long idUsuario) {
         return favoritoService.findByUsuario_IdUsuario(idUsuario);
     }
@@ -79,6 +83,7 @@ public class FavoritoController {
             @ApiResponse(responseCode = "200", description = "Favoritos encontrados", content = @Content(schema = @Schema(implementation = Favorito.class)))
     })
     @GetMapping("/usuario/{idUsuario}/tipo/{tipoEntidad}")
+    @PreAuthorize("hasRole('Cliente') or hasRole('Administrador')")
     public List<Favorito> getFavoritosByUsuarioAndTipoEntidad(@PathVariable Long idUsuario, @PathVariable TipoEntidad tipoEntidad) {
         return favoritoService.findByUsuario_IdUsuarioAndTipoEntidad(idUsuario, tipoEntidad);
     }
@@ -89,6 +94,7 @@ public class FavoritoController {
             @ApiResponse(responseCode = "200", description = "Favorito creado", content = @Content(schema = @Schema(implementation = Favorito.class)))
     })
     @PostMapping("/crear")
+    @PreAuthorize("hasRole('Cliente') or hasRole('Administrador')")
     public Favorito createFavorito(@RequestBody Favorito favorito) {
         return favoritoService.save(favorito);
     }
@@ -100,6 +106,7 @@ public class FavoritoController {
             @ApiResponse(responseCode = "404", description = "Favorito no encontrado", content = @Content)
     })
     @PutMapping("/modificar/{id}")
+    @PreAuthorize("hasRole('Cliente') or hasRole('Administrador')")
     public ResponseEntity<Favorito> updateFavorito(@PathVariable Long id, @RequestBody Favorito favorito) {
         try {
             Favorito actualizado = favoritoService.updateFavorito(id, favorito);
@@ -117,6 +124,7 @@ public class FavoritoController {
             @ApiResponse(responseCode = "404", description = "Favorito no encontrado", content = @Content)
     })
     @DeleteMapping("/eliminar/{id}")
+    @PreAuthorize("hasRole('Cliente') or hasRole('Administrador')")
     public ResponseEntity<Response> deleteFavorito(@PathVariable Long id) {
         try {
             favoritoService.deleteById(id);

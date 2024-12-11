@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,6 +41,7 @@ public class LugarInteresController {
             @ApiResponse(responseCode = "404", description = "Lugar de interes no encontrado", content = @Content)
     })
     @GetMapping("/detalle-completo/{id}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor'))")
     public ResponseEntity<LugarInteres> getLugarInteresById(@PathVariable Long id) {
         try {
             LugarInteres lugarInteres = lugarInteresService.findById(id);
@@ -58,6 +60,7 @@ public class LugarInteresController {
             @ApiResponse(responseCode = "409", description = "Lugar de interes no esta activo", content = @Content)
     })
     @GetMapping("/detalle/{id}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor') or hasRole('Cliente')")
     public ResponseEntity<LugarInteres> getLugarInteresActivoById(@PathVariable Long id) {
         try {
             LugarInteres lugarInteres = lugarInteresService.findLugarInteresActivoByID(id);
@@ -76,6 +79,7 @@ public class LugarInteresController {
             @ApiResponse(responseCode = "200", description = "Listado de lugares de interes", content = @Content(schema = @Schema(implementation = LugarInteres.class)))
     })
     @GetMapping("/todos")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
     public ResponseEntity<List<LugarInteres>> getAllLugaresInteres() {
         try {
             List<LugarInteres> lugaresInteres = lugarInteresService.findAll();
@@ -92,6 +96,7 @@ public class LugarInteresController {
             @ApiResponse(responseCode = "200", description = "Listado de lugares de interes activos", content = @Content(schema = @Schema(implementation = LugarInteres.class)))
     })
     @GetMapping("/activos")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor') or hasRole('Cliente')")
     public ResponseEntity<List<LugarInteres>> getAllLugaresInteresActivos() {
         try {
             List<LugarInteres> lugaresInteresActivos = lugarInteresService.findAllActivos();
@@ -108,6 +113,7 @@ public class LugarInteresController {
             @ApiResponse(responseCode = "404", description = "Coordenadas no introducidas", content = @Content)
     })
     @PostMapping("/crear")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
 //  Aqui cambio el ResponseEntity<LugarInteres> por ResponseEntity<?> para poder devolver tanto el objeto JSON LugarInteres como la Response con la excepcion.
     public ResponseEntity<?> createLugarInteres(@RequestBody LugarInteres lugarInteres) {
         try {
@@ -125,6 +131,7 @@ public class LugarInteresController {
             @ApiResponse(responseCode = "404", description = "Lugar de interes no encontrado", content = @Content)
     })
     @PutMapping("/modificar/{id}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
     public ResponseEntity<LugarInteres> updateLugarInteres(@PathVariable Long id, @RequestBody LugarInteres lugarInteresDetalle) {
         try {
             LugarInteres lugarInteres = lugarInteresService.updateLugarInteres(id, lugarInteresDetalle);
@@ -142,6 +149,7 @@ public class LugarInteresController {
             @ApiResponse(responseCode = "404", description = "Lugar de interes no encontrado", content = @Content)
     })
     @PutMapping("/desactivar/{id}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
     public ResponseEntity<LugarInteres> desactivarLugarInteres(@PathVariable Long id) {
         try {
             LugarInteres lugarInteres = lugarInteresService.desactivarLugarInteres(id);
@@ -159,6 +167,7 @@ public class LugarInteresController {
             @ApiResponse(responseCode = "404", description = "Lugar de interes no encontrado", content = @Content)
     })
     @DeleteMapping("/eliminar/{id}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<Response> deleteLugarInteres(@PathVariable Long id) {
 
         try {

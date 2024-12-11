@@ -37,11 +37,12 @@ public class PlatoController {
     @Autowired
     private PlatoService platoService;
 
-    //-----GET----- OBTENER PLATOS
+    //-----GET----- OBTENER PLATO POR ID
 
     @Operation(summary = "Obtiene un plato por su ID")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Plato encontrado", content = @Content(schema = @Schema(implementation = Plato.class))), @ApiResponse(responseCode = "404", description = "Plato no encontrado", content = @Content)})
     @GetMapping("/detalle/{id}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor') or hasRole('Cliente')")
     public ResponseEntity<Plato> getPlatoById(@PathVariable Long id) {
         try {
             Plato plato = platoService.findById(id);
@@ -56,7 +57,7 @@ public class PlatoController {
     @Operation(summary = "Obtiene todos los platos")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Listado de platos", content = @Content(schema = @Schema(implementation = Plato.class)))})
     @GetMapping("/todos")
-    @PreAuthorize("hasRole('Cliente')")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
     public ResponseEntity<List<Plato>> getAllPlatos() {
         try {
             List<Plato> platos = platoService.findAll();
@@ -84,6 +85,7 @@ public class PlatoController {
 
     // Obtener platos no aprobados
     @GetMapping("/no-aprobados")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
     public ResponseEntity<List<Plato>> getPlatosNoAprobados() {
         try {
             List<Plato> platos = platoService.findNoAprobados();
@@ -96,6 +98,7 @@ public class PlatoController {
 
     // Obtener platos eliminados
     @GetMapping("/eliminados")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<List<Plato>> getPlatosEliminados() {
         try {
             List<Plato> platos = platoService.findEliminados();
@@ -108,6 +111,7 @@ public class PlatoController {
 
     // Obtener platos no aprobados y no eliminados
     @GetMapping("/no-aprobados-no-eliminados")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
     public ResponseEntity<List<Plato>> getPlatosNoAprobadosNoEliminados() {
         try {
             List<Plato> platos = platoService.findNoAprobadosNoEliminados();
@@ -127,6 +131,7 @@ public class PlatoController {
     @Operation(summary = "Crea un nuevo plato")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Plato creado", content = @Content(schema = @Schema(implementation = Plato.class))), @ApiResponse(responseCode = "400", description = "Datos proporcionados invalidos", content = @Content)})
     @PostMapping("/crear")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<Plato> createPlato(@RequestBody Plato plato) {
         try {
             Plato platoDB = platoService.createPlato(plato);
@@ -143,6 +148,7 @@ public class PlatoController {
     @Operation(summary = "Modifica un plato por su ID")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Plato modificado", content = @Content(schema = @Schema(implementation = Plato.class))), @ApiResponse(responseCode = "404", description = "Plato no encontrado", content = @Content)})
     @PutMapping("/modificar/{id}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
     public ResponseEntity<Plato> updatePlato(@PathVariable Long id, @RequestBody Plato platoDetalles) {
         try {
             Plato platoUpdated = platoService.updatePlato(id, platoDetalles);
@@ -158,6 +164,7 @@ public class PlatoController {
     @Operation(summary = "Aprueba un plato por su ID")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Plato aprobado", content = @Content(schema = @Schema(implementation = Plato.class))), @ApiResponse(responseCode = "404", description = "Plato o aprobador no encontrado", content = @Content)})
     @PutMapping("/aprobar/{platoId}/{aprobadorId}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
     public ResponseEntity<Plato> aprobarPlato(@PathVariable Long platoId, @PathVariable Long aprobadorId) {
         try {
             Plato platoAprobado = platoService.aprobarPlato(platoId, aprobadorId);
@@ -175,6 +182,7 @@ public class PlatoController {
             @ApiResponse(responseCode = "404", description = "Plato no encontrado")
     })
     @PutMapping("/borrar-logico/{id}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
     public ResponseEntity<String> borrarLogico(@PathVariable Long id) {
         try {
             platoService.borrarLogico(id);
@@ -188,6 +196,7 @@ public class PlatoController {
     @Operation(summary = "Elimina un plato por su ID")
     @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Plato eliminado", content = @Content), @ApiResponse(responseCode = "404", description = "Plato no encontrado", content = @Content)})
     @DeleteMapping("/eliminar/{id}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<Response> deletePlato(@PathVariable Long id) {
         try {
             platoService.deleteById(id);

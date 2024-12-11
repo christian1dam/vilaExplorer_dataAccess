@@ -44,6 +44,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Usuarios encontrados", content = @Content(schema = @Schema(implementation = Usuario.class)))
     })
     @GetMapping("/getAll")
+    @PreAuthorize("hasRole('Administrador')")
     public List<Usuario> getAllUsuarios() {
         //Cuando no se manipulan los header de la respuesta no es necesario devolver un ResponseEntity
         return usuarioService.findAll();
@@ -56,8 +57,8 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Usuario encontrado", content = @Content(schema = @Schema(implementation = Usuario.class))),
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
     })
-    @GetMapping("/{id}")
-    @PreAuthorize("hasRole('Cliente')")
+    @GetMapping("/por-id/{id}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long id) {
         try {
             Usuario usuario = usuarioService.findById(id);
@@ -75,7 +76,8 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Usuarios encontrados", content = @Content(schema = @Schema(implementation = Usuario.class))),
             @ApiResponse(responseCode = "204", description = "No se encontraron usuarios con ese rol", content = @Content)
     })
-    @GetMapping()
+    @GetMapping("/por-rol/")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<List<Usuario>> getUsuariosByRol(@RequestParam(value = "rol") String rol) {
         List<Usuario> usuarios;
         try {
@@ -87,6 +89,7 @@ public class UsuarioController {
         }
     }
 
+    //NO SE DEBE USAR EN PRODUCCIÓN - SOLO PARA PRUEBAS
     @GetMapping("/signIn")
     public ResponseEntity<Usuario> getUsuario(@RequestParam(value = "nombre") String nombre, @RequestParam(value = "password") String password) {
         try {
@@ -107,6 +110,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor", content = @Content)
     })
     @PostMapping("/add")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<Usuario> createUsuario(@RequestBody Usuario usuario, @RequestParam(value = "rol") String rol) {
         try {
             Usuario usuarioConRol = usuarioService.crearUsuarioConRol(usuario, rol);
@@ -130,7 +134,8 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Usuario actualizado", content = @Content(schema = @Schema(implementation = Usuario.class))),
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
     })
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
     public ResponseEntity<Usuario> updateUsuario(@PathVariable Long id, @RequestBody Usuario usuarioDetails) {
         try {
             Usuario usuarioActualizado = usuarioService.updateUsuario(id, usuarioDetails);
@@ -147,7 +152,8 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Usuario con rol actualizado", content = @Content(schema = @Schema(implementation = Usuario.class))),
             @ApiResponse(responseCode = "404", description = "Usuario o rol no encontrado", content = @Content)
     })
-    @PatchMapping("/updateRole")
+    @PatchMapping("/update-role")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<Usuario> updateRole(@RequestParam(value = "id_usuario") Long usuarioID, @RequestParam(value = "rol") String rol) {
         try {
             Usuario usuarioActualizado = usuarioService.updateRolDelUsuario(usuarioID, rol);
@@ -171,6 +177,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
     })
     @PutMapping("/desactivar/{id}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<Response> deleteUsuarioLogico(@PathVariable Long id) {
         try {
             usuarioService.deleteUsuarioLogico(id);
@@ -187,7 +194,8 @@ public class UsuarioController {
             @ApiResponse(responseCode = "204", description = "Usuario eliminado", content = @Content),
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
     })
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<Response> deleteUsuario(@PathVariable Long id) {
         try {
             usuarioService.deleteById(id);

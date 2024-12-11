@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class RutaController {
             @ApiResponse(responseCode = "404", description = "Ruta no encontrada", content = @Content)
     })
     @GetMapping("/detalle/{id}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<Ruta> getRutaById(@PathVariable Long id) {
         Optional<Ruta> ruta = rutaService.findById(id);
         return ruta.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
@@ -45,6 +47,7 @@ public class RutaController {
             @ApiResponse(responseCode = "200", description = "Listado de rutas", content = @Content(schema = @Schema(implementation = Ruta.class)))
     })
     @GetMapping("/todos")
+    @PreAuthorize("hasRole('Administrador')")
     public List<Ruta> getAllRutas() {
         return rutaService.findAll();
     }
@@ -57,6 +60,7 @@ public class RutaController {
             @ApiResponse(responseCode = "400", description = "Datos proporcionados invalidos", content = @Content)
     })
     @PostMapping("/crear")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<Ruta> createRuta(@RequestBody Ruta ruta) {
         // Validar que se hayan enviado coordenadas
         if (ruta.getCoordenadas() == null || ruta.getCoordenadas().isEmpty()) {
@@ -78,6 +82,7 @@ public class RutaController {
             @ApiResponse(responseCode = "404", description = "Ruta no encontrada", content = @Content)
     })
     @DeleteMapping("/eliminar/{id}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<Void> deleteRuta(@PathVariable Long id) {
         rutaService.deleteById(id);
         return ResponseEntity.noContent().build();
@@ -89,6 +94,7 @@ public class RutaController {
             @ApiResponse(responseCode = "200", description = "Rutas encontradas", content = @Content(schema = @Schema(implementation = Ruta.class)))
     })
     @GetMapping("/autor/{autorId}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public List<Ruta> getRutasByAutor(@PathVariable Long autorId) {
         return rutaService.findByAutorId(autorId);
     }

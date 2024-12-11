@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class ArticuloController {
     @Autowired
     private ArticuloService articuloService;
 
+    //-----GET----- OBTENER ARTICULOS
     @Operation(summary = "Obtener un articulo por su id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Articulo encontrado"),
@@ -56,6 +58,7 @@ public class ArticuloController {
             @ApiResponse(responseCode = "404", description = "Articulos no encontrados")
     })
     @GetMapping("/todos")
+    @PreAuthorize("hasRole('Administrador', 'Redactor', 'Cliente')")
     public ResponseEntity<List<Articulo>> getAllArticulos() {
         try {
             List<Articulo> articulos = articuloService.findAll();
@@ -71,6 +74,7 @@ public class ArticuloController {
             @ApiResponse(responseCode = "200", description = "Articulo creado", content = @Content(schema = @Schema(implementation = Articulo.class)))
     })
     @PostMapping("/crear")
+    @PreAuthorize("hasRole('Administrador', 'Redactor')")
     public Articulo createArticulo(@RequestBody Articulo articulo) {
         return articuloService.save(articulo);
     }

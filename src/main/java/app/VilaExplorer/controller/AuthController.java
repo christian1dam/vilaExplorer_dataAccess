@@ -15,6 +15,7 @@ import app.VilaExplorer.security.services.UserDetailsImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -126,4 +127,99 @@ public class AuthController {
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
+
+
+    // Metodo para registrar usuarios moviles (clientes)
+    @PostMapping("/signup-mobile")
+    public ResponseEntity<?> registerMobileUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+        // Validacion de existencia de nombre y correo
+        if (userRepository.existsByNombre(signUpRequest.getNombre())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Username is already taken!"));
+        }
+
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Email is already in use!"));
+        }
+
+        // Crear cuenta de usuario con rol Cliente
+        Usuario user = new Usuario(
+                signUpRequest.getNombre(),
+                signUpRequest.getEmail(),
+                encoder.encode(signUpRequest.getPassword()),
+                LocalDateTime.now(),
+                true
+        );
+
+        Usuario savedUser = userRepository.save(user);
+
+        // Asignar rol de Cliente
+        Rol clienteRol = rolRepository.findByNombre("Cliente").orElseThrow(() ->
+                new RuntimeException("Error: Role Cliente not found"));
+        UsuarioRol usuarioRol = new UsuarioRol(savedUser, clienteRol, LocalDateTime.now());
+        usuarioRolRepository.save(usuarioRol);
+
+        savedUser.getRoles().add(usuarioRol);
+        savedUser.setRolActual(clienteRol);
+
+        userRepository.save(savedUser);
+
+        return ResponseEntity.ok(new MessageResponse("User registered successfully as Cliente!"));
+    }
+
+    // Metodo para registrar usuarios administrativos (Administrador o Redactor)
+    @PostMapping("/signup-admin")
+    @PreAuthorize("hasRole('Administrador')")
+    public ResponseEntity<?> registerAdminUser(@Valid @RequestBody SignUpRequest signUpRequest,
+                                               @RequestParam(value = "rol") String rol) {
+        // Validacion de existencia de nombre y correo
+        if (userRepository.existsByNombre(signUpRequest.getNombre())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Username is already taken!"));
+        }
+
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Email is already in use!"));
+        }
+
+        // Validar que el rol proporcionado exista
+        Rol rolFromDB = rolRepository.findByNombre(rol).orElseThrow(() ->
+                new RuntimeException("Error: Role " + rol + " not found in database"));
+
+        // Crear cuenta de usuario con rol especificado
+        Usuario user = new Usuario(
+                signUpRequest.getNombre(),
+                signUpRequest.getEmail(),
+                encoder.encode(signUpRequest.getPassword()),
+                LocalDateTime.now(),
+                true
+        );
+
+        Usuario savedUser = userRepository.save(user);
+
+        // Asignar el rol proporcionado
+        UsuarioRol usuarioRol = new UsuarioRol(savedUser, rolFromDB, LocalDateTime.now());
+        usuarioRolRepository.save(usuarioRol);
+
+        savedUser.getRoles().add(usuarioRol);
+        savedUser.setRolActual(rolFromDB);
+
+        userRepository.save(savedUser);
+
+        return ResponseEntity.ok(new MessageResponse("User registered successfully with role " + rol + "!"));
+    }
+
+
+
+
+
+
+
+
 }

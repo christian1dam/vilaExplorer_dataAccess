@@ -42,12 +42,14 @@ public class FiestaTradicionController {
 
     // Buscar fiestas tradicionales activas
     @GetMapping("/activas")
+    @PreAuthorize("hasRole('Cliente') or hasRole('Redactor') or hasRole('Administrador')")
     public List<FiestaTradicion> getAllFiestasTradicionActivas() {
         return fiestaTradicionService.findAllActive();
     }
 
     // Buscar fiestas tradicionales activas por palabra clave
     @GetMapping("/buscar_activos")
+    @PreAuthorize("hasRole('Cliente') or hasRole('Redactor') or hasRole('Administrador')")
     public ResponseEntity<List<FiestaTradicion>> searchFiestasActivas(@RequestParam String keyword) {
         List<FiestaTradicion> results = fiestaTradicionService.searchActiveByKeyword(keyword);
         if (results.isEmpty()) {
@@ -59,6 +61,7 @@ public class FiestaTradicionController {
 
     // Buscar fiestas tradicionales activas por palabra clave con paginacion
     @GetMapping("/buscar_activos_paginados")
+    @PreAuthorize("hasRole('Cliente') or hasRole('Redactor') or hasRole('Administrador')")
     public ResponseEntity<Page<FiestaTradicion>> searchFiestasActivasPaginadas(@RequestParam String keyword, Pageable pageable) {
         Page<FiestaTradicion> results = fiestaTradicionService.searchActiveByKeyword(keyword, pageable);
         if (results.isEmpty()) {
@@ -70,6 +73,7 @@ public class FiestaTradicionController {
 
     // Buscar fiestas tradicionales activas de un autor
     @GetMapping("/activas/autor/{idAutor}")
+    @PreAuthorize("hasRole('Redactor') or hasRole('Administrador')")
     public ResponseEntity<List<FiestaTradicion>> getFiestasActivasByAutor(@PathVariable Long idAutor) {
         List<FiestaTradicion> fiestas = fiestaTradicionService.findActiveByAutor(idAutor);
         if (fiestas.isEmpty()) {
@@ -86,6 +90,7 @@ public class FiestaTradicionController {
             @ApiResponse(responseCode = "404", description = "Fiesta tradicional no encontrada", content = @Content)
     })
     @GetMapping("/detalle/{id}")
+    @PreAuthorize("hasRole('Cliente') or hasRole('Redactor') or hasRole('Administrador')")
     public ResponseEntity<FiestaTradicion> getFiestaTradicionById(@PathVariable Long id) {
         try {
             FiestaTradicion fiesta = fiestaTradicionService.findById(id);
@@ -102,7 +107,7 @@ public class FiestaTradicionController {
             @ApiResponse(responseCode = "200", description = "Fiestas tradicionales encontradas", content = @Content(schema = @Schema(implementation = FiestaTradicion.class)))
     })
     @GetMapping("/todos")
-    @PreAuthorize("hasRole('Cliente')")
+    @PreAuthorize("hasRole('Redactor') or hasRole('Administrador')")
     public ResponseEntity<List<FiestaTradicion>> getAllFiestasTradiciones() {
         try {
             List<FiestaTradicion> fiestasTradiciones = fiestaTradicionService.findAll();
@@ -119,6 +124,7 @@ public class FiestaTradicionController {
             @ApiResponse(responseCode = "200", description = "Fiesta tradicional creada", content = @Content(schema = @Schema(implementation = FiestaTradicion.class)))
     })
     @PostMapping("/crear")
+    @PreAuthorize("hasRole('Redactor') or hasRole('Administrador')")
     public ResponseEntity<FiestaTradicion> createFiestaTradicion(@RequestBody FiestaTradicion fiestaTradicion, @RequestParam(value = "autor") Long idAutor) {
         try {
             FiestaTradicion fiestaCreada = fiestaTradicionService.save(fiestaTradicion, idAutor);
@@ -139,6 +145,7 @@ public class FiestaTradicionController {
             @ApiResponse(responseCode = "404", description = "Fiesta tradicional no encontrada", content = @Content)
     })
     @PutMapping("/modificar/{id}")
+    @PreAuthorize("hasRole('Redactor') or hasRole('Administrador')")
     public ResponseEntity<FiestaTradicion> updateFiestaTradicion(@PathVariable Long id, @RequestBody FiestaTradicion fiestaTradicion) {
         try {
             FiestaTradicion fiestaActualizada = fiestaTradicionService.updateFiestaTradicion(id, fiestaTradicion);
@@ -157,6 +164,7 @@ public class FiestaTradicionController {
             @ApiResponse(responseCode = "204", description = "Fiesta tradicional eliminada", content = @Content)
     })
     @DeleteMapping("/eliminar/{id}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<Response> deleteFiestaTradicion(@PathVariable Long id) {
         try {
             fiestaTradicionService.deleteById(id);
@@ -169,6 +177,7 @@ public class FiestaTradicionController {
 
     // Eliminar una fiesta tradicional de forma lógica
     @DeleteMapping("/eliminar/logico/{id}")
+    @PreAuthorize("hasRole('Redactor') or hasRole('Administrador')")
     public ResponseEntity<Void> deleteFiestaTradicionLogico(@PathVariable Long id) {
         try {
             fiestaTradicionService.deleteLogicallyById(id);
@@ -186,6 +195,7 @@ public class FiestaTradicionController {
             @ApiResponse(responseCode = "404", description = "Autor no encontrado", content = @Content)
     })
     @GetMapping("/autor/{idAutor}")
+    @PreAuthorize("hasRole('Redactor') or hasRole('Administrador')")
     public ResponseEntity<List<FiestaTradicion>> getFiestasByAutor(@PathVariable Long idAutor) {
         try {
             List<FiestaTradicion> fiestasPorAutor = fiestaTradicionService.getListaFiestasByAutor(idAutor);
@@ -203,6 +213,7 @@ public class FiestaTradicionController {
             @ApiResponse(responseCode = "204", description = "No se encontraron fiestas tradicionales", content = @Content)
     })
     @GetMapping("/buscar_palabra")
+    @PreAuthorize("hasRole('Cliente') or hasRole('Redactor') or hasRole('Administrador')")
     public ResponseEntity<List<FiestaTradicion>> searchFiestas(@RequestParam String keyword) {
         try {
             List<FiestaTradicion> results = fiestaTradicionService.searchByKeyword(keyword);
@@ -215,12 +226,14 @@ public class FiestaTradicionController {
 
 
 
+    //no se usa
     @Operation(summary = "Buscar fiestas tradicionales por palabra clave con paginacion")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fiestas tradicionales encontradas", content = @Content(schema = @Schema(implementation = FiestaTradicion.class))),
             @ApiResponse(responseCode = "204", description = "No se encontraron fiestas tradicionales", content = @Content)
     })
     @GetMapping("/buscar")
+    @PreAuthorize("hasRole('Cliente') or hasRole('Redactor') or hasRole('Administrador')")
     public ResponseEntity<Page<FiestaTradicion>> searchFiestas(@RequestParam String keyword, Pageable pageable) {
         try {
             Page<FiestaTradicion> results = fiestaTradicionService.searchByKeyword(keyword, pageable);

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,12 +35,14 @@ public class CategoriaPlatoController {
     private CategoriaPlatoService categoriaPlatoService;
 
 
+    //Obtener una categoría de plato por ID
     @Operation(summary = "Obtiene una categoría de plato por ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Categoria de plato encontrada", content = @Content(schema = @Schema(implementation = CategoriaPlato.class))),
             @ApiResponse(responseCode = "404", description = "Categoria de plato no encontrada", content = @Content)
     })
     @GetMapping("/detalle/{id}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<CategoriaPlato> getCategoriaPlatoById(@PathVariable Long id) {
         try {
             CategoriaPlato categoriaPlato = categoriaPlatoService.findById(id);
@@ -50,33 +53,38 @@ public class CategoriaPlatoController {
         }
     }
 
-
+    //Obtener todas las categorías de plato
     @Operation(summary = "Obtiene todas las categorias de plato")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Listado de categorias de plato", content = @Content(schema = @Schema(implementation = CategoriaPlato.class)))
     })
     @GetMapping("/todos")
+    @PreAuthorize("hasRole('Administrador')")
     public List<CategoriaPlato> getAllCategoriasPlato() {
         return categoriaPlatoService.findAll();
     }
 
 
+    //Obtener todas las categorías de plato activas
     @Operation(summary = "Obtiene todas las categorias de plato activas")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Listado de categorias de plato activas", content = @Content(schema = @Schema(implementation = CategoriaPlato.class)))
     })
     @GetMapping("/activos")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public List<CategoriaPlato> getAllCategoriasPlatoActivos() {
         return categoriaPlatoService.findAllActivos();
     }
 
 
+    //Crear una nueva categoría de plato
     @Operation(summary = "Crea una nueva categoría de plato")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Categoria de plato creada", content = @Content(schema = @Schema(implementation = CategoriaPlato.class))),
             @ApiResponse(responseCode = "409", description = "Conflicto: el objeto ya existe en la base de datos", content = @Content(schema = @Schema(implementation = CategoriaPlato.class)))
     })
     @PostMapping("/crear")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<CategoriaPlato> createCategoriaPlato(@RequestBody CategoriaPlato categoriaPlato) {
         try {
             CategoriaPlato nueva = categoriaPlatoService.crearCategoriaPlato(categoriaPlato);
@@ -88,12 +96,14 @@ public class CategoriaPlatoController {
     }
 
 
+    //Modificar una categoría de plato por ID
     @Operation(summary = "Modifica una categoria de plato por su ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Categoria de plato modificada", content = @Content(schema = @Schema(implementation = CategoriaPlato.class))),
             @ApiResponse(responseCode = "404", description = "Categoria de plato no encontrada", content = @Content)
     })
     @PutMapping("/modificar/{id}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<CategoriaPlato> updateCategoriaPlato(@PathVariable Long id, @RequestBody CategoriaPlato categoriaPlato) {
         try {
             CategoriaPlato categoriaActualizada = categoriaPlatoService.updateCategoriaPlato(id, categoriaPlato);
@@ -113,6 +123,7 @@ public class CategoriaPlatoController {
             @ApiResponse(responseCode = "404", description = "Categoria de plato no encontrada", content = @Content)
     })
     @DeleteMapping("/eliminar/{id}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<Response> deleteCategoriaPlatoLogico(@PathVariable Long id) {
         try {
             categoriaPlatoService.deleteByIdLogico(id);

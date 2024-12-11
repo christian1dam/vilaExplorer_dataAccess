@@ -86,7 +86,7 @@ public class FiestaTradicion {
         }
     }
 
-    // Método para establecer la imagenBase64
+    // Metodo para establecer la imagenBase64
     public void setImagenBase64FromPath() {
         this.imagenBase64 = getImagenBase64();
     }

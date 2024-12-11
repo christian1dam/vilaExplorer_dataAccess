@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,6 +43,7 @@ public class PuntuacionController {
             @ApiResponse(responseCode = "204", description = "No se encontraron puntuaciones", content = @Content)
     })
     @GetMapping("/entidad/{tipoEntidad}/{idEntidad}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<List<Puntuacion>> getAllByEntidad(
             @PathVariable TipoEntidad tipoEntidad,
             @PathVariable Long idEntidad) {
@@ -56,6 +58,7 @@ public class PuntuacionController {
             @ApiResponse(responseCode = "204", description = "No se encontraron calificaciones", content = @Content)
     })
     @GetMapping("/promedio/{tipoEntidad}/{idEntidad}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<Double> getPromedioCalificacion(
             @PathVariable TipoEntidad tipoEntidad,
             @PathVariable Long idEntidad) {
@@ -70,6 +73,7 @@ public class PuntuacionController {
             @ApiResponse(responseCode = "204", description = "No se encontraron calificaciones", content = @Content)
     })
     @GetMapping("/conteo/{tipoEntidad}/{idEntidad}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<Map<Integer, Long>> getConteoCalificacionesPorEstrella(
             @PathVariable TipoEntidad tipoEntidad,
             @PathVariable Long idEntidad) {
@@ -84,6 +88,7 @@ public class PuntuacionController {
             @ApiResponse(responseCode = "204", description = "No se encontraron puntuaciones", content = @Content)
     })
     @GetMapping("/usuario/{idUsuario}/entidad/{tipoEntidad}/{idEntidad}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<List<Puntuacion>> getPuntuacionesByUsuarioAndEntidad(
             @PathVariable Long idUsuario,
             @PathVariable TipoEntidad tipoEntidad,
@@ -99,6 +104,7 @@ public class PuntuacionController {
             @ApiResponse(responseCode = "204", description = "No se encontraron puntuaciones", content = @Content)
     })
     @GetMapping("/usuario/{idUsuario}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<List<Puntuacion>> getAllPuntuacionesByUsuario(@PathVariable Long idUsuario) {
         List<Puntuacion> puntuaciones = puntuacionService.findAllByUsuario(idUsuario);
         return puntuaciones.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(puntuaciones);
@@ -111,6 +117,7 @@ public class PuntuacionController {
             @ApiResponse(responseCode = "204", description = "No se encontraron entidades con la calificacion minima", content = @Content)
     })
     @GetMapping("/entidades-con-calificacion/{tipoEntidad}/{calificacionMinima}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<List<Long>> getEntidadesConCalificacionMinima(
             @PathVariable TipoEntidad tipoEntidad,
             @PathVariable double calificacionMinima) {
@@ -127,6 +134,7 @@ public class PuntuacionController {
             @ApiResponse(responseCode = "400", description = "Datos proporcionados inválidos", content = @Content)
     })
     @PostMapping("/crear")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<Puntuacion> createPuntuacion(@RequestBody Puntuacion puntuacion) {
         try {
             Puntuacion nuevaPuntuacion = puntuacionService.createPuntuacion(puntuacion);
@@ -151,6 +159,7 @@ public class PuntuacionController {
             @ApiResponse(responseCode = "404", description = "Puntuacion no encontrada", content = @Content)
     })
     @PutMapping("/actualizar")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<Puntuacion> actualizarPuntuacion(
             @RequestParam Long idUsuario,
             @RequestParam Long idEntidad,
@@ -160,29 +169,26 @@ public class PuntuacionController {
         Puntuacion puntuacionActualizada = puntuacionService.updatePuntuacion(idUsuario, idEntidad, tipoEntidad, nuevaPuntuacion);
         return ResponseEntity.ok(puntuacionActualizada);
     }
-
-
     //------------------------------------------------------------------------------------------------
-
     //Endopoint para obtener el promedio de calificacion  de una entidad especifica
     @GetMapping("/promedio/plato/{idPlato}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<Double> getPromedioCalificacionPlato(@PathVariable Long idPlato) {
         Optional<Double> promedio = puntuacionService.getPromedioCalificacionPlato(idPlato);
         return promedio.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @GetMapping("/promedio/tradicion/{idTradicion}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<Double> getPromedioCalificacionTradicion(@PathVariable Long idTradicion) {
         Optional<Double> promedio = puntuacionService.getPromedioCalificacionTradicion(idTradicion);
         return promedio.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @GetMapping("/promedio/lugar-interes/{idLugarInteres}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<Double> getPromedioCalificacionLugarInteres(@PathVariable Long idLugarInteres) {
         Optional<Double> promedio = puntuacionService.getPromedioCalificacionLugarInteres(idLugarInteres);
         return promedio.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
     }
-
-
-
 }

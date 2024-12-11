@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,6 +41,7 @@ public class RolController {
             @ApiResponse(responseCode = "200", description = "Roles encontrados", content = @Content(schema = @Schema(implementation = Rol.class)))
     })
     @GetMapping("/all")
+    @PreAuthorize("hasRole('Administrador')")
     public List<Rol> getAllRoles() {
         return rolService.getAll();
     }
@@ -51,7 +53,8 @@ public class RolController {
             @ApiResponse(responseCode = "200", description = "Rol encontrado en la base de datos", content = @Content(schema = @Schema(implementation = Rol.class))),
             @ApiResponse(responseCode = "404", description = "Rol no encontrado en la base de datos", content = @Content(schema = @Schema(implementation = Rol.class))),
     })
-    @GetMapping()
+    @GetMapping("/nombre")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<?> getRolByNombre(@RequestParam(value = "rol") String rol){
         try {
             Rol rolFromDB = rolService.getRolByNombre(rol);
@@ -67,6 +70,7 @@ public class RolController {
             @ApiResponse(responseCode = "201", description = "Rol creado", content = @Content(schema = @Schema(implementation = Rol.class)))
     })
     @PostMapping("/add")
+    @PreAuthorize("hasRole('Administrador')")
     @Transactional
     public ResponseEntity<Rol> anyadirRol(@RequestBody Rol rol) {
         try {
@@ -86,6 +90,7 @@ public class RolController {
             @ApiResponse(responseCode = "404", description = "Rol no encontrado", content = @Content)
     })
     @DeleteMapping("/logical/{id}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<Response> eliminarRolLogicamentePorID(@PathVariable Long id) {
         try {
             rolService.desactivaRolPorID(id); // Realiza un borrado lógico
@@ -103,6 +108,7 @@ public class RolController {
             @ApiResponse(responseCode = "404", description = "Rol no encontrado", content = @Content)
     })
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<Response> eliminarRolPorID(@PathVariable Long id) {
         try {
             rolService.eliminarRolPorID(id);

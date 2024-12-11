@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class TipoPlatoController {
     @Operation(summary = "Obtiene todos los tipos de plato, incluyendo los desactivados")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Tipos de plato encontrados", content = @Content(schema = @Schema(implementation = TipoPlato.class)))})
     @GetMapping("/all")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<List<TipoPlato>> getAllTiposPlato() {
         try {
             List<TipoPlato> tipoPlatoList = tipoPlatoService.findAll();
@@ -52,6 +54,7 @@ public class TipoPlatoController {
     @Operation(summary = "Obtiene todos los tipos de plato activos")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Tipos de plato activos encontrados", content = @Content(schema = @Schema(implementation = TipoPlato.class)))})
     @GetMapping("/activos")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<?> getAllTiposPlatoActivos() {
         try {
             List<TipoPlato> tipoPlatoList = tipoPlatoService.findAllActivos();
@@ -66,6 +69,7 @@ public class TipoPlatoController {
     @Operation(summary = "Obtiene un tipo de plato por su ID")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Tipo de plato encontrado", content = @Content(schema = @Schema(implementation = TipoPlato.class))), @ApiResponse(responseCode = "404", description = "Tipo de plato no encontrado", content = @Content)})
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<TipoPlato> getTipoPlatoById(@PathVariable Long id) {
         try {
             TipoPlato plato = tipoPlatoService.findById(id);
@@ -81,6 +85,7 @@ public class TipoPlatoController {
     @Operation(summary = "Crea o actualiza un tipo de plato")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Tipo de plato creado o actualizado", content = @Content(schema = @Schema(implementation = TipoPlato.class)))})
     @PostMapping("/crear")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<TipoPlato> createOrUpdateTipoPlato(@RequestBody TipoPlato tipoPlato) {
         TipoPlato savedTipoPlato = tipoPlatoService.save(tipoPlato);
         return ResponseEntity.ok(savedTipoPlato);
@@ -91,6 +96,7 @@ public class TipoPlatoController {
     @Operation(summary = "Elimina un tipo de plato de forma lógica")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Tipo de plato eliminado lógicamente", content = @Content)})
     @DeleteMapping("/eliminar/{id}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<Response> deleteTipoPlatoLogico(@PathVariable Long id) {
         try {
             tipoPlatoService.deleteByIdLogico(id);
@@ -105,11 +111,13 @@ public class TipoPlatoController {
     @Operation(summary = "Obtiene todos los tipos de plato activos por ID de categoría")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Tipos de plato activos encontrados para la categoría", content = @Content(schema = @Schema(implementation = TipoPlato.class)))})
     @GetMapping("/categoria/{categoriaId}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public List<TipoPlato> getTiposPlatoByCategoriaId(@PathVariable Long categoriaId) {
         return tipoPlatoService.findByCategoriaId(categoriaId);
     }
 
     @PutMapping("/activar/{id}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<TipoPlato> activarTipoPlato(@PathVariable Long id, @RequestParam(value = "activo") String activo){
         try{
             TipoPlato tipoPlato = tipoPlatoService.activarTipoPlato(id, activo);

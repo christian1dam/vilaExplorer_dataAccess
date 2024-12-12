@@ -21,7 +21,7 @@ public interface PlatoService {
     Plato aprobarPlato(Long platoId, Long aprobadorId) throws PlatoNotFoundException, UsuarioNotFoundException, RolNotFoundException;
 
     //metodo para crear un plato
-    Plato createPlato(Plato plato) throws DataIntegrityViolationException;
+    void createPlato(Plato plato) throws DataIntegrityViolationException;
 
     //metodo para actualizar un plato
     Plato updatePlato(Long id, Plato platoDetalles) throws PlatoNotFoundException;

@@ -58,7 +58,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
     })
     @GetMapping("/por-id/{id}")
-    @PreAuthorize("hasRole('Administrador')")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long id) {
         try {
             Usuario usuario = usuarioService.findById(id);

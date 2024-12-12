@@ -123,19 +123,30 @@ public class PlatoController {
     }
 
 
-
-
-
-
     //-----POST----- CREAR PLATO
     @Operation(summary = "Crea un nuevo plato")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Plato creado", content = @Content(schema = @Schema(implementation = Plato.class))), @ApiResponse(responseCode = "400", description = "Datos proporcionados invalidos", content = @Content)})
     @PostMapping("/crear")
     @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
-    public ResponseEntity<Plato> createPlato(@RequestBody Plato plato) {
+    public ResponseEntity<Plato> createPlato(@RequestBody Plato plato   ) {
         try {
-            Plato platoDB = platoService.createPlato(plato);
-            return new ResponseEntity<>(platoService.save(plato), HttpStatus.OK);
+            platoService.createPlato(plato);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (DataIntegrityViolationException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+     //-----POST----- CREAR PLATO
+    @Operation(summary = "Crea un nuevo plato")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Plato creado", content = @Content(schema = @Schema(implementation = Plato.class))), @ApiResponse(responseCode = "400", description = "Datos proporcionados invalidos", content = @Content)})
+    @PostMapping("/crearFlutter")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
+    public ResponseEntity<Plato> createPlatoFlutter(@RequestBody Plato plato, @RequestParam(value = "autorID") Long autorID, @RequestParam(value = "tipoPlatoID") Long tipoPlatoID) {
+        try {
+            platoService.createPlato(plato);
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

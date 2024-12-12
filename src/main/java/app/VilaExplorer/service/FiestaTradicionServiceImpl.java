@@ -128,7 +128,7 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
 
     @Override
     public List<FiestaTradicion> findAllActive() {
-        return List.of();
+        return fiestaTradicionRepository.findAllActive();
     }
 
     @Override

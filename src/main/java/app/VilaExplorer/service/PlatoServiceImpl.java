@@ -71,11 +71,11 @@ public class PlatoServiceImpl implements PlatoService {
     }
 
     @Override
-    public Plato createPlato(Plato plato) throws DataIntegrityViolationException {
+    public void createPlato(Plato plato) throws DataIntegrityViolationException {
         if (platoRepository.findByNombre(plato.getNombre()).isPresent()) {
             throw new DataIntegrityViolationException("Este plato ya existe en la base de datos.");
         }
-        return platoRepository.save(plato);
+        platoRepository.save(plato);
     }
 
     @Override

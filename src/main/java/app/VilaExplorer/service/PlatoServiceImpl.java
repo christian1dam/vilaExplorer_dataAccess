@@ -1,10 +1,12 @@
 package app.VilaExplorer.service;
 
 import app.VilaExplorer.domain.Plato;
+import app.VilaExplorer.domain.TipoPlato;
 import app.VilaExplorer.domain.Usuario;
 import app.VilaExplorer.exception.PlatoNotFoundException;
 import app.VilaExplorer.exception.RolNotFoundException;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
+import app.VilaExplorer.repository.TipoPlatoRepository;
 import app.VilaExplorer.repository.UsuarioRepository;
 import app.VilaExplorer.repository.PlatoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,9 @@ public class PlatoServiceImpl implements PlatoService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private TipoPlatoRepository tipoPlatoRepository;
 
     @Override
     public Plato findById(Long id) throws PlatoNotFoundException {
@@ -75,8 +80,27 @@ public class PlatoServiceImpl implements PlatoService {
         if (platoRepository.findByNombre(plato.getNombre()).isPresent()) {
             throw new DataIntegrityViolationException("Este plato ya existe en la base de datos.");
         }
+
+        // Validar y asociar autor
+        if (plato.getAutor() == null || plato.getAutor().getIdUsuario() == null) {
+            throw new RuntimeException("El autor del plato no puede ser nulo.");
+        }
+        Usuario autor = usuarioRepository.findById(plato.getAutor().getIdUsuario())
+                .orElseThrow(() -> new RuntimeException("El autor con ID " + plato.getAutor().getIdUsuario() + " no existe"));
+        plato.setAutor(autor);
+
+        // Validar y asociar tipoPlato
+        if (plato.getTipoPlato() == null || plato.getTipoPlato().getIdTipoPlato() == null) {
+            throw new RuntimeException("El tipo de plato no puede ser nulo.");
+        }
+        TipoPlato tipoPlato = tipoPlatoRepository.findById(plato.getTipoPlato().getIdTipoPlato())
+                .orElseThrow(() -> new RuntimeException("El tipo de plato con ID " + plato.getTipoPlato().getIdTipoPlato() + " no existe"));
+        plato.setTipoPlato(tipoPlato);
+
+        // Guardar el plato
         platoRepository.save(plato);
     }
+
 
     @Override
     public Plato updatePlato(Long id, Plato platoDetalles) throws PlatoNotFoundException {

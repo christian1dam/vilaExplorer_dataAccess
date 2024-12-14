@@ -28,19 +28,15 @@ public class PlatoServiceImpl implements PlatoService {
 
     @Override
     public Plato findById(Long id) throws PlatoNotFoundException {
-        if (platoRepository.findById(id).isEmpty())
-            throw new PlatoNotFoundException("Este ID " + id + " no se encuentra en la base de datos");
-        Plato plato = platoRepository.findById(id).get();
-        plato.setImagen(plato.getImagenBase64());
-        return plato;
+        return platoRepository.findById(id)
+                .orElseThrow(() -> new PlatoNotFoundException("Este ID " + id + " no se encuentra en la base de datos"));
     }
 
     @Override
     public List<Plato> findAll() {
-        List<Plato> platos = platoRepository.findAll();
-        platos.forEach(Plato::setImagenBase64FromPath); // Convertir la imagen a Base64
-        return platos;
+        return platoRepository.findAll();
     }
+
 
     @Override
     public Plato save(Plato plato) {

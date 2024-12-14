@@ -66,9 +66,11 @@ public class Plato {
     @Schema(description = "Ruta de la imagen del plato", example = "images/platos/paella.jpg")
     private String imagen;
 
+    /*
     @Schema(description = "Imagen representativa en formato Base64", example = "data:image/jpeg;base64,...")
     @Transient
     private String imagenBase64;
+    */
 
     @ManyToOne
     @JoinColumn(name = "id_tipo_plato", nullable = false)
@@ -95,6 +97,7 @@ public class Plato {
 
 
     // Método para convertir la imagen a Base64 y devolverla como String
+    /*
     public String getImagenBase64() {
         Path imagePath = Paths.get(this.imagen);
         try {
@@ -106,8 +109,15 @@ public class Plato {
         }
     }
 
+     */
+
     // Método para establecer la imagenBase64
+    /*
     public void setImagenBase64FromPath() {
         this.imagenBase64 = getImagenBase64();
     }
+
+     */
+
+
 }

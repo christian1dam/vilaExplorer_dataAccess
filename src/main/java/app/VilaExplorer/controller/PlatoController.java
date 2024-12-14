@@ -143,9 +143,6 @@ public class PlatoController {
         }
     }
 
-
-
-
     //-----POST----- CREAR PLATO
     @Operation(summary = "Crea un nuevo plato")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Plato creado", content = @Content(schema = @Schema(implementation = Plato.class))), @ApiResponse(responseCode = "400", description = "Datos proporcionados invalidos", content = @Content)})

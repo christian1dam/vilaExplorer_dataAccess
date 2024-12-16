@@ -1,6 +1,7 @@
 package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.Plato;
+import app.VilaExplorer.dto.PlatoDTO;
 import app.VilaExplorer.exception.PlatoNotFoundException;
 import app.VilaExplorer.exception.RolNotFoundException;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
@@ -19,7 +20,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static app.VilaExplorer.controller.Response.NOT_FOUND;
 
@@ -54,12 +58,11 @@ public class PlatoController {
     }
 
     //-----GET----- OBTENER TODOS LOS PLATOS INCLUYENDO LOS NO APROBADOS Y LOS ELMINADOS LOGICAMENTE
-    @Operation(summary = "Obtiene todos los platos")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Listado de platos", content = @Content(schema = @Schema(implementation = Plato.class)))})
     @GetMapping("/todos")
     @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
     public ResponseEntity<List<Plato>> getAllPlatos() {
         try {
+            // Obtener directamente todos los platos desde el service
             List<Plato> platos = platoService.findAll();
             return new ResponseEntity<>(platos, HttpStatus.OK);
         } catch (PlatoNotFoundException e) {
@@ -68,11 +71,14 @@ public class PlatoController {
         }
     }
 
+
+
+
     // Obtener platos aprobados y no eliminados
     @Operation(summary = "Obtiene los platos aprobados y no eliminados")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Listado de platos aprobados", content = @Content(schema = @Schema(implementation = Plato.class)))})
     @GetMapping("/aprobados")
-    @PreAuthorize("hasRole('Cliente')")
+    @PreAuthorize("hasRole('Cliente') or hasRole('Administrador') or hasRole('Redactor')")
     public ResponseEntity<List<Plato>> getPlatosAprobados() {
         try {
             List<Plato> platos = platoService.findAprobadosNoEliminados();

@@ -1,6 +1,7 @@
 package app.VilaExplorer.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -39,11 +40,13 @@ public class Coordenadas {
     private Double longitud;
 
     @Schema(description = "Lugar de interés asociado con las coordenadas", example = "1")
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_lugar_interes")
     private LugarInteres lugarInteres;
 
     @Schema(description = "Ruta asociada con las coordenadas", example = "1")
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_ruta")
     private Ruta ruta;

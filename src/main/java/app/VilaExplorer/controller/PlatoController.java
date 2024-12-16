@@ -4,8 +4,11 @@ import app.VilaExplorer.domain.Plato;
 import app.VilaExplorer.dto.PlatoDTO;
 import app.VilaExplorer.exception.PlatoNotFoundException;
 import app.VilaExplorer.exception.RolNotFoundException;
+import app.VilaExplorer.exception.TipoPlatoNotFoundException;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
 import app.VilaExplorer.service.PlatoService;
+import app.VilaExplorer.service.TipoPlatoService;
+import app.VilaExplorer.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,6 +43,12 @@ public class PlatoController {
 
     @Autowired
     private PlatoService platoService;
+
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private TipoPlatoService tipoPlatoService;
 
     //-----GET----- OBTENER PLATO POR ID
 
@@ -156,9 +165,11 @@ public class PlatoController {
     @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<Plato> createPlatoFlutter(@RequestBody Plato plato, @RequestParam(value = "autorID") Long autorID, @RequestParam(value = "tipoPlatoID") Long tipoPlatoID) {
         try {
+            plato.setAutor(usuarioService.findById(autorID));
+            plato.setTipoPlato(tipoPlatoService.findById(tipoPlatoID));
             platoService.createPlato(plato);
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch (DataIntegrityViolationException e) {
+        } catch (DataIntegrityViolationException | UsuarioNotFoundException | TipoPlatoNotFoundException e) {
             System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

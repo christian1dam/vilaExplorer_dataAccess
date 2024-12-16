@@ -27,6 +27,16 @@ import java.util.Base64;
 @Table(name = "plato")
 @Schema(description = "Representación de un plato en la base de datos")
 public class Plato {
+    //    CONSTRUCTOR PARA CREAR PLATOS DESDE FLUTTER
+    public Plato(String descripcion, String nombre, String ingredientes, String receta) {
+        this.descripcion = descripcion;
+        this.nombre = nombre;
+        this.ingredientes = ingredientes;
+        this.receta = receta;
+        this.estado = false;
+        this.puntuacionMediaPlato = 0.0;
+        this.eliminado = false;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,12 +76,6 @@ public class Plato {
     @Schema(description = "Ruta de la imagen del plato", example = "images/platos/paella.jpg")
     private String imagen;
 
-    /*
-    @Schema(description = "Imagen representativa en formato Base64", example = "data:image/jpeg;base64,...")
-    @Transient
-    private String imagenBase64;
-    */
-
     @ManyToOne
     @JoinColumn(name = "id_tipo_plato", nullable = false)
     @NotNull
@@ -93,31 +97,5 @@ public class Plato {
     @Column(name = "eliminado", nullable = false)
     @Schema(description = "Indica si el plato está eliminado (borrado lógico)", example = "false", requiredMode = Schema.RequiredMode.REQUIRED)
     private boolean eliminado = false; // Inicialmente false, no eliminado
-
-
-
-    // Método para convertir la imagen a Base64 y devolverla como String
-    /*
-    public String getImagenBase64() {
-        Path imagePath = Paths.get(this.imagen);
-        try {
-            byte[] imageBytes = Files.readAllBytes(imagePath);
-            return Base64.getEncoder().encodeToString(imageBytes);
-        } catch (IOException e) {
-            System.out.println("Error al leer la imagen: " + e.getMessage());
-            return null;
-        }
-    }
-
-     */
-
-    // Método para establecer la imagenBase64
-    /*
-    public void setImagenBase64FromPath() {
-        this.imagenBase64 = getImagenBase64();
-    }
-
-     */
-
 
 }

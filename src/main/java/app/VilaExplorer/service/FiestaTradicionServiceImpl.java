@@ -39,7 +39,6 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
         if (fiestaTradicionRepository.findById(idFiestaTradicion).isEmpty())
             throw new FiestaTradicionNotFound(NOT_FOUND);
         FiestaTradicion fiesta = fiestaTradicionRepository.findById(idFiestaTradicion).get();
-        fiesta.setImagen(fiesta.getImagenBase64());
         return fiesta;
     }
 
@@ -50,7 +49,6 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
     @Override
     public List<FiestaTradicion> findAll() {
         List<FiestaTradicion> fiestas = fiestaTradicionRepository.findAll();
-        fiestas.forEach(FiestaTradicion::setImagenBase64FromPath); // Convertir la imagen a Base64
         return fiestas;
     }
 

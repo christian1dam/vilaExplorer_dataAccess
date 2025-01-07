@@ -134,7 +134,7 @@ public class PuntuacionController {
             @ApiResponse(responseCode = "400", description = "Datos proporcionados inválidos", content = @Content)
     })
     @PostMapping("/crear")
-    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
+    @PreAuthorize("hasRole('Cliente')")
     public ResponseEntity<Puntuacion> createPuntuacion(@RequestBody Puntuacion puntuacion) {
         try {
             Puntuacion nuevaPuntuacion = puntuacionService.createPuntuacion(puntuacion);

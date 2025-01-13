@@ -110,7 +110,7 @@ public class LugarInteresController {
     @Operation(summary = "Crea un nuevo lugar de interes")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lugar de interes creado", content = @Content(schema = @Schema(implementation = LugarInteres.class))),
-            @ApiResponse(responseCode = "404", description = "Coordenadas no introducidas", content = @Content)
+            @ApiResponse(responseCode = "404", description = "Lugar de interes no creado", content = @Content)
     })
     @PostMapping("/crear")
     @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
@@ -143,6 +143,7 @@ public class LugarInteresController {
     }
 
 
+    //Metodo para desactivar un lugar de interes (eliminar logicamente)
     @Operation(summary = "Desactiva un lugar de interés por su ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lugar de interes desactivado", content = @Content(schema = @Schema(implementation = LugarInteres.class))),
@@ -153,6 +154,24 @@ public class LugarInteresController {
     public ResponseEntity<LugarInteres> desactivarLugarInteres(@PathVariable Long id) {
         try {
             LugarInteres lugarInteres = lugarInteresService.desactivarLugarInteres(id);
+            return new ResponseEntity<>(lugarInteres, HttpStatus.OK);
+        } catch (LugarInteresNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    //Metodo para Activar un lugar de interes (cambiar el estado de activo a true)
+    @Operation(summary = "Activa un lugar de interes por su ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lugar de interes activado", content = @Content(schema = @Schema(implementation = LugarInteres.class))),
+            @ApiResponse(responseCode = "404", description = "Lugar de interes no encontrado", content = @Content)
+    })
+    @PutMapping("/activar/{id}")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
+    public ResponseEntity<LugarInteres> activarLugarInteres(@PathVariable Long id) {
+        try {
+            LugarInteres lugarInteres = lugarInteresService.activarLugarInteres(id);
             return new ResponseEntity<>(lugarInteres, HttpStatus.OK);
         } catch (LugarInteresNotFoundException e) {
             System.out.println(e.getMessage());
@@ -177,6 +196,9 @@ public class LugarInteresController {
             return handleException(e);
         }
     }
+
+
+
 
     @ExceptionHandler({LugarInteresNotFoundException.class})
     @ResponseBody

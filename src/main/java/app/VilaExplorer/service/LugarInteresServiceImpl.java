@@ -123,5 +123,14 @@ public class LugarInteresServiceImpl implements LugarInteresService {
         lugarInteresRepository.save(lugarInteres); // Guarda el cambio
     }
 
+    public LugarInteres activarLugarInteres(Long id) throws LugarInteresNotFoundException {
+        Optional<LugarInteres> optionalLugarInteres = lugarInteresRepository.findById(id);
+        if (optionalLugarInteres.isEmpty()) {
+            throw new LugarInteresNotFoundException("El lugar de interés con ID " + id + " no se encuentra en la base de datos");
+        }
+        LugarInteres lugarInteres = optionalLugarInteres.get();
+        lugarInteres.setActivo(true); // Cambiar el estado a activo
+        return lugarInteresRepository.save(lugarInteres); // Guardar los cambios
+    }
 
 }

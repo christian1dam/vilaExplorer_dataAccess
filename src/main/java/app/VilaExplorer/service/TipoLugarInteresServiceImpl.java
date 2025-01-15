@@ -33,10 +33,16 @@ public class TipoLugarInteresServiceImpl implements TipoLugarInteresService {
         return tipoLugarInteresRepository.save(tipoLugarInteres);
     }
 
-    //Metodo para eliminar un tipo de lugar por id
+    // Borrado lógico: marca 'activo' como false en lugar de eliminar físicamente
     @Override
     public void deleteById(Long id) {
-        tipoLugarInteresRepository.deleteById(id);
+        Optional<TipoLugarInteres> optionalTipo = tipoLugarInteresRepository.findById(id);
+        if (optionalTipo.isPresent()) {
+            TipoLugarInteres tipoLugar = optionalTipo.get();
+            tipoLugar.setActivo(false);
+            tipoLugarInteresRepository.save(tipoLugar);
+        }
+        // Si no existe, no hacemos nada o podríamos lanzar una excepción
     }
 }
 

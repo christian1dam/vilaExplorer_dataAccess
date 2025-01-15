@@ -97,5 +97,4 @@ public class Plato {
     @Column(name = "eliminado", nullable = false)
     @Schema(description = "Indica si el plato está eliminado (borrado lógico)", example = "false", requiredMode = Schema.RequiredMode.REQUIRED)
     private boolean eliminado = false; // Inicialmente false, no eliminado
-
 }

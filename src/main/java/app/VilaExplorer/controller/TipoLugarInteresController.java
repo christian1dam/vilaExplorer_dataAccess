@@ -85,16 +85,12 @@ public class TipoLugarInteresController {
         }
     }
 
-    //Eliminar un tipo de lugar
-    @Operation(summary = "Elimina un tipo de lugar de interés por su ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Tipo de lugar eliminado", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Tipo de lugar no encontrado", content = @Content)
-    })
     @DeleteMapping("/eliminar/{id}")
     @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<Void> deleteTipoLugarInteres(@PathVariable Long id) {
+        // Ahora solo marcará como inactivo
         tipoLugarInteresService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
 }

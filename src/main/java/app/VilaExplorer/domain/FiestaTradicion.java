@@ -59,10 +59,6 @@ public class FiestaTradicion {
     @Column(name = "imagen", nullable = false)
     private String imagen;
 
-    @Schema(description = "Imagen representativa en formato Base64", example = "data:image/jpeg;base64,...")
-    @Transient
-    private String imagenBase64;
-
     @Schema(description = "Indica si la fiesta o tradición está activa", requiredMode = RequiredMode.REQUIRED)
     @NotBlank
     @Column(name = "activo", nullable = false)
@@ -73,21 +69,4 @@ public class FiestaTradicion {
     @ManyToOne
     @JoinColumn(name = "id_autor", nullable = false, foreignKey = @ForeignKey(name = "FK_fiesta_tradicion_usuario"))
     private Usuario autor;
-
-    // Metodo para convertir la imagen a Base64 y devolverla como String
-    public String getImagenBase64() {
-        Path imagePath = Paths.get(this.imagen);
-        try {
-            byte[] imageBytes = Files.readAllBytes(imagePath);
-            return Base64.getEncoder().encodeToString(imageBytes);
-        } catch (IOException e) {
-            System.out.println("Error al leer la imagen: " + e.getMessage());
-            return null;
-        }
-    }
-
-    // Metodo para establecer la imagenBase64
-    public void setImagenBase64FromPath() {
-        this.imagenBase64 = getImagenBase64();
-    }
 }

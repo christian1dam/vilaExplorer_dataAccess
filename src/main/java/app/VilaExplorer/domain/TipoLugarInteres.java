@@ -30,4 +30,8 @@ public class TipoLugarInteres {
     @NotBlank
     @Schema(description = "Nombre del tipo de lugar de interés", example = "Parque Natural", requiredMode = Schema.RequiredMode.REQUIRED)
     private String nombreTipo;
+
+    // NUEVO ATRIBUTO para el borrado lógico
+    @Column(name = "activo", nullable = false)
+    private Boolean activo = true;
 }

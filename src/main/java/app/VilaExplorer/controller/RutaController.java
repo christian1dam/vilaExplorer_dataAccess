@@ -47,7 +47,7 @@ public class RutaController {
             @ApiResponse(responseCode = "200", description = "Listado de rutas", content = @Content(schema = @Schema(implementation = Ruta.class)))
     })
     @GetMapping("/todos")
-    @PreAuthorize("hasRole('Administrador')")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public List<Ruta> getAllRutas() {
         return rutaService.findAll();
     }

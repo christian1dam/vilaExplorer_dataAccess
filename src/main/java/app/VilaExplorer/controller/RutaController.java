@@ -2,6 +2,7 @@ package app.VilaExplorer.controller;
 
 
 import app.VilaExplorer.domain.Ruta;
+import app.VilaExplorer.exception.RutaNotFoundException;
 import app.VilaExplorer.service.RutaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -75,6 +76,24 @@ public class RutaController {
         return ResponseEntity.ok(savedRuta);
     }
 
+    // Actualizar una ruta
+    @PutMapping("/modificar/{id}")
+    @Operation(summary = "Modifica una ruta por su ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ruta modificada",
+                    content = @Content(schema = @Schema(implementation = Ruta.class))),
+            @ApiResponse(responseCode = "404", description = "Ruta no encontrada", content = @Content)
+    })
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
+    public ResponseEntity<Ruta> updateRuta(@PathVariable Long id, @RequestBody Ruta rutaDetails) {
+        try {
+            Ruta updatedRuta = rutaService.updateRuta(id, rutaDetails);
+            return ResponseEntity.ok(updatedRuta);
+        } catch (RutaNotFoundException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 
     @Operation(summary = "Elimina una ruta por su ID")
     @ApiResponses(value = {
@@ -98,4 +117,54 @@ public class RutaController {
     public List<Ruta> getRutasByAutor(@PathVariable Long autorId) {
         return rutaService.findByAutorId(autorId);
     }
+
+
+    // =========== GET RUTAS ACTIVAS =============
+    @GetMapping("/activos")
+    @Operation(summary = "Obtiene todas las rutas activas")
+    public ResponseEntity<List<Ruta>> getAllRutasActivas() {
+        List<Ruta> rutasActivas = rutaService.findAllActivas();
+        if (rutasActivas.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(rutasActivas);
+    }
+
+    // =========== DESACTIVAR (Borrado lógico) =============
+    @PutMapping("/desactivar/{id}")
+    @Operation(summary = "Desactiva una ruta (borrado lógico) por su ID")
+    public ResponseEntity<Ruta> desactivarRuta(@PathVariable Long id) {
+        try {
+            Ruta rutaDesactivada = rutaService.desactivarRuta(id);
+            return ResponseEntity.ok(rutaDesactivada);
+        } catch (RutaNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // =========== ACTIVAR ============
+    @PutMapping("/activar/{id}")
+    @Operation(summary = "Activa una ruta que estaba desactivada")
+    public ResponseEntity<Ruta> activarRuta(@PathVariable Long id) {
+        try {
+            Ruta rutaActivada = rutaService.activarRuta(id);
+            return ResponseEntity.ok(rutaActivada);
+        } catch (RutaNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // =========== ELIMINAR LÓGICAMENTE ============
+    @DeleteMapping("/eliminar-logico/{id}")
+    @Operation(summary = "Elimina una ruta de forma lógica por su ID")
+    public ResponseEntity<Void> deleteRutaLogico(@PathVariable Long id) {
+        try {
+            rutaService.deleteByIdLogico(id);
+            // Podrías devolver un objeto con un mensaje, o directamente 200/204
+            return ResponseEntity.ok().build();
+        } catch (RutaNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

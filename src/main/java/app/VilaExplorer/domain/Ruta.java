@@ -45,4 +45,8 @@ public class Ruta {
     @Schema(description = "Lista de coordenadas que conforman la ruta")
     private List<Coordenadas> coordenadas;
 
+    // NUEVO CAMPO para indicar si está activa (borrado lógico)
+    @Column(name = "activo", nullable = false)
+    private Boolean activo = true;
+
 }

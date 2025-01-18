@@ -11,4 +11,7 @@ import java.util.List;
 public interface RutaRepository extends JpaRepository<Ruta, Long> {
     // Encuentra rutas por autor
     List<Ruta> findByAutor_IdUsuario(Long autorId);//JPa entederá que el campo autor_id_usuario es el que se debe buscar
+
+    // Encuentra rutas activas
+    List<Ruta> findAllByActivoTrue();
 }

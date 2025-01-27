@@ -89,6 +89,46 @@ public class UsuarioController {
         }
     }
 
+    // Actualizar el nombre de un usuario
+    @Operation(summary = "Actualiza el nombre de un usuario")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Nombre actualizado", content = @Content(schema = @Schema(implementation = Usuario.class))),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
+    })
+    @PutMapping("/editar/nombre")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
+    public ResponseEntity<Usuario> editarNombre(@RequestParam(value = "id") Long id, @RequestParam(value = "nuevoNombre") String nuevoNombre) {
+        try {
+            Usuario usuarioActualizado = usuarioService.editarNombre(id, nuevoNombre);
+            return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);
+        } catch (UsuarioNotFoundException e) {
+            System.out.println(RED + e.getMessage() + RESET);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    // Actualizar la contraseña de un usuario
+    @Operation(summary = "Actualiza la contraseña de un usuario")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Contraseña actualizada", content = @Content(schema = @Schema(implementation = Usuario.class))),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
+    })
+    @PutMapping("/editar/contraseña")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
+    public ResponseEntity<Usuario> editarContrasenya(@RequestParam(value = "id") Long id,
+                                                     @RequestParam(value = "contraseñaActual") String contrasenyaActual,
+                                                     @RequestParam(value = "nuevaContraseña") String nuevaContrasenya) {
+        try {
+            Usuario usuarioActualizado = usuarioService.editarContrasenya(id, contrasenyaActual, nuevaContrasenya);
+            return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);
+        } catch (UsuarioNotFoundException e) {
+            System.out.println(RED + e.getMessage() + RESET);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+
     //NO SE DEBE USAR EN PRODUCCIÓN - SOLO PARA PRUEBAS
     @GetMapping("/signIn")
     public ResponseEntity<Usuario> getUsuario(@RequestParam(value = "nombre") String nombre, @RequestParam(value = "password") String password) {

@@ -55,6 +55,34 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional
+    public Usuario editarNombre(Long id, String nuevoNombre) throws UsuarioNotFoundException {
+        if (usuarioRepository.findById(id).isEmpty()) {
+            throw new UsuarioNotFoundException("El usuario con ID " + id + " no existe.");
+        }
+        Usuario usuario = usuarioRepository.findById(id).get();
+        usuario.setNombre(nuevoNombre);
+        return usuarioRepository.save(usuario);
+    }
+
+    @Override
+    @Transactional
+    public Usuario editarContrasenya(Long id, String contrasenyaActual, String nuevaContrasenya) throws UsuarioNotFoundException {
+        if (usuarioRepository.findById(id).isEmpty()) {
+            throw new UsuarioNotFoundException("El usuario con ID " + id + " no existe.");
+        }
+        Usuario usuario = usuarioRepository.findById(id).get();
+
+        if (!usuario.getPassword().equals(contrasenyaActual)) {
+            throw new IllegalArgumentException("La contraseña actual no es válida.");
+        }
+
+        usuario.setPassword(nuevaContrasenya);
+        return usuarioRepository.save(usuario);
+    }
+
+
+    @Override
+    @Transactional
     public Usuario updateRolDelUsuario(Long usuarioId, String nombreRol) throws UsuarioNotFoundException, RolNotFoundException {
         // Buscar el usuario por ID
         if (usuarioRepository.findById(usuarioId).isEmpty()) {

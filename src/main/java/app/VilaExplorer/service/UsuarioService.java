@@ -16,6 +16,10 @@ public interface UsuarioService {
 
     void deleteById(Long id) throws UsuarioNotFoundException;
 
+    Usuario editarNombre(Long id, String nuevoNombre) throws UsuarioNotFoundException;
+
+    Usuario editarContrasenya(Long id, String contrasenyaActual, String nuevaContrasenya) throws UsuarioNotFoundException;
+
     Usuario updateRolDelUsuario(Long usuarioId, String rol) throws UsuarioNotFoundException, RolNotFoundException;
 
     List<Usuario> findUsuariosByRol(String rol) throws RolNotFoundException;

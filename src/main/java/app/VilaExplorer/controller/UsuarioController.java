@@ -113,11 +113,11 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Contraseña actualizada", content = @Content(schema = @Schema(implementation = Usuario.class))),
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
     })
-    @PutMapping("/editar/contraseña")
+    @PutMapping("/editar/contrasenya")
     @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<Usuario> editarContrasenya(@RequestParam(value = "id") Long id,
-                                                     @RequestParam(value = "contraseñaActual") String contrasenyaActual,
-                                                     @RequestParam(value = "nuevaContraseña") String nuevaContrasenya) {
+                                                     @RequestParam(value = "contrasenyaActual") String contrasenyaActual,
+                                                     @RequestParam(value = "nuevaContrasenya") String nuevaContrasenya) {
         try {
             Usuario usuarioActualizado = usuarioService.editarContrasenya(id, contrasenyaActual, nuevaContrasenya);
             return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);

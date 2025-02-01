@@ -3,6 +3,7 @@ package app.VilaExplorer.controller;
 import app.VilaExplorer.domain.Usuario;
 import app.VilaExplorer.exception.RolNotFoundException;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
+import app.VilaExplorer.payload.request.NombreRequest;
 import app.VilaExplorer.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -97,15 +98,16 @@ public class UsuarioController {
     })
     @PutMapping("/editar/nombre")
     @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
-    public ResponseEntity<Usuario> editarNombre(@RequestParam(value = "id") Long id, @RequestParam(value = "nuevoNombre") String nuevoNombre) {
+    public ResponseEntity<Usuario> editarNombre(@RequestBody NombreRequest nombreRequest) {
         try {
-            Usuario usuarioActualizado = usuarioService.editarNombre(id, nuevoNombre);
+            Usuario usuarioActualizado = usuarioService.editarNombre(nombreRequest.getId(), nombreRequest.getNuevoNombre());
             return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);
         } catch (UsuarioNotFoundException e) {
             System.out.println(RED + e.getMessage() + RESET);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
 
     // Actualizar la contraseña de un usuario
     @Operation(summary = "Actualiza la contraseña de un usuario")

@@ -1,9 +1,12 @@
 package app.VilaExplorer.controller;
 
 
+import app.VilaExplorer.domain.Coordenadas;
 import app.VilaExplorer.domain.Ruta;
 import app.VilaExplorer.exception.RutaNotFoundException;
 import app.VilaExplorer.service.RutaService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,11 +17,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
  * Controlador para la API REST de Rutas.
+ *
  * @author VilaExplorerAdmin
  * @version 1.0
  */
@@ -54,7 +61,6 @@ public class RutaController {
     }
 
 
-
     @Operation(summary = "Crea una nueva ruta")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ruta creada", content = @Content(schema = @Schema(implementation = Ruta.class))),
@@ -75,6 +81,80 @@ public class RutaController {
         Ruta savedRuta = rutaService.save(ruta);
         return ResponseEntity.ok(savedRuta);
     }
+
+
+    @Operation(summary = "Crea una ruta pasándo las coordenadas de origen y fin")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ruta creada", content = @Content(schema = @Schema(implementation = Ruta.class))),
+            @ApiResponse(responseCode = "400", description = "Datos proporcionados invalidos", content = @Content)
+    })
+    @GetMapping("/generarRuta")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
+    public ResponseEntity<?> generarRuta(
+            @RequestParam("origenLat") Double origenLat,
+            @RequestParam("origenLng") Double origenLng,
+            @RequestParam("destinoLat") Double destinoLat,
+            @RequestParam("destinoLng") Double destinoLng) {
+
+        try {
+
+            String openRouteUrl = String.format(
+                    Locale.US,
+                    "https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf62485d469bd2cba74cc7bbf095ac9c66e654&start=%f,%f&end=%f,%f",
+                    origenLng, origenLat, destinoLng, destinoLat
+            );
+
+
+            ApiClient apiClient = new ApiClient();
+            HttpResponse<String> response = apiClient.getRequest(openRouteUrl);
+            System.out.println("RESPONSE BODY: "+ response.body());
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(response.body());
+
+            List<Double> bbox = new ArrayList<>();
+            if (jsonNode.has("bbox")) {
+                for (JsonNode value : jsonNode.get("bbox")) {
+                    bbox.add(value.asDouble());
+                }
+            }
+
+            double distancia = 0;
+            double duracion = 0;
+            if (jsonNode.get("features").get(0).get("properties").has("segments")) {
+                JsonNode segment = jsonNode.get("features").get(0).get("properties").get("segments").get(0);
+                distancia = segment.get("distance").asDouble();
+                duracion = segment.get("duration").asDouble();
+            }
+
+            List<Coordenadas> coordenadasRuta = new ArrayList<>();
+            if (jsonNode.get("features").get(0).get("geometry").has("coordinates")) {
+                JsonNode coordinatesNode = jsonNode.get("features").get(0).get("geometry").get("coordinates");
+                for (JsonNode coord : coordinatesNode) {
+                    double longitud = coord.get(0).asDouble();
+                    double latitud = coord.get(1).asDouble();
+                    Coordenadas nuevaCoordenada = new Coordenadas();
+                    nuevaCoordenada.setLatitud(latitud);
+                    nuevaCoordenada.setLongitud(longitud);
+                    coordenadasRuta.add(nuevaCoordenada);
+                }
+            }
+
+            Ruta nuevaRuta = new Ruta();
+            nuevaRuta.setNombreRuta("Ruta generada automáticamente");
+            nuevaRuta.setCoordenadas(coordenadasRuta);
+            nuevaRuta.setDistancia(distancia);
+            nuevaRuta.setDuracion(duracion);
+            nuevaRuta.setBbox(bbox);
+            nuevaRuta.setActivo(true);
+
+            return ResponseEntity.ok(nuevaRuta);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(500).body("Error al procesar la ruta");
+        }
+    }
+
 
     // Actualizar una ruta
     @PutMapping("/modificar/{id}")

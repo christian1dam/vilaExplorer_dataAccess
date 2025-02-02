@@ -27,4 +27,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return UserDetailsImpl.build(user);
     }
 
+    @Transactional
+    public UserDetails loadUserById(Long idUsuario) throws UsernameNotFoundException {
+        Usuario user = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new UsernameNotFoundException("User not Found with ID: " + idUsuario));
+        return UserDetailsImpl.build(user);
+    }
 }

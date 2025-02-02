@@ -3,7 +3,6 @@ package app.VilaExplorer.controller;
 import app.VilaExplorer.domain.Usuario;
 import app.VilaExplorer.exception.RolNotFoundException;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
-import app.VilaExplorer.payload.request.NombreRequest;
 import app.VilaExplorer.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,8 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -59,7 +56,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
     })
     @GetMapping("/por-id/{id}")
-    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long id) {
         try {
             Usuario usuario = usuarioService.findById(id);
@@ -90,59 +87,6 @@ public class UsuarioController {
         }
     }
 
-    // Actualizar el nombre de un usuario
-    @Operation(summary = "Actualiza el nombre de un usuario")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Nombre actualizado", content = @Content(schema = @Schema(implementation = Usuario.class))),
-            @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
-    })
-    @PutMapping("/editar/nombre")
-    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
-    public ResponseEntity<Usuario> editarNombre(@RequestBody NombreRequest nombreRequest) {
-        try {
-            Usuario usuarioActualizado = usuarioService.editarNombre(nombreRequest.getId(), nombreRequest.getNuevoNombre());
-            return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);
-        } catch (UsuarioNotFoundException e) {
-            System.out.println(RED + e.getMessage() + RESET);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-
-    // Actualizar la contraseña de un usuario
-    @Operation(summary = "Actualiza la contraseña de un usuario")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contraseña actualizada", content = @Content(schema = @Schema(implementation = Usuario.class))),
-            @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
-    })
-    @PutMapping("/editar/contrasenya")
-    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
-    public ResponseEntity<Usuario> editarContrasenya(@RequestParam(value = "id") Long id,
-                                                     @RequestParam(value = "contrasenyaActual") String contrasenyaActual,
-                                                     @RequestParam(value = "nuevaContrasenya") String nuevaContrasenya) {
-        try {
-            Usuario usuarioActualizado = usuarioService.editarContrasenya(id, contrasenyaActual, nuevaContrasenya);
-            return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);
-        } catch (UsuarioNotFoundException e) {
-            System.out.println(RED + e.getMessage() + RESET);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-
-
-    //NO SE DEBE USAR EN PRODUCCIÓN - SOLO PARA PRUEBAS
-    @GetMapping("/signIn")
-    public ResponseEntity<Usuario> getUsuario(@RequestParam(value = "nombre") String nombre, @RequestParam(value = "password") String password) {
-        try {
-            Usuario usuarioFromDB = usuarioService.findUser(nombre, password);
-            System.out.println(usuarioFromDB.getNombre());
-            return new ResponseEntity<>(usuarioFromDB, HttpStatus.OK);
-        } catch (UsuarioNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
     // Crear un nuevo usuario
     @Operation(summary = "Crea un nuevo usuario")
     @ApiResponses(value = {
@@ -152,7 +96,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor", content = @Content)
     })
     @PostMapping("/add")
-    @PreAuthorize("hasRole('Administrador')")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<Usuario> createUsuario(@RequestBody Usuario usuario, @RequestParam(value = "rol") String rol) {
         try {
             Usuario usuarioConRol = usuarioService.crearUsuarioConRol(usuario, rol);
@@ -169,6 +113,31 @@ public class UsuarioController {
         }
     }
 
+    @Operation(summary = "Crea un nuevo usuario")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Usuario creado", content = @Content(schema = @Schema(implementation = Usuario.class))),
+            @ApiResponse(responseCode = "404", description = "Rol no encontrado", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Error de consistencia de datos", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor", content = @Content)
+    })
+    @PostMapping("/validatePassword")
+    @PreAuthorize("hasRole('Cliente')")
+    public ResponseEntity<Boolean> validatePassword(@RequestBody Usuario usuario) {
+        try {
+            if (usuario == null || usuario.getIdUsuario() == null || usuario.getPassword() == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            Boolean validatedPasswrord = usuarioService.validatePassword(usuario);
+            return new ResponseEntity<>(validatedPasswrord, HttpStatus.OK);
+        } catch (UsuarioNotFoundException e) {
+            System.out.println(RED + e.getMessage() + RESET);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            System.err.println("Error inesperado: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     // Actualizar un usuario existente
     @Operation(summary = "Actualiza un usuario existente")
@@ -177,7 +146,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
     })
     @PutMapping("/update/{id}")
-    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor') or hasRole('Cliente')")
     public ResponseEntity<Usuario> updateUsuario(@PathVariable Long id, @RequestBody Usuario usuarioDetails) {
         try {
             Usuario usuarioActualizado = usuarioService.updateUsuario(id, usuarioDetails);

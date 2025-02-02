@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 
 /**
  * Clase que representa la relación entre un usuario y un rol.
+ *
  * @Author VilaExplorerAdmin
  * @Version 1.0
  */

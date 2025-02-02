@@ -1,11 +1,14 @@
 package app.VilaExplorer.controller;
 
+import app.VilaExplorer.domain.FiestaTradicion;
+import app.VilaExplorer.domain.LugarInteres;
+import app.VilaExplorer.domain.Plato;
 import app.VilaExplorer.domain.Puntuacion;
 import app.VilaExplorer.enums.TipoEntidad;
 import app.VilaExplorer.exception.FiestaTradicionNotFound;
 import app.VilaExplorer.exception.LugarInteresNotFoundException;
 import app.VilaExplorer.exception.PlatoNotFoundException;
-import app.VilaExplorer.service.PuntuacionService;
+import app.VilaExplorer.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,6 +36,12 @@ public class PuntuacionController {
 
     @Autowired
     private PuntuacionService puntuacionService;
+    @Autowired
+    private LugarInteresService lugarInteresService;
+    @Autowired
+    private FiestaTradicionService fiestaTradicionService;
+    @Autowired
+    private PlatoService platoService;
 
     //-----GET----- OBTENER PUNTUACIONES
 
@@ -135,9 +144,20 @@ public class PuntuacionController {
     })
     @PostMapping("/crear")
     @PreAuthorize("hasRole('Cliente')")
-    public ResponseEntity<Puntuacion> createPuntuacion(@RequestBody Puntuacion puntuacion) {
+    public ResponseEntity<?> createPuntuacion(@RequestBody Puntuacion puntuacion) {
         try {
             Puntuacion nuevaPuntuacion = puntuacionService.createPuntuacion(puntuacion);
+
+             if (TipoEntidad.LUGAR_INTERES == nuevaPuntuacion.getTipoEntidad()){
+            LugarInteres lugarInteres = lugarInteresService.findById(nuevaPuntuacion.getIdEntidad());
+            return ResponseEntity.ok(lugarInteres);
+        } else if(TipoEntidad.FIESTA_TRADICION == nuevaPuntuacion.getTipoEntidad()){
+            FiestaTradicion fiestaTradicion = fiestaTradicionService.findById(nuevaPuntuacion.getIdEntidad());
+            return ResponseEntity.ok(fiestaTradicion);
+        } else if(TipoEntidad.PLATO == nuevaPuntuacion.getTipoEntidad()){
+            Plato plato = platoService.findById(nuevaPuntuacion.getIdEntidad());
+            ResponseEntity.ok(plato);
+        }
             return new ResponseEntity<>(nuevaPuntuacion, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -160,13 +180,24 @@ public class PuntuacionController {
     })
     @PutMapping("/actualizar")
     @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
-    public ResponseEntity<Puntuacion> actualizarPuntuacion(
+    public ResponseEntity<?> actualizarPuntuacion(
             @RequestParam Long idUsuario,
             @RequestParam Long idEntidad,
             @RequestParam TipoEntidad tipoEntidad,
             @RequestParam Integer nuevaPuntuacion) throws PlatoNotFoundException, FiestaTradicionNotFound, LugarInteresNotFoundException {
 
         Puntuacion puntuacionActualizada = puntuacionService.updatePuntuacion(idUsuario, idEntidad, tipoEntidad, nuevaPuntuacion);
+        //NECESITO QUE ME DEVUELVA EL OBJETO DE LA ENTIDAD A LA QUE SE HA PUNTUADO PARA ACTUALIZAR LA INTERFAZ
+        if (TipoEntidad.LUGAR_INTERES == tipoEntidad){
+            LugarInteres lugarInteres = lugarInteresService.findById(idEntidad);
+            return ResponseEntity.ok(lugarInteres);
+        } else if(TipoEntidad.FIESTA_TRADICION == tipoEntidad){
+            FiestaTradicion fiestaTradicion = fiestaTradicionService.findById(idEntidad);
+            return ResponseEntity.ok(fiestaTradicion);
+        } else if(TipoEntidad.PLATO == tipoEntidad){
+            Plato plato = platoService.findById(idEntidad);
+            ResponseEntity.ok(plato);
+        }
         return ResponseEntity.ok(puntuacionActualizada);
     }
     //------------------------------------------------------------------------------------------------

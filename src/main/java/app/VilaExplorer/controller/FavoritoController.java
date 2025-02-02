@@ -2,10 +2,15 @@ package app.VilaExplorer.controller;
 
 
 import app.VilaExplorer.domain.Favorito;
+import app.VilaExplorer.domain.FiestaTradicion;
+import app.VilaExplorer.domain.LugarInteres;
+import app.VilaExplorer.domain.Plato;
 import app.VilaExplorer.enums.TipoEntidad;
-import app.VilaExplorer.exception.CategoriaPlatoNotFoundException;
 import app.VilaExplorer.exception.FavoritoNotFoundException;
 import app.VilaExplorer.service.FavoritoService;
+import app.VilaExplorer.service.FiestaTradicionService;
+import app.VilaExplorer.service.LugarInteresService;
+import app.VilaExplorer.service.PlatoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static app.VilaExplorer.controller.Response.NOT_FOUND;
@@ -37,12 +43,16 @@ public class FavoritoController {
     @Autowired
     private FavoritoService favoritoService;
 
+    @Autowired
+    private LugarInteresService lugarInteresService;
+    @Autowired
+    private FiestaTradicionService fiestaTradicionService;
+    @Autowired
+    private PlatoService platoService;
+
 
     @Operation(summary = "Obtener un favorito por su id")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Favorito encontrado", content = @Content(schema = @Schema(implementation = Favorito.class))),
-            @ApiResponse(responseCode = "404", description = "Favorito no encontrado", content = @Content)
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Favorito encontrado", content = @Content(schema = @Schema(implementation = Favorito.class))), @ApiResponse(responseCode = "404", description = "Favorito no encontrado", content = @Content)})
     @GetMapping("/detalle/{id}")
     @PreAuthorize("hasRole('Cliente') or hasRole('Administrador')")
     public ResponseEntity<Favorito> getFavoritoById(@PathVariable Long id) {
@@ -57,9 +67,7 @@ public class FavoritoController {
 
 
     @Operation(summary = "Obtener todos los favoritos")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Favoritos encontrados", content = @Content(schema = @Schema(implementation = Favorito.class)))
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Favoritos encontrados", content = @Content(schema = @Schema(implementation = Favorito.class)))})
     @GetMapping("/todos")
     @PreAuthorize("hasRole('Administrador')")
     public List<Favorito> getAllFavoritos() {
@@ -68,20 +76,35 @@ public class FavoritoController {
 
 
     @Operation(summary = "Obtener favoritos por usuario")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Favoritos encontrados", content = @Content(schema = @Schema(implementation = Favorito.class)))
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Favoritos encontrados", content = @Content(schema = @Schema(implementation = Favorito.class)))})
     @GetMapping("/usuario/{idUsuario}")
     @PreAuthorize("hasRole('Cliente') or hasRole('Administrador')")
-    public List<Favorito> getFavoritosByUsuario(@PathVariable Long idUsuario) {
-        return favoritoService.findByUsuario_IdUsuario(idUsuario);
+    public ResponseEntity<List<Object>> getFavoritosByUsuario(@PathVariable Long idUsuario) {
+        List<Favorito> favoritosDelUsuario = favoritoService.findByUsuario_IdUsuario(idUsuario);
+        List<Object> favortios = new ArrayList<>();
+        try {
+            for (Favorito favorito : favoritosDelUsuario) {
+                if (TipoEntidad.FIESTA_TRADICION == favorito.getTipoEntidad()) {
+                    FiestaTradicion fiestaFavoritaUsuario = fiestaTradicionService.findById(favorito.getIdEntidad());
+                    favortios.add(fiestaFavoritaUsuario);
+                } else if (TipoEntidad.PLATO == favorito.getTipoEntidad()) {
+                    Plato platoFavoritoUsuario = platoService.findById(favorito.getIdEntidad());
+                    favortios.add(platoFavoritoUsuario);
+                } else if (TipoEntidad.LUGAR_INTERES == favorito.getTipoEntidad()) {
+                    LugarInteres lugarInteresFavoritoUsuario = lugarInteresService.findById(favorito.getIdEntidad());
+                    favortios.add(lugarInteresFavoritoUsuario);
+                }
+            }
+            return new ResponseEntity<>(favortios, HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
     @Operation(summary = "Obtener favoritos por usuario y tipo de entidad")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Favoritos encontrados", content = @Content(schema = @Schema(implementation = Favorito.class)))
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Favoritos encontrados", content = @Content(schema = @Schema(implementation = Favorito.class)))})
     @GetMapping("/usuario/{idUsuario}/tipo/{tipoEntidad}")
     @PreAuthorize("hasRole('Cliente') or hasRole('Administrador')")
     public List<Favorito> getFavoritosByUsuarioAndTipoEntidad(@PathVariable Long idUsuario, @PathVariable TipoEntidad tipoEntidad) {
@@ -90,9 +113,7 @@ public class FavoritoController {
 
 
     @Operation(summary = "Crear un favorito")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Favorito creado", content = @Content(schema = @Schema(implementation = Favorito.class)))
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Favorito creado", content = @Content(schema = @Schema(implementation = Favorito.class)))})
     @PostMapping("/crear")
     @PreAuthorize("hasRole('Cliente') or hasRole('Administrador')")
     public Favorito createFavorito(@RequestBody Favorito favorito) {
@@ -101,10 +122,7 @@ public class FavoritoController {
 
 
     @Operation(summary = "Modificar un favorito")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Favorito modificado", content = @Content(schema = @Schema(implementation = Favorito.class))),
-            @ApiResponse(responseCode = "404", description = "Favorito no encontrado", content = @Content)
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Favorito modificado", content = @Content(schema = @Schema(implementation = Favorito.class))), @ApiResponse(responseCode = "404", description = "Favorito no encontrado", content = @Content)})
     @PutMapping("/modificar/{id}")
     @PreAuthorize("hasRole('Cliente') or hasRole('Administrador')")
     public ResponseEntity<Favorito> updateFavorito(@PathVariable Long id, @RequestBody Favorito favorito) {
@@ -119,10 +137,7 @@ public class FavoritoController {
 
 
     @Operation(summary = "Eliminar un favorito por su id")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Favorito eliminado", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Favorito no encontrado", content = @Content)
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Favorito eliminado", content = @Content), @ApiResponse(responseCode = "404", description = "Favorito no encontrado", content = @Content)})
     @DeleteMapping("/eliminar/{id}")
     @PreAuthorize("hasRole('Cliente') or hasRole('Administrador')")
     public ResponseEntity<Response> deleteFavorito(@PathVariable Long id) {
@@ -138,8 +153,7 @@ public class FavoritoController {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Response> handleException(FavoritoNotFoundException fnfe) {
-        Response response = Response.errorResponse(NOT_FOUND,
-                fnfe.getMessage());
+        Response response = Response.errorResponse(NOT_FOUND, fnfe.getMessage());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }

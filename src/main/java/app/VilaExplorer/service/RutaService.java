@@ -28,4 +28,9 @@ public interface RutaService {
     // Mtodo opcional para obtener solo las rutas activas
     List<Ruta> findAllActivas();
 
+    //metodo para actualizar rutas que no son predefinidas
+    Ruta updateRutaNoPredefinida(Long id, Ruta rutaDetails) throws RutaNotFoundException;
+
+    //  Obtener rutas del usuario + predefinidas
+    List<Ruta> findRutasForUser(Long autorId);
 }

@@ -93,4 +93,40 @@ RutaServiceImpl implements RutaService {
         return rutaRepository.save(ruta);
     }
 
+    // NUEVO MTODO para actualizar rutas que no son predefinidas
+    @Override
+    public Ruta updateRutaNoPredefinida(Long id, Ruta rutaDetails) throws RutaNotFoundException {
+        // 1. Verificar si la ruta existe
+        Ruta rutaFromDB = rutaRepository.findByIdAndPredefinidaFalse(id)
+                .orElseThrow(() -> new RutaNotFoundException("No se encontró la ruta (O es predifinida), con ID: " + id));
+
+        // 2. Actualizar los atributos que se desee
+        rutaFromDB.setNombreRuta(rutaDetails.getNombreRuta());
+        rutaFromDB.setAutor(rutaDetails.getAutor());
+        // Aquí  se podria actualizar cualquier otro campo de ruta que se tenga
+
+        // 3. Manejar la lógica de coordenadas
+        //    (Vaciar las que existen y reemplazarlas por las nuevas que lleguen)
+        rutaFromDB.getCoordenadas().clear();
+        rutaFromDB.getCoordenadas().addAll(rutaDetails.getCoordenadas());
+        // Asignar la ruta a cada coordenada para la relación bidireccional
+        rutaDetails.getCoordenadas().forEach(coordenada -> coordenada.setRuta(rutaFromDB));
+
+        // 4. Guardar y devolver
+        return rutaRepository.save(rutaFromDB);
+    }
+
+    // NUEVO MTODO para obtener rutas del usuario + predefinidas
+    @Override
+    public List<Ruta> findRutasForUser(Long autorId) {
+        // Rutas creadas por el usuario
+        List<Ruta> rutasUsuario = rutaRepository.findByAutor_IdUsuario(autorId);
+        // Rutas predefinidas disponibles para todos
+        List<Ruta> rutasPredefinidas = rutaRepository.findByPredefinidaTrue();
+        // Unir ambas listas
+        rutasUsuario.addAll(rutasPredefinidas);
+        return rutasUsuario;
+    }
+
+
 }

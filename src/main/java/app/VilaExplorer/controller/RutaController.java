@@ -247,4 +247,32 @@ public class RutaController {
         }
     }
 
+
+    // =========== ACTUALIZAR RUTA NO PREDEFINIDA PARA USUARIOS DE TIPO CLIENTE============
+
+    @PutMapping("/modificar-no-predefinida/{id}")
+    @Operation(summary = "Un usuario cliente Modifica una ruta no predefinida por su ID")
+    public ResponseEntity<Ruta> updateRutaNoPredefinida(@PathVariable Long id, @RequestBody Ruta rutaDetails) {
+        try {
+            Ruta updatedRuta = rutaService.updateRutaNoPredefinida(id, rutaDetails);
+            return ResponseEntity.ok(updatedRuta);
+        } catch (RutaNotFoundException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * NUEVO ENDPOINT: Permite a un usuario (Cliente) ver sus rutas junto con las predefinidas.
+     */
+    @GetMapping("/mis-rutas/{autorId}")
+    @PreAuthorize("hasRole('Cliente')")
+    @Operation(summary = "Obtiene las rutas creadas por el usuario junto con las predefinidas")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Rutas encontradas", content = @Content(schema = @Schema(implementation = Ruta.class)))
+    })
+    public ResponseEntity<List<Ruta>> getRutasForUser(@PathVariable Long autorId) {
+        List<Ruta> rutas = rutaService.findRutasForUser(autorId);
+        return ResponseEntity.ok(rutas);
+    }
+
 }

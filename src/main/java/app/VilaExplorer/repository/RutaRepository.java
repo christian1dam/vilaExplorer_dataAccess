@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RutaRepository extends JpaRepository<Ruta, Long> {
@@ -14,4 +15,10 @@ public interface RutaRepository extends JpaRepository<Ruta, Long> {
 
     // Encuentra rutas activas
     List<Ruta> findAllByActivoTrue();
+
+    // Metodo para obtener ruts que no sean predefinidas
+    Optional<Ruta> findByIdAndPredefinidaFalse(Long id);
+
+    // Metodo para obtener rutas que sean predefinidas
+    List<Ruta> findByPredefinidaTrue();
 }

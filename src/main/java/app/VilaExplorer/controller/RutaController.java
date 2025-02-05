@@ -7,6 +7,7 @@ import app.VilaExplorer.exception.RutaNotFoundException;
 import app.VilaExplorer.service.RutaService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -88,6 +89,7 @@ public class RutaController {
             @ApiResponse(responseCode = "200", description = "Ruta creada", content = @Content(schema = @Schema(implementation = Ruta.class))),
             @ApiResponse(responseCode = "400", description = "Datos proporcionados invalidos", content = @Content)
     })
+//    SE HACE LA PETICION A OPENROUTESERVICE Y REBOTA AL USUARIO -> NO SE ALMACENA EN NUESTRA BD POR EL MOMENTO
     @GetMapping("/generarRuta")
     @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<?> generarRuta(
@@ -112,7 +114,9 @@ public class RutaController {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(response.body());
 
+
             List<Double> bbox = new ArrayList<>();
+
             if (jsonNode.has("bbox")) {
                 for (JsonNode value : jsonNode.get("bbox")) {
                     bbox.add(value.asDouble());
@@ -121,6 +125,7 @@ public class RutaController {
 
             double distancia = 0;
             double duracion = 0;
+
             if (jsonNode.get("features").get(0).get("properties").has("segments")) {
                 JsonNode segment = jsonNode.get("features").get(0).get("properties").get("segments").get(0);
                 distancia = segment.get("distance").asDouble();
@@ -148,7 +153,78 @@ public class RutaController {
             nuevaRuta.setBbox(bbox);
             nuevaRuta.setActivo(true);
 
-            return ResponseEntity.ok(nuevaRuta);
+            return ResponseEntity.ok(jsonNode);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(500).body("Error al procesar la ruta");
+        }
+    }
+
+    @Operation(summary = "Crea una ruta pasándo las coordenadas de origen y fin")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ruta creada", content = @Content(schema = @Schema(implementation = Ruta.class))),
+            @ApiResponse(responseCode = "400", description = "Datos proporcionados invalidos", content = @Content)
+    })
+//    SE HACE LA PETICION A OPENROUTESERVICE Y GUARDA EN LA BD
+    @PostMapping("/createRoute")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
+    public ResponseEntity<?> createRoute(@RequestParam("profile") String profile, List<JsonNode> coordenadas) {
+        try {
+
+            String openRouteUrl = String.format(
+                    Locale.US,
+                    "https://api.openrouteservice.org/v2/directions/%s/geojson",
+                    profile
+            );
+
+
+            ApiClient apiClient = new ApiClient();
+            HttpResponse<String> response = apiClient.postRequest(openRouteUrl, coordenadas.toString(), "5b3ce3597851110001cf62485d469bd2cba74cc7bbf095ac9c66e654");
+            System.out.println("RESPONSE BODY: "+ response.body());
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(response.body());
+
+
+            List<Double> bbox = new ArrayList<>();
+
+            if (jsonNode.has("bbox")) {
+                for (JsonNode value : jsonNode.get("bbox")) {
+                    bbox.add(value.asDouble());
+                }
+            }
+
+            double distancia = 0;
+            double duracion = 0;
+
+            if (jsonNode.get("features").get(0).get("properties").has("segments")) {
+                JsonNode segment = jsonNode.get("features").get(0).get("properties").get("segments").get(0);
+                distancia = segment.get("distance").asDouble();
+                duracion = segment.get("duration").asDouble();
+            }
+
+            List<Coordenadas> coordenadasRuta = new ArrayList<>();
+            if (jsonNode.get("features").get(0).get("geometry").has("coordinates")) {
+                JsonNode coordinatesNode = jsonNode.get("features").get(0).get("geometry").get("coordinates");
+                for (JsonNode coord : coordinatesNode) {
+                    double longitud = coord.get(0).asDouble();
+                    double latitud = coord.get(1).asDouble();
+                    Coordenadas nuevaCoordenada = new Coordenadas();
+                    nuevaCoordenada.setLatitud(latitud);
+                    nuevaCoordenada.setLongitud(longitud);
+                    coordenadasRuta.add(nuevaCoordenada);
+                }
+            }
+
+            Ruta nuevaRuta = new Ruta();
+            nuevaRuta.setNombreRuta("Ruta generada automáticamente");
+            nuevaRuta.setCoordenadas(coordenadasRuta);
+            nuevaRuta.setDistancia(distancia);
+            nuevaRuta.setDuracion(duracion);
+            nuevaRuta.setBbox(bbox);
+            nuevaRuta.setActivo(true);
+
+            return ResponseEntity.ok(jsonNode);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(500).body("Error al procesar la ruta");

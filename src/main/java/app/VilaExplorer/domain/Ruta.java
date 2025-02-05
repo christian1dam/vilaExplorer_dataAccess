@@ -49,11 +49,11 @@ public class Ruta {
     @Schema(description = "Indica si la ruta está activa")
     private Boolean activo = true;
 
-    @Column(name = "distancia", nullable = true)
+    @Column(name = "distancia")
     @Schema(description = "Distancia total de la ruta", example = "10.5")
     private Double distancia;
 
-    @Column(name = "duracion", nullable = true)
+    @Column(name = "duracion")
     @Schema(description = "Duración total de la ruta en horas", example = "2.5")
     private Double duracion;
 

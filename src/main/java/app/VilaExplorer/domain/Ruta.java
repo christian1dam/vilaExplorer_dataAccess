@@ -50,15 +50,15 @@ public class Ruta {
     private Boolean activo = true;
 
     @Column(name = "distancia", nullable = true)
-    @Schema(description = "Distancia total de la ruta", example = "10.5", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Distancia total de la ruta", example = "10.5")
     private Double distancia;
 
     @Column(name = "duracion", nullable = true)
-    @Schema(description = "Duración total de la ruta en horas", example = "2.5", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Duración total de la ruta en horas", example = "2.5")
     private Double duracion;
 
     @Column(name = "predefinida", nullable = false)
-    @Schema(description = "Indica si la ruta es predefinida por los administradores", example = "false", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Indica si la ruta es predefinida por los administradores", example = "false")
     private Boolean predefinida = false;
 
     @ElementCollection

@@ -33,4 +33,9 @@ public interface RutaService {
 
     //  Obtener rutas del usuario + predefinidas
     List<Ruta> findRutasForUser(Long autorId);
+
+    // Obtener todas las rutas inactivas
+    List<Ruta> findAllInactivas();
+
+
 }

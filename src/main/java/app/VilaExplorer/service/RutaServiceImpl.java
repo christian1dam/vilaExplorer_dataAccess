@@ -127,5 +127,12 @@ RutaServiceImpl implements RutaService {
         return rutasUsuario;
     }
 
+    // NUEVO MTODO para obtener todas las rutas inactivas
+    @Override
+    public List<Ruta> findAllInactivas() {
+        return rutaRepository.findAllByActivoFalse();
+    }
+
+
 
 }

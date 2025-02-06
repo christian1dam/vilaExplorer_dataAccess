@@ -22,5 +22,9 @@ public interface RutaRepository extends JpaRepository<Ruta, Long> {
     // Metodo para obtener rutas que sean predefinidas
     List<Ruta> findByPredefinidaTrue();
 
+    // Encuentra todas las rutas inactivas
+    List<Ruta> findAllByActivoFalse();
+
+
 
 }

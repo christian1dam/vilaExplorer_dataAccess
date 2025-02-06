@@ -50,6 +50,7 @@ public class RutaController {
     }
 
 
+    // =========== GET TODAS LAS RUTAS =============
     @Operation(summary = "Obtiene todas las rutas")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Listado de rutas", content = @Content(schema = @Schema(implementation = Ruta.class)))
@@ -58,6 +59,28 @@ public class RutaController {
     @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public List<Ruta> getAllRutas() {
         return rutaService.findAll();
+    }
+
+    // =========== GET RUTAS ACTIVAS =============
+    @GetMapping("/activos")
+    @Operation(summary = "Obtiene todas las rutas activas")
+    public ResponseEntity<List<Ruta>> getAllRutasActivas() {
+        List<Ruta> rutasActivas = rutaService.findAllActivas();
+        if (rutasActivas.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(rutasActivas);
+    }
+
+    // =========== GET RUTAS INACTIVAS =============
+    @Operation(summary = "Obtiene todas las rutas inactivas")
+    @GetMapping("/inactivas")
+    public ResponseEntity<List<Ruta>> getAllRutasInactivas() {
+        List<Ruta> rutasInactivas = rutaService.findAllInactivas();
+        if (rutasInactivas.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(rutasInactivas);
     }
 
 
@@ -199,16 +222,7 @@ public class RutaController {
     }
 
 
-    // =========== GET RUTAS ACTIVAS =============
-    @GetMapping("/activos")
-    @Operation(summary = "Obtiene todas las rutas activas")
-    public ResponseEntity<List<Ruta>> getAllRutasActivas() {
-        List<Ruta> rutasActivas = rutaService.findAllActivas();
-        if (rutasActivas.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(rutasActivas);
-    }
+
 
     // =========== DESACTIVAR (Borrado lógico) =============
     @PutMapping("/desactivar/{id}")

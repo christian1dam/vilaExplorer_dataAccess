@@ -21,11 +21,23 @@ public class ApiClient {
          return  httpClient.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    public HttpResponse<String> postRequest(String endpoint, String jsonBody) throws Exception {
+        public HttpResponse<String> getRequest(String endpoint, String authorization) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI(endpoint))
+                .GET()
+                .header("Content-Type", "application/json")
+                .header("Authorization", authorization)
+                .build();
+
+         return  httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public HttpResponse<String> postRequest(String endpoint, String jsonBody, String authorization) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(endpoint))
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .header("Content-Type", "application/json")
+                .header("Authorizartion", authorization)
                 .build();
 
          return httpClient.send(request, HttpResponse.BodyHandlers.ofString());

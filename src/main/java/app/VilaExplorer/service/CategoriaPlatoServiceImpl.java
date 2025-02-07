@@ -34,6 +34,12 @@ public class CategoriaPlatoServiceImpl implements CategoriaPlatoService {
     }
 
     @Override
+    public List<CategoriaPlato> findAllInactivas() {
+        return categoriaPlatoRepository.findByActivoFalse();
+    }
+
+
+    @Override
     public CategoriaPlato crearCategoriaPlato(CategoriaPlato categoriaPlato) throws DataIntegrityViolationException {
         if(categoriaPlatoRepository.findById(categoriaPlato.getIdCategoriaPlato()).isPresent()){
             throw new DataIntegrityViolationException("Este rol ya existe en la base de datos");

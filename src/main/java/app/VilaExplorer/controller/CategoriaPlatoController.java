@@ -76,6 +76,21 @@ public class CategoriaPlatoController {
         return categoriaPlatoService.findAllActivos();
     }
 
+    //Obtener todas las categorías de plato inactivas
+    @Operation(summary = "Obtiene todas las categorías de platos inactivas")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listado de categorías inactivas"),
+            @ApiResponse(responseCode = "204", description = "No hay categorías inactivas")
+    })
+    @GetMapping("/inactivas")
+    public ResponseEntity<List<CategoriaPlato>> getAllCategoriasInactivas() {
+        List<CategoriaPlato> categoriasInactivas = categoriaPlatoService.findAllInactivas();
+        if (categoriasInactivas.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(categoriasInactivas);
+    }
+
 
     //Crear una nueva categoría de plato
     @Operation(summary = "Crea una nueva categoría de plato")

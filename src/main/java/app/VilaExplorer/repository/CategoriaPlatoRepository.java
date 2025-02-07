@@ -11,4 +11,7 @@ import java.util.List;
 public interface CategoriaPlatoRepository extends JpaRepository<CategoriaPlato, Long> {
     // Metodo para  buscar todas las categorías activas
     List<CategoriaPlato> findByActivoTrue();
+
+    //metodo para buscar las categorias inactivas
+    List<CategoriaPlato> findByActivoFalse();
 }

@@ -64,6 +64,22 @@ public class TipoPlatoController {
         }
     }
 
+    // Obtener todos los tipos de plato inactivos
+    @Operation(summary = "Obtiene todos los tipos de plato inactivos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Tipos de plato inactivos encontrados"),
+            @ApiResponse(responseCode = "204", description = "No hay tipos de plato inactivos")
+    })
+    @GetMapping("/inactivos")
+    public ResponseEntity<List<TipoPlato>> getAllTiposPlatoInactivos() {
+        try {
+            List<TipoPlato> tiposPlatoInactivos = tipoPlatoService.findAllInactivos();
+            return ResponseEntity.ok(tiposPlatoInactivos);
+        } catch (TipoPlatoNotFoundException e) {
+            return ResponseEntity.noContent().build();
+        }
+    }
+
 
     // Obtener un tipo de plato por ID
     @Operation(summary = "Obtiene un tipo de plato por su ID")

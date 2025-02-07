@@ -23,5 +23,9 @@ public interface TipoPlatoService {
     // Obtener todos los tipos de plato activos por ID de categoría
     List<TipoPlato> findByCategoriaId(Long categoriaId);
 
+    // Obtener todos los tipos de plato inactivos
+    List<TipoPlato> findAllInactivos() throws TipoPlatoNotFoundException;
+
+    // Activar o desactivar un tipo de plato
     TipoPlato activarTipoPlato(Long id, String activo) throws TipoPlatoNotFoundException, IllegalArgumentException;
 }

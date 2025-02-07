@@ -40,6 +40,15 @@ public class TipoPlatoServiceimpl implements TipoPlatoService {
     }
 
     @Override
+    public List<TipoPlato> findAllInactivos() throws TipoPlatoNotFoundException {
+        List<TipoPlato> inactivos = tipoPlatoRepository.findByActivoFalse();
+        if (inactivos.isEmpty()) {
+            throw new TipoPlatoNotFoundException("No hay tipos de plato inactivos");
+        }
+        return inactivos;
+    }
+
+    @Override
     public TipoPlato save(TipoPlato tipoPlato) {
         return tipoPlatoRepository.save(tipoPlato);
     }

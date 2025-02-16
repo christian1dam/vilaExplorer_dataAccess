@@ -44,9 +44,7 @@ public interface PlatoService {
     //metodo para encontrar platos no aprobados y no eliminados
     List<Plato> findNoAprobadosNoEliminados();
 
-
-
-
-
+    //Metodo para contar los platos
+    long countAllPlatos();
 
 }

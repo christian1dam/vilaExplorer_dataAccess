@@ -239,6 +239,23 @@ public class PlatoController {
         }
     }
 
+    //-----CONTAR EL NUMERO DE RECETAS
+    @Operation(summary = "Devuelve el número total de platos (tanto aprobados como no aprobados, eliminados o no)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Cuenta obtenida con éxito",
+                    content = @Content(schema = @Schema(implementation = Long.class)))
+    })
+    @GetMapping("/count")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
+    public ResponseEntity<Map<String, Long>> getCountPlatos() {
+        long total = platoService.countAllPlatos();
+        Map<String, Long> respuesta = new HashMap<>();
+        respuesta.put("totalPlatos", total);
+        return ResponseEntity.ok(respuesta);
+    }
+
+
 
     // Manejo de excepciones
     @ExceptionHandler(PlatoNotFoundException.class)

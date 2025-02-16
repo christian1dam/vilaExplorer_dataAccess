@@ -29,4 +29,6 @@ public interface UsuarioService {
     Usuario findUser(String email, String password) throws UsuarioNotFoundException;
 
     Boolean validatePassword(Usuario usuario) throws UsuarioNotFoundException;
+
+    long countAllUsuarios();
 }

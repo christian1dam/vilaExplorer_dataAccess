@@ -29,5 +29,9 @@ public interface LugarInteresService {
     LugarInteres activarLugarInteres(Long id) throws LugarInteresNotFoundException;
 
     List<LugarInteres> searchByKeyword(String keyword);
+
+    //metodo para contar el total de lugares de interes
+    long countAllLugaresInteres();
+
 }
 

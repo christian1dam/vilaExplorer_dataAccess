@@ -200,6 +200,7 @@ public class LugarInteresController {
 
     @Operation(summary = "Buscar lugar de interés por palabra clave")
     @ApiResponses(value = {
+
             @ApiResponse(responseCode = "200", description = "Lugares de interés encontrados", content = @Content(schema = @Schema(implementation = FiestaTradicion.class))),
             @ApiResponse(responseCode = "204", description = "No se encontraron lugares de interés", content = @Content)
     })
@@ -212,7 +213,19 @@ public class LugarInteresController {
         return new ResponseEntity<>(results, HttpStatus.OK);
     }
 
+    //Metodo para contar el total de lugares de interes
+    @Operation(summary = "Obtiene el total de lugares de interes")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Total de lugares de interes", content = @Content(schema = @Schema(implementation = Long.class)))
+    })
+    @GetMapping("/total")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
+    public ResponseEntity<Long> countAllLugaresInteres() {
+        long total = lugarInteresService.countAllLugaresInteres();
+        return new ResponseEntity<>(total, HttpStatus.OK);
+    }
 
+    //------------------------------------EXCEPTION HANDLERS------------------------------------
     @ExceptionHandler({LugarInteresNotFoundException.class})
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)

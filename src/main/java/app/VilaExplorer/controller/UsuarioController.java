@@ -16,7 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static app.VilaExplorer.controller.Response.NOT_FOUND;
 
@@ -216,6 +218,23 @@ public class UsuarioController {
         }
     }
 
+    // metodo para obtener el total de usuarios
+    @Operation(summary = "Obtiene el total de usuarios")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Total de usuarios", content = @Content(schema = @Schema(implementation = Long.class)))
+    })
+    @GetMapping("/total")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor')")
+    public ResponseEntity<Map<String, Long>> countAllUsuarios() {
+        long total = usuarioService.countAllUsuarios();
+        Map<String, Long> respuesta = new HashMap<>();
+        respuesta.put("totalUsuarios", total);
+        return ResponseEntity.ok(respuesta);
+    }
+
+
+
+    // Manejo de excepciones
     @ExceptionHandler(UsuarioNotFoundException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)

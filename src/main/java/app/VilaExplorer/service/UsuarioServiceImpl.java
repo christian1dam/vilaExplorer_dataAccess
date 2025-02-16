@@ -170,4 +170,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         return usuarioRepository.save(usuarioGuardado);
     }
+
+    @Override
+    public long countAllUsuarios() {
+        return usuarioRepository.count();
+    }
 }

@@ -181,9 +181,11 @@ public class PlatoServiceImpl implements PlatoService {
         return platoRepository.findByEstadoFalseAndEliminadoFalse();
     }
 
-
-
-
+    //Implmentacion para contar el total de platos
+    @Override
+    public long countAllPlatos() {
+        return platoRepository.count();
+    }
 
 
 }

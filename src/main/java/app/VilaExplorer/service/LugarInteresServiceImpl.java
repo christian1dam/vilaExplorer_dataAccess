@@ -138,4 +138,9 @@ public class LugarInteresServiceImpl implements LugarInteresService {
         return lugarInteresRepository.findByNombreLugarContainingIgnoreCaseAndActivoTrue(keyword);
     }
 
+    @Override
+     public long countAllLugaresInteres() {
+        return lugarInteresRepository.count();
+    }
+
 }

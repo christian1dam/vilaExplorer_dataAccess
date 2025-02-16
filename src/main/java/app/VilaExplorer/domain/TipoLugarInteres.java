@@ -3,9 +3,7 @@ package app.VilaExplorer.domain;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * Clase que representa un tipo de lugar de interés turístico.
@@ -13,7 +11,9 @@ import lombok.NoArgsConstructor;
  * @version 1.0
  */
 @Entity
-@Data
+@ToString
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "tipo_lugar_interes")

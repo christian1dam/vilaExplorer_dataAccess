@@ -133,4 +133,9 @@ public class LugarInteresServiceImpl implements LugarInteresService {
         return lugarInteresRepository.save(lugarInteres); // Guardar los cambios
     }
 
+    @Override
+    public List<LugarInteres> searchByKeyword(String keyword) {
+        return lugarInteresRepository.findByNombreLugarContainingIgnoreCaseAndActivoTrue(keyword);
+    }
+
 }

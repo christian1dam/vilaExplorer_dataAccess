@@ -1,5 +1,6 @@
 package app.VilaExplorer.controller;
 
+import app.VilaExplorer.domain.FiestaTradicion;
 import app.VilaExplorer.domain.LugarInteres;
 import app.VilaExplorer.exception.CoordenadasNotFoundException;
 import app.VilaExplorer.exception.LugarInteresNotActiveException;
@@ -197,7 +198,19 @@ public class LugarInteresController {
         }
     }
 
-
+    @Operation(summary = "Buscar lugar de interés por palabra clave")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lugares de interés encontrados", content = @Content(schema = @Schema(implementation = FiestaTradicion.class))),
+            @ApiResponse(responseCode = "204", description = "No se encontraron lugares de interés", content = @Content)
+    })
+    @GetMapping("/buscar")
+    @PreAuthorize("hasRole('Cliente') or hasRole('Redactor') or hasRole('Administrador')")
+    public ResponseEntity<List<LugarInteres>> searchLugarDeInteres(@RequestParam String keyword) {
+        System.out.println(keyword);
+        List<LugarInteres> results = lugarInteresService.searchByKeyword(keyword);
+        if(results.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(results, HttpStatus.OK);
+    }
 
 
     @ExceptionHandler({LugarInteresNotFoundException.class})

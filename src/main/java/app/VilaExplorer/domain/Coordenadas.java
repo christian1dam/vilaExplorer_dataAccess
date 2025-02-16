@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 
 /**
@@ -16,7 +14,9 @@ import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
  * @version 1.0
  */
 @Entity
-@Data
+@ToString
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "coordenadas")

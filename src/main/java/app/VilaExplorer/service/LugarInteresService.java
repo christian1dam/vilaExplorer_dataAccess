@@ -27,5 +27,7 @@ public interface LugarInteresService {
     void actualizarPuntuacionMediaLugarInteres(Long idLugarInteres);
 
     LugarInteres activarLugarInteres(Long id) throws LugarInteresNotFoundException;
+
+    List<LugarInteres> searchByKeyword(String keyword);
 }
 

@@ -176,7 +176,7 @@ public class FiestaTradicionController {
 
 
     // Eliminar una fiesta tradicional de forma lógica
-    @DeleteMapping("/eliminar/logico/{id}")
+    @PutMapping("/eliminar/logico/{id}")
     @PreAuthorize("hasRole('Redactor') or hasRole('Administrador')")
     public ResponseEntity<Void> deleteFiestaTradicionLogico(@PathVariable Long id) {
         try {

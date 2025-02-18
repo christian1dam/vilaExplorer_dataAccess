@@ -171,9 +171,6 @@ public class RutaController {
             Ruta nuevaRuta = new Ruta();
             nuevaRuta.setNombreRuta("Ruta generada automáticamente");
             nuevaRuta.setCoordenadas(coordenadasRuta);
-            nuevaRuta.setDistancia(distancia);
-            nuevaRuta.setDuracion(duracion);
-            nuevaRuta.setBbox(bbox);
             nuevaRuta.setActivo(true);
 
             return ResponseEntity.ok(jsonNode);
@@ -242,9 +239,6 @@ public class RutaController {
             Ruta nuevaRuta = new Ruta();
             nuevaRuta.setNombreRuta("Ruta generada automáticamente");
             nuevaRuta.setCoordenadas(coordenadasRuta);
-            nuevaRuta.setDistancia(distancia);
-            nuevaRuta.setDuracion(duracion);
-            nuevaRuta.setBbox(bbox);
             nuevaRuta.setActivo(true);
 
             return ResponseEntity.ok(jsonNode);

@@ -49,20 +49,21 @@ public class Ruta {
     @Schema(description = "Indica si la ruta está activa")
     private Boolean activo = true;
 
-    @Column(name = "distancia")
+    @Column(name = "distancia", nullable = false)
     @Schema(description = "Distancia total de la ruta", example = "10.5")
     private Double distancia;
 
-    @Column(name = "duracion")
+    @Column(name = "duracion", nullable = false)
     @Schema(description = "Duración total de la ruta en horas", example = "2.5")
     private Double duracion;
 
     @Column(name = "predefinida", nullable = false)
     @Schema(description = "Indica si la ruta es predefinida por los administradores", example = "false")
-    private Boolean predefinida = false;
+    private Boolean predefinida;
 
     @ElementCollection
-    @Column(name = "bbox")
+    @Column(name = "bbox", nullable = false)
+    @Schema(description = "Bounding box de la ruta")
     private List<Double> bbox;
 
 }

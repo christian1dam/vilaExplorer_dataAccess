@@ -156,14 +156,23 @@ public class FiestaTradicionServiceImpl implements FiestaTradicionService {
     @Transactional
     public FiestaTradicion updateFiestaTradicion(Long id, FiestaTradicion fiestaTradicion) throws FiestaTradicionNotFound {
         if (fiestaTradicionRepository.findById(id).isEmpty()) throw new FiestaTradicionNotFound(NOT_FOUND);
+
         FiestaTradicion fiestaTradicionFromDB = fiestaTradicionRepository.findById(id).get();
         fiestaTradicionFromDB.setIdFiestaTradicion(fiestaTradicion.getIdFiestaTradicion());
         fiestaTradicionFromDB.setNombre(fiestaTradicion.getNombre());
         fiestaTradicionFromDB.setAutor(fiestaTradicion.getAutor());
         fiestaTradicionFromDB.setDescripcion(fiestaTradicion.getDescripcion());
         fiestaTradicionFromDB.setImagen(fiestaTradicion.getImagen());
+
+        // Se agrega la actualización del campo 'fecha'
+        fiestaTradicionFromDB.setFecha(fiestaTradicion.getFecha());
+
+        // Se agrega la actualización del campo 'activo'
+        fiestaTradicionFromDB.setActivo(fiestaTradicion.getActivo());
+
         return fiestaTradicionRepository.save(fiestaTradicionFromDB);
     }
+
 
     // Metodo adicional: Calcular promedio de puntuación de una fiesta o tradición específica
     @Override

@@ -14,7 +14,7 @@ public interface FavoritoService {
 
     Favorito save(Favorito favorito);
 
-    void deleteById(Long id) throws FavoritoNotFoundException;
+    void deleteByIdEntidad(Long idEntidad, Long idUsuario) throws FavoritoNotFoundException;
 
     List<Favorito> findByUsuario_IdUsuario(Long idUsuario);
 

@@ -150,8 +150,8 @@ public class PlatoController {
     @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<?> createPlato(@RequestBody Plato plato) {
         try {
-            platoService.createPlato(plato);
-            return new ResponseEntity<>(plato, HttpStatus.CREATED);
+            Plato platoCreado = platoService.createPlato(plato);
+            return new ResponseEntity<>(platoCreado, HttpStatus.CREATED);
         } catch (RuntimeException e) {
             System.out.println("Error: " + e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -167,12 +167,15 @@ public class PlatoController {
         try {
             plato.setAutor(usuarioService.findById(autorID));
             plato.setTipoPlato(tipoPlatoService.findById(tipoPlatoID));
-            platoService.createPlato(plato);
-            return new ResponseEntity<>(HttpStatus.OK);
+            Plato platoCreado = platoService.createPlato(plato);
+            if(platoCreado != null) {
+                return new ResponseEntity<>(platoCreado, HttpStatus.OK);
+            }
         } catch (DataIntegrityViolationException | UsuarioNotFoundException | TipoPlatoNotFoundException e) {
             System.out.println(e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
 

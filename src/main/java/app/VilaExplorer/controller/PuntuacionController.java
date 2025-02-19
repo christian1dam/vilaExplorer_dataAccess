@@ -8,7 +8,10 @@ import app.VilaExplorer.enums.TipoEntidad;
 import app.VilaExplorer.exception.FiestaTradicionNotFound;
 import app.VilaExplorer.exception.LugarInteresNotFoundException;
 import app.VilaExplorer.exception.PlatoNotFoundException;
-import app.VilaExplorer.service.*;
+import app.VilaExplorer.service.FiestaTradicionService;
+import app.VilaExplorer.service.LugarInteresService;
+import app.VilaExplorer.service.PlatoService;
+import app.VilaExplorer.service.PuntuacionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,8 +27,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 /**
  * Controlador para la API REST de Puntuaciones.
+ *
  * @author VilaExplorerAdmin
  * @version 1.0
  */
@@ -147,17 +152,22 @@ public class PuntuacionController {
     public ResponseEntity<?> createPuntuacion(@RequestBody Puntuacion puntuacion) {
         try {
             Puntuacion nuevaPuntuacion = puntuacionService.createPuntuacion(puntuacion);
-
-             if (TipoEntidad.LUGAR_INTERES == nuevaPuntuacion.getTipoEntidad()){
-            LugarInteres lugarInteres = lugarInteresService.findById(nuevaPuntuacion.getIdEntidad());
-            return ResponseEntity.ok(lugarInteres);
-        } else if(TipoEntidad.FIESTA_TRADICION == nuevaPuntuacion.getTipoEntidad()){
-            FiestaTradicion fiestaTradicion = fiestaTradicionService.findById(nuevaPuntuacion.getIdEntidad());
-            return ResponseEntity.ok(fiestaTradicion);
-        } else if(TipoEntidad.PLATO == nuevaPuntuacion.getTipoEntidad()){
-            Plato plato = platoService.findById(nuevaPuntuacion.getIdEntidad());
-            ResponseEntity.ok(plato);
-        }
+            if (TipoEntidad.LUGAR_INTERES == nuevaPuntuacion.getTipoEntidad()) {
+                LugarInteres lugarInteres = lugarInteresService.findById(nuevaPuntuacion.getIdEntidad());
+                if (lugarInteres != null) {
+                    return ResponseEntity.ok(lugarInteres);
+                }
+            } else if (TipoEntidad.FIESTA_TRADICION == nuevaPuntuacion.getTipoEntidad()) {
+                FiestaTradicion fiestaTradicion = fiestaTradicionService.findById(nuevaPuntuacion.getIdEntidad());
+                if (fiestaTradicion != null) {
+                    return ResponseEntity.ok(fiestaTradicion);
+                }
+            } else if (TipoEntidad.PLATO == nuevaPuntuacion.getTipoEntidad()) {
+                Plato plato = platoService.findById(nuevaPuntuacion.getIdEntidad());
+                if (plato != null) {
+                    return ResponseEntity.ok(plato);
+                }
+            }
             return new ResponseEntity<>(nuevaPuntuacion, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -166,10 +176,11 @@ public class PuntuacionController {
 
 
     /**
-    * Endpoint para actualizar una calificación de una entidad específica por un usuario.
-     * @param idUsuario ID del usuario que actualiza la calificación
-     * @param idEntidad ID de la entidad calificada
-     * @param tipoEntidad Tipo de entidad (PLATO, LUGAR_INTERES, FIESTA_TRADICION)
+     * Endpoint para actualizar una calificación de una entidad específica por un usuario.
+     *
+     * @param idUsuario       ID del usuario que actualiza la calificación
+     * @param idEntidad       ID de la entidad calificada
+     * @param tipoEntidad     Tipo de entidad (PLATO, LUGAR_INTERES, FIESTA_TRADICION)
      * @param nuevaPuntuacion Nueva calificación
      * @return Puntuacion actualizada
      */
@@ -188,18 +199,33 @@ public class PuntuacionController {
 
         Puntuacion puntuacionActualizada = puntuacionService.updatePuntuacion(idUsuario, idEntidad, tipoEntidad, nuevaPuntuacion);
         //NECESITO QUE ME DEVUELVA EL OBJETO DE LA ENTIDAD A LA QUE SE HA PUNTUADO PARA ACTUALIZAR LA INTERFAZ
-        if (TipoEntidad.LUGAR_INTERES == tipoEntidad){
+        if (TipoEntidad.LUGAR_INTERES == puntuacionActualizada.getTipoEntidad()) {
             LugarInteres lugarInteres = lugarInteresService.findById(idEntidad);
             return ResponseEntity.ok(lugarInteres);
-        } else if(TipoEntidad.FIESTA_TRADICION == tipoEntidad){
+        } else if (TipoEntidad.FIESTA_TRADICION == puntuacionActualizada.getTipoEntidad()) {
             FiestaTradicion fiestaTradicion = fiestaTradicionService.findById(idEntidad);
             return ResponseEntity.ok(fiestaTradicion);
-        } else if(TipoEntidad.PLATO == tipoEntidad){
+        } else if (TipoEntidad.PLATO == puntuacionActualizada.getTipoEntidad()) {
             Plato plato = platoService.findById(idEntidad);
-            ResponseEntity.ok(plato);
+            return ResponseEntity.ok(plato);
         }
-        return ResponseEntity.ok(puntuacionActualizada);
+        return ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/existePuntuacion")
+    public ResponseEntity<?> obtenerPuntuacion(
+            @RequestParam Long idUsuario,
+            @RequestParam Long idEntidad,
+            @RequestParam String tipoEntidad) {
+
+        Optional<Puntuacion> puntuacion = puntuacionService.usuarioHaPuntuadoEsteObjeto(idUsuario, idEntidad, tipoEntidad);
+        if (puntuacion.isPresent()) {
+            return ResponseEntity.ok(puntuacion.get ());
+        } else {
+            return ResponseEntity.noContent().build();
+        }
+    }
+
     //------------------------------------------------------------------------------------------------
     //Endopoint para obtener el promedio de calificacion  de una entidad especifica
     @GetMapping("/promedio/plato/{idPlato}")

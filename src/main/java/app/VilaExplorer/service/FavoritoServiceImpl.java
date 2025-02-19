@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FavoritoServiceImpl implements FavoritoService {
@@ -52,13 +53,17 @@ public class FavoritoServiceImpl implements FavoritoService {
     /**
      * Elimina un favorito por su id.
      *
-     * @param id el id del favorito
+     * @param idEntidad el id de la entidad a la que representa el favorito (PLATO, LUGAR INTERES, FIESTA)
+     * @param idUsuario el id de la entidad a la que representa el usuario
      */
     @Override
-    public void deleteById(Long id) throws FavoritoNotFoundException {
-        if (favoritoRepository.findById(id).isEmpty())
-            throw new FavoritoNotFoundException("El ID " + id + " no existe en la base de datos");
-        favoritoRepository.deleteById(id);
+    public void deleteByIdEntidad(Long idEntidad, Long idUsuario) throws FavoritoNotFoundException {
+        Optional<Favorito> favorito = favoritoRepository.findByIdEntidadAndUsuario_IdUsuario(idEntidad, idUsuario);
+        if (favorito.isPresent()) {
+            favoritoRepository.delete(favorito.get());
+        } else {
+            throw new FavoritoNotFoundException("No se encontró el favorito con idEntidad: " + idEntidad + " y idUsuario: " + idUsuario);
+        }
     }
 
     /**

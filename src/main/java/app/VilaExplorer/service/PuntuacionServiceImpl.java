@@ -180,5 +180,9 @@ public class PuntuacionServiceImpl implements PuntuacionService {
         return getPromedioCalificacion(idLugarInteres, TipoEntidad.LUGAR_INTERES);
     }
 
-
+    @Override
+    public Optional<Puntuacion> usuarioHaPuntuadoEsteObjeto(Long idUsuario, Long idEntidad, String tipoEntidad) {
+       TipoEntidad tipo = TipoEntidad.valueOf(tipoEntidad);
+        return puntuacionRepository.findByUsuario_IdUsuarioAndIdEntidadAndTipoEntidad(idUsuario, idEntidad, tipo).stream().findFirst();
+    }
 }

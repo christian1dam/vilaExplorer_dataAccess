@@ -32,5 +32,4 @@ public interface PuntuacionRepository extends JpaRepository<Puntuacion, Long> {
     // Metodo adicional: Contar puntuaciones agrupadas por estrellas para una entidad específica
     @Query("SELECT p.puntuacion, COUNT(p) FROM Puntuacion p WHERE p.idEntidad = :idEntidad AND p.tipoEntidad = :tipoEntidad GROUP BY p.puntuacion")
     List<Object[]> findPuntuacionCountByEntidad(@Param("idEntidad") Long idEntidad, @Param("tipoEntidad") TipoEntidad tipoEntidad);
-
 }

@@ -7,6 +7,9 @@ import app.VilaExplorer.domain.LugarInteres;
 import app.VilaExplorer.domain.Plato;
 import app.VilaExplorer.enums.TipoEntidad;
 import app.VilaExplorer.exception.FavoritoNotFoundException;
+import app.VilaExplorer.exception.FiestaTradicionNotFound;
+import app.VilaExplorer.exception.LugarInteresNotFoundException;
+import app.VilaExplorer.exception.PlatoNotFoundException;
 import app.VilaExplorer.service.FavoritoService;
 import app.VilaExplorer.service.FiestaTradicionService;
 import app.VilaExplorer.service.LugarInteresService;
@@ -116,8 +119,27 @@ public class FavoritoController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Favorito creado", content = @Content(schema = @Schema(implementation = Favorito.class)))})
     @PostMapping("/crear")
     @PreAuthorize("hasRole('Cliente') or hasRole('Administrador')")
-    public Favorito createFavorito(@RequestBody Favorito favorito) {
-        return favoritoService.save(favorito);
+    public ResponseEntity<Object> createFavorito(@RequestBody Favorito favorito) {
+         Object favoritoCreado = null;
+        try {
+            Favorito fav = favoritoService.save(favorito);
+
+            if(fav == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+            if (TipoEntidad.FIESTA_TRADICION == fav.getTipoEntidad()) {
+                favoritoCreado = fiestaTradicionService.findById(fav.getIdEntidad());
+            } else if (TipoEntidad.PLATO == fav.getTipoEntidad()) {
+                favoritoCreado = platoService.findById(fav.getIdEntidad());
+            } else if (TipoEntidad.LUGAR_INTERES == fav.getTipoEntidad()) {
+                favoritoCreado = lugarInteresService.findById(favorito.getIdEntidad());
+            }
+
+            return new ResponseEntity<>(favoritoCreado, HttpStatus.OK);
+
+        } catch (FiestaTradicionNotFound | PlatoNotFoundException | LugarInteresNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 
@@ -138,11 +160,11 @@ public class FavoritoController {
 
     @Operation(summary = "Eliminar un favorito por su id")
     @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Favorito eliminado", content = @Content), @ApiResponse(responseCode = "404", description = "Favorito no encontrado", content = @Content)})
-    @DeleteMapping("/eliminar/{id}")
+    @DeleteMapping("/eliminar")
     @PreAuthorize("hasRole('Cliente') or hasRole('Administrador')")
-    public ResponseEntity<Response> deleteFavorito(@PathVariable Long id) {
+    public ResponseEntity<Response> deleteFavorito(@RequestParam Long idEntidad, @RequestParam Long idUsuario) {
         try {
-            favoritoService.deleteById(id);
+            favoritoService.deleteByIdEntidad(idEntidad, idUsuario);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (FavoritoNotFoundException e) {
             return handleException(e);

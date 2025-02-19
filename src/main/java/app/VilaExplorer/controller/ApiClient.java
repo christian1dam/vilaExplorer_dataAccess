@@ -37,7 +37,7 @@ public class ApiClient {
                 .uri(new URI(endpoint))
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .header("Content-Type", "application/json")
-                .header("Authorizartion", authorization)
+                .header("Authorization", authorization)
                 .build();
 
          return httpClient.send(request, HttpResponse.BodyHandlers.ofString());

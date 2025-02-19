@@ -3,11 +3,14 @@ package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.Coordenadas;
 import app.VilaExplorer.domain.Ruta;
+import app.VilaExplorer.domain.Usuario;
 import app.VilaExplorer.exception.RutaNotFoundException;
+import app.VilaExplorer.repository.UsuarioRepository;
 import app.VilaExplorer.service.RutaService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.core.util.Json;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,10 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Controlador para la API REST de Rutas.
@@ -34,6 +34,8 @@ import java.util.Optional;
 @RequestMapping("/ruta")
 public class RutaController {
 
+    @Autowired
+    UsuarioRepository usuarioRepository;
     @Autowired
     private RutaService rutaService;
 
@@ -65,6 +67,7 @@ public class RutaController {
     // =========== GET RUTAS ACTIVAS =============
     @GetMapping("/activos")
     @Operation(summary = "Obtiene todas las rutas activas")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
     public ResponseEntity<List<Ruta>> getAllRutasActivas() {
         List<Ruta> rutasActivas = rutaService.findAllActivas();
         if (rutasActivas.isEmpty()) {
@@ -132,7 +135,7 @@ public class RutaController {
 
             ApiClient apiClient = new ApiClient();
             HttpResponse<String> response = apiClient.getRequest(openRouteUrl);
-            System.out.println("RESPONSE BODY: "+ response.body());
+            System.out.println("RESPONSE BODY: " + response.body());
 
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(response.body());
@@ -171,6 +174,9 @@ public class RutaController {
             Ruta nuevaRuta = new Ruta();
             nuevaRuta.setNombreRuta("Ruta generada automáticamente");
             nuevaRuta.setCoordenadas(coordenadasRuta);
+            nuevaRuta.setDistancia(distancia);
+            nuevaRuta.setDuracion(duracion);
+            nuevaRuta.setBbox(bbox);
             nuevaRuta.setActivo(true);
 
             return ResponseEntity.ok(jsonNode);
@@ -188,60 +194,80 @@ public class RutaController {
 //    SE HACE LA PETICION A OPENROUTESERVICE Y GUARDA EN LA BD
     @PostMapping("/createRoute")
     @PreAuthorize("hasRole('Administrador') or hasRole('Cliente')")
-    public ResponseEntity<?> createRoute(@RequestParam("profile") String profile, List<JsonNode> coordenadas) {
+    public ResponseEntity<?> createRoute(
+            @RequestParam Long idAutor,
+            @RequestBody Map<String, List<List<Double>>> requestBody,
+            @RequestParam String titulo,
+            @RequestParam boolean predefinida) {
         try {
+            List<List<Double>> coordenadas = requestBody.get("coordinates");
+            if (coordenadas == null || coordenadas.isEmpty()) {
+                return ResponseEntity.badRequest().body("No se han recibido coordenadas válidas.");
+            }
 
-            String openRouteUrl = String.format(
-                    Locale.US,
-                    "https://api.openrouteservice.org/v2/directions/%s/geojson",
-                    profile
-            );
+            Optional<Usuario> usuarioOptional = usuarioRepository.findById(idAutor);
+            if (usuarioOptional.isEmpty()) {
+                return ResponseEntity.badRequest().body("El usuario con ID " + idAutor + " no existe.");
+            }
+            Usuario autor = usuarioOptional.get();
 
-
-            ApiClient apiClient = new ApiClient();
-            HttpResponse<String> response = apiClient.postRequest(openRouteUrl, coordenadas.toString(), "5b3ce3597851110001cf62485d469bd2cba74cc7bbf095ac9c66e654");
-            System.out.println("RESPONSE BODY: "+ response.body());
+            String openRouteUrl = "https://api.openrouteservice.org/v2/directions/foot-walking/geojson";
 
             ObjectMapper objectMapper = new ObjectMapper();
+            ApiClient apiClient = new ApiClient();
+
+            ObjectNode jsonRequest = objectMapper.createObjectNode();
+            ArrayNode coordinatesNode = objectMapper.createArrayNode();
+
+            for (List<Double> coord : coordenadas) {
+                ArrayNode pair = objectMapper.createArrayNode();
+                pair.add(coord.get(0));  // Longitud
+                pair.add(coord.get(1));  // Latitud
+                coordinatesNode.add(pair);
+            }
+
+            jsonRequest.set("coordinates", coordinatesNode);
+
+            HttpResponse<String> response = apiClient.postRequest(
+                    openRouteUrl,
+                    jsonRequest.toString(),
+                    "5b3ce3597851110001cf62485d469bd2cba74cc7bbf095ac9c66e654"
+            );
+
             JsonNode jsonNode = objectMapper.readTree(response.body());
 
-
-            List<Double> bbox = new ArrayList<>();
-
-            if (jsonNode.has("bbox")) {
-                for (JsonNode value : jsonNode.get("bbox")) {
-                    bbox.add(value.asDouble());
-                }
-            }
-
-            double distancia = 0;
-            double duracion = 0;
-
-            if (jsonNode.get("features").get(0).get("properties").has("segments")) {
-                JsonNode segment = jsonNode.get("features").get(0).get("properties").get("segments").get(0);
-                distancia = segment.get("distance").asDouble();
-                duracion = segment.get("duration").asDouble();
-            }
-
             List<Coordenadas> coordenadasRuta = new ArrayList<>();
-            if (jsonNode.get("features").get(0).get("geometry").has("coordinates")) {
-                JsonNode coordinatesNode = jsonNode.get("features").get(0).get("geometry").get("coordinates");
-                for (JsonNode coord : coordinatesNode) {
-                    double longitud = coord.get(0).asDouble();
-                    double latitud = coord.get(1).asDouble();
-                    Coordenadas nuevaCoordenada = new Coordenadas();
-                    nuevaCoordenada.setLatitud(latitud);
-                    nuevaCoordenada.setLongitud(longitud);
-                    coordenadasRuta.add(nuevaCoordenada);
+            if (jsonNode.has("features") && jsonNode.get("features").isArray() && !jsonNode.get("features").isEmpty()) {
+                JsonNode firstFeature = jsonNode.get("features").get(0);
+                if (firstFeature.has("geometry") && firstFeature.get("geometry").has("coordinates")) {
+                    JsonNode coordinatesJsonNode = firstFeature.get("geometry").get("coordinates");
+                    for (JsonNode coord : coordinatesJsonNode) {
+                        double longitud = coord.get(0).asDouble();
+                        double latitud = coord.get(1).asDouble();
+                        Coordenadas nuevaCoordenada = new Coordenadas();
+                        nuevaCoordenada.setLatitud(latitud);
+                        nuevaCoordenada.setLongitud(longitud);
+                        nuevaCoordenada.setRuta(null);
+                        coordenadasRuta.add(nuevaCoordenada);
+                    }
                 }
             }
 
             Ruta nuevaRuta = new Ruta();
-            nuevaRuta.setNombreRuta("Ruta generada automáticamente");
-            nuevaRuta.setCoordenadas(coordenadasRuta);
+            nuevaRuta.setNombreRuta(titulo);
             nuevaRuta.setActivo(true);
+            nuevaRuta.setAutor(autor);
+            nuevaRuta.setPredefinida(predefinida);
 
-            return ResponseEntity.ok(jsonNode);
+            for (Coordenadas coordenada : coordenadasRuta) {
+                coordenada.setRuta(nuevaRuta);
+            }
+
+            nuevaRuta.setCoordenadas(coordenadasRuta);
+
+            Ruta rutaDBGuardada = rutaService.save(nuevaRuta);
+
+            return ResponseEntity.ok(rutaDBGuardada);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(500).body("Error al procesar la ruta");

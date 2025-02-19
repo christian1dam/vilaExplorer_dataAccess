@@ -66,4 +66,7 @@ public interface PuntuacionService {
     // Obtener promedio de calificación para un lugar de interés
     Optional<Double> getPromedioCalificacionLugarInteres(Long idLugarInteres);
 
+//-----------------------------------------------------------------------------------------------------------
+    Optional<Puntuacion> usuarioHaPuntuadoEsteObjeto(Long idUsuario, Long idEntidad, String tipoEntidad);
+
 }

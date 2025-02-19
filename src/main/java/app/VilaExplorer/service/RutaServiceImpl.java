@@ -134,6 +134,4 @@ RutaServiceImpl implements RutaService {
         return rutaRepository.findAllByActivoFalse();
     }
 
-
-
 }

@@ -72,7 +72,7 @@ public class PlatoServiceImpl implements PlatoService {
     }
 
     @Override
-    public void createPlato(Plato plato) throws DataIntegrityViolationException {
+    public Plato createPlato(Plato plato) throws DataIntegrityViolationException {
         if (platoRepository.findByNombre(plato.getNombre()).isPresent()) {
             throw new DataIntegrityViolationException("Este plato ya existe en la base de datos.");
         }
@@ -94,7 +94,7 @@ public class PlatoServiceImpl implements PlatoService {
         plato.setTipoPlato(tipoPlato);
 
         // Guardar el plato
-        platoRepository.save(plato);
+        return platoRepository.save(plato);
     }
 
 

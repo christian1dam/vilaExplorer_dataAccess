@@ -36,6 +36,4 @@ public interface RutaService {
 
     // Obtener todas las rutas inactivas
     List<Ruta> findAllInactivas();
-
-
 }

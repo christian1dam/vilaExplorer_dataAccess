@@ -1,11 +1,11 @@
 package app.VilaExplorer.controller;
 
 import app.VilaExplorer.domain.Plato;
-import app.VilaExplorer.dto.PlatoDTO;
 import app.VilaExplorer.exception.PlatoNotFoundException;
 import app.VilaExplorer.exception.RolNotFoundException;
 import app.VilaExplorer.exception.TipoPlatoNotFoundException;
 import app.VilaExplorer.exception.UsuarioNotFoundException;
+import app.VilaExplorer.repository.PlatoRepository;
 import app.VilaExplorer.service.PlatoService;
 import app.VilaExplorer.service.TipoPlatoService;
 import app.VilaExplorer.service.UsuarioService;
@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static app.VilaExplorer.controller.Response.NOT_FOUND;
 
@@ -49,6 +48,9 @@ public class PlatoController {
 
     @Autowired
     private TipoPlatoService tipoPlatoService;
+
+    @Autowired
+    private PlatoRepository platoRepository;
 
     //-----GET----- OBTENER PLATO POR ID
 
@@ -80,7 +82,13 @@ public class PlatoController {
         }
     }
 
-
+//    RECETAS DEL USUARIO
+     @GetMapping("/recetasUsuario")
+    @PreAuthorize("hasRole('Administrador') or hasRole('Redactor') or hasRole('Cliente')")
+    public ResponseEntity<List<Plato>> getPlatoByUserID(@RequestParam Long autorID) {
+         List<Plato> platos = platoRepository.findByAutor_idUsuario(autorID);
+         return new ResponseEntity<>(platos, HttpStatus.OK);
+     }
 
 
     // Obtener platos aprobados y no eliminados

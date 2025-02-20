@@ -41,4 +41,5 @@ public interface PlatoRepository extends JpaRepository<Plato, Long> {
     List<Plato> findByEstadoFalseAndEliminadoFalse();
 
 
+    List<Plato> findByAutor_idUsuario(Long autorID);
 }

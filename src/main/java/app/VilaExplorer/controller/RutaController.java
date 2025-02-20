@@ -128,7 +128,7 @@ public class RutaController {
 
             String openRouteUrl = String.format(
                     Locale.US,
-                    "https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf62485d469bd2cba74cc7bbf095ac9c66e654&start=%f,%f&end=%f,%f",
+                    "https://api.openrouteservice.org/v2/directions/foot-walking?api_key=5b3ce3597851110001cf62485d469bd2cba74cc7bbf095ac9c66e654&start=%f,%f&end=%f,%f",
                     origenLng, origenLat, destinoLng, destinoLat
             );
 
@@ -237,8 +237,25 @@ public class RutaController {
             JsonNode jsonNode = objectMapper.readTree(response.body());
 
             List<Coordenadas> coordenadasRuta = new ArrayList<>();
+            double distancia = 0.0;
+            double duracion = 0.0;
+            List<Double> bbox = new ArrayList<>();
             if (jsonNode.has("features") && jsonNode.get("features").isArray() && !jsonNode.get("features").isEmpty()) {
                 JsonNode firstFeature = jsonNode.get("features").get(0);
+                if (firstFeature.has("properties") && firstFeature.get("properties").has("summary")) {
+                    JsonNode summaryNode = firstFeature.get("properties").get("summary");
+                    if (summaryNode.has("distance")) {
+                        distancia = summaryNode.get("distance").asDouble();
+                    }
+                    if (summaryNode.has("duration")) {
+                        duracion = summaryNode.get("duration").asDouble();
+                    }
+                }
+                if (firstFeature.has("bbox")) {
+                    for (JsonNode coord : firstFeature.get("bbox")) {
+                        bbox.add(coord.asDouble());
+                    }
+                }
                 if (firstFeature.has("geometry") && firstFeature.get("geometry").has("coordinates")) {
                     JsonNode coordinatesJsonNode = firstFeature.get("geometry").get("coordinates");
                     for (JsonNode coord : coordinatesJsonNode) {
@@ -258,6 +275,9 @@ public class RutaController {
             nuevaRuta.setActivo(true);
             nuevaRuta.setAutor(autor);
             nuevaRuta.setPredefinida(predefinida);
+            nuevaRuta.setDistancia(distancia);
+            nuevaRuta.setDuracion(duracion);
+            nuevaRuta.setBbox(bbox);
 
             for (Coordenadas coordenada : coordenadasRuta) {
                 coordenada.setRuta(nuevaRuta);
@@ -316,8 +336,6 @@ public class RutaController {
     public List<Ruta> getRutasByAutor(@PathVariable Long autorId) {
         return rutaService.findByAutorId(autorId);
     }
-
-
 
 
     // =========== DESACTIVAR (Borrado lógico) =============
